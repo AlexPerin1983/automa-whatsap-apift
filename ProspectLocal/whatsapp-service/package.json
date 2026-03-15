@@ -1,0 +1,17 @@
+{
+  "name": "prospectlocal-whatsapp",
+  "version": "1.0.0",
+  "description": "Servico WhatsApp para ProspectLocal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "baileys": "github:rsalcara/InfiniteAPI#7981f89059c499a46ecd7445d9937641a790b69a",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
+    "pino": "^8.18.0",
+    "qrcode": "^1.5.3"
+  }
+}

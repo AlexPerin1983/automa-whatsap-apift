@@ -1,0 +1,35 @@
+╔══════════════════════════════════════════════════════════════╗
+║          🚀 ProspectLocal – Como Usar                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+REQUISITOS:
+  - Python 3.8 ou superior instalado no seu computador
+  - Conta gratuita na Apify (apify.com)
+
+INSTALAÇÃO (só na primeira vez):
+  Abra o terminal/prompt nesta pasta e execute:
+  pip install flask apify-client requests
+
+COMO INICIAR:
+  python3 iniciar.py
+  (ou duplo clique no arquivo iniciar.py se Python estiver no PATH)
+
+  Depois acesse: http://localhost:5000
+
+CONFIGURAR TOKEN APIFY:
+  1. Acesse: https://console.apify.com/settings/integrations
+  2. Copie o "Token de API padrão"
+  3. No sistema, vá em Configurações (⚙️) e cole o token
+  4. Clique em "Salvar Token"
+
+COMO USAR:
+  1. Dashboard: Veja seus créditos Apify e stats
+  2. Buscar: Escolha palavra-chave + localização e clique Buscar
+  3. Empresas: Veja todas coletadas (filtre "Sem website" 🎯)
+  4. Histórico: Acompanhe suas buscas anteriores
+
+DICA IMPORTANTE:
+  O plano gratuito Apify dá $5/mês de crédito.
+  Comece com 20 resultados por busca para economizar.
+
+ATOR UTILIZADO: compass/crawler-google-places (Google Maps)

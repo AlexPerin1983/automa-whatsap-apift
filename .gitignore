@@ -1,0 +1,42 @@
+# Node
+node_modules/
+.next/
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Databases
+*.db
+*.db-journal
+*.sqlite3
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Project specific
+ProspectLocal/whatsapp-service/
+ProspectLocal/**/auth/
+ProspectLocal/**/session/
+ProspectLocal/**/*.db
+ProspectLocal/**/*.db-journal
+ProspectLocal/.fuse_hidden*
+*.pdf
+ProspectLocal/__pycache__/
+lovable-webdesign/__pycache__/
+node_modules/
+**/node_modules/
+.next/
+**/ .next/
+
+# OS files
+.DS_Store
+Thumbs.db
