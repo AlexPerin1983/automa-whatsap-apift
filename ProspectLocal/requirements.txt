@@ -1,0 +1,4 @@
+flask
+apify-client
+reportlab
+requests
