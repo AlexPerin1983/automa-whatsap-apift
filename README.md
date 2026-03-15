@@ -81,13 +81,27 @@ Windows CMD:
 pip install -r requirements.txt
 ```
 
-5. Rode a aplicacao:
+5. Use o arquivo `.env.example` apenas como referencia de setup:
+
+```bash
+cp .env.example .env
+```
+
+No Windows, se preferir, voce pode apenas abrir o arquivo e usar como checklist.
+
+Importante:
+
+- a versao atual do `ProspectLocal` nao le `.env` automaticamente
+- o token da Apify e configurado pela interface do sistema
+- o arquivo existe para facilitar onboarding e documentacao
+
+6. Rode a aplicacao:
 
 ```bash
 python iniciar.py
 ```
 
-6. Abra no navegador:
+7. Abra no navegador:
 
 ```text
 http://localhost:5000
