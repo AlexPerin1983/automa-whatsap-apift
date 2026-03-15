@@ -29,6 +29,25 @@ Antes de rodar, instale:
 - npm
 - Git
 
+## Downloads oficiais
+
+Se esta for a primeira vez configurando a maquina, baixe as ferramentas aqui:
+
+- Python: [python.org/downloads](https://www.python.org/downloads/)
+- Node.js LTS: [nodejs.org/en/download](https://nodejs.org/en/download/)
+- Git para Windows: [git-scm.com/install/windows](https://git-scm.com/install/windows)
+
+Depois de instalar, vale testar no terminal:
+
+```bash
+python --version
+node --version
+npm --version
+git --version
+```
+
+Se algum comando nao funcionar, a instalacao nao terminou direito ou o terminal precisa ser fechado e aberto novamente.
+
 ## Projeto 1: ProspectLocal
 
 Aplicacao local em Flask para buscar empresas, organizar leads e operar campanhas de WhatsApp.
