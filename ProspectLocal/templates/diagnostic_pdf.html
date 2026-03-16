@@ -44,7 +44,7 @@
     .page {
       width: 210mm;
       height: 297mm;
-      padding: 18mm 16mm 14mm;
+      padding: 18mm 16mm 18mm;
       position: relative;
       overflow: hidden;
       page-break-after: always;
@@ -628,9 +628,12 @@
     }
 
     .category-card,
-    .priority-card,
     .roadmap-card {
       padding: 16px;
+    }
+
+    .priority-card {
+      padding: 12px;
     }
 
     .category-card {
@@ -841,16 +844,16 @@
     }
 
     .priority-card {
-      min-height: 104px;
+      min-height: 78px;
       border-radius: 16px;
       position: relative;
     }
 
     .priority-card .index {
       position: absolute;
-      right: 18px;
-      top: 16px;
-      font-size: 18px;
+      right: 14px;
+      top: 12px;
+      font-size: 16px;
       font-weight: 800;
       color: inherit;
       opacity: 0.85;
@@ -872,18 +875,18 @@
     }
 
     .priority-title {
-      margin: 10px 0 6px;
-      font-size: 15px;
+      margin: 6px 0 4px;
+      font-size: 13px;
       line-height: 1.25;
       font-weight: 800;
       color: var(--ink);
-      padding-right: 44px;
+      padding-right: 36px;
     }
 
     .priority-copy {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+      font-size: 10.8px;
+      line-height: 1.35;
     }
 
     .roadmap-card {
@@ -1067,13 +1070,13 @@
       position: absolute;
       left: 16mm;
       right: 16mm;
-      bottom: 10mm;
+      bottom: 6mm;
       display: flex;
       justify-content: space-between;
       color: var(--muted);
-      font-size: 10px;
+      font-size: 9px;
       border-top: 1px solid var(--border);
-      padding-top: 6px;
+      padding-top: 5px;
     }
   </style>
 </head>
@@ -1332,11 +1335,11 @@
       </div>
     </div>
 
-    <div class="section-head" style="margin-top:18px;">
+    <div class="section-head" style="margin-top:10px;">
       <div class="section-title">Prioridades recomendadas</div>
       <div class="section-subtitle">Impacto e velocidade</div>
     </div>
-    <div class="priority-grid" style="grid-template-columns: repeat({{ priorities|length }}, minmax(0, 1fr));">
+    <div class="priority-grid" style="grid-template-columns: repeat({{ priorities|length }}, minmax(0, 1fr)); gap: 8px;">
       {% for item in priorities %}
         <div class="priority-card card {{ item.class_name }}">
           <div class="pill pill-{{ item.class_name }}">{{ item.priority }}</div>
