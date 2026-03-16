@@ -346,6 +346,7 @@ def init_db():
         "ALTER TABLE kanban_contatos ADD COLUMN ultimo_contexto_envio TEXT",
         "ALTER TABLE kanban_contatos ADD COLUMN campanha_id INTEGER",
         "ALTER TABLE kanban_contatos ADD COLUMN campanha_item_id INTEGER",
+        "ALTER TABLE kanban_contatos ADD COLUMN briefing_lead TEXT",
         "ALTER TABLE empresas ADD COLUMN nome_responsavel TEXT",
     ]:
         try:
@@ -2644,7 +2645,21 @@ def _ensure_logo_assets():
         print(f'[Logo] Aviso: nao foi possivel gerar logos: {e}')
 
 
-def _build_pdf(d, output):
+def _draw_text_logo(c, center_x, baseline_y, brand='OtimizaAI', subtitle='Presenca Digital'):
+    """Fallback simples em texto caso o arquivo de logo nao esteja disponivel."""
+    from reportlab.lib import colors as _colors
+
+    c.saveState()
+    c.setFillColor(_colors.white)
+    c.setFont('Helvetica-Bold', 24)
+    c.drawCentredString(center_x, baseline_y, brand)
+    c.setFillColor(_colors.HexColor('#93C5FD'))
+    c.setFont('Helvetica', 9)
+    c.drawCentredString(center_x, baseline_y - 14, subtitle)
+    c.restoreState()
+
+
+def _build_pdf_v4_legacy(d, output):
     """Gera PDF Diagnostico Digital v4 - OtimizaAI - Capa + Relatorio Moderno."""
     _ensure_logo_assets()
     from reportlab.lib.pagesizes import A4
@@ -3250,6 +3265,33 @@ def _build_pdf(d, output):
     c.drawCentredString(W/2, 8*mm, f'{prosp}  |  Diagnostico Digital  |  {data_str}  |  Pagina 3')
 
     c.save()
+
+
+def _build_pdf(d, output):
+    try:
+        from .diagnostic_pdf_html import build_diagnostic_pdf_html
+    except ImportError:
+        from diagnostic_pdf_html import build_diagnostic_pdf_html
+
+    try:
+        return build_diagnostic_pdf_html(
+            d,
+            output,
+            ensure_logo_assets=_ensure_logo_assets,
+            draw_text_logo=_draw_text_logo,
+        )
+    except Exception:
+        try:
+            from .pdf_builder_v5 import build_diagnostic_pdf
+        except ImportError:
+            from pdf_builder_v5 import build_diagnostic_pdf
+
+        return build_diagnostic_pdf(
+            d,
+            output,
+            ensure_logo_assets=_ensure_logo_assets,
+            draw_text_logo=_draw_text_logo,
+        )
 
 
 @app.route('/api/templates')
@@ -4662,6 +4704,79 @@ def get_nome_indicacao(empresa_id, conn):
 # ═══════════════════════════════════════════════════════════════════════════════
 
 KANBAN_COLUNAS = ['Fila', 'Enviado', 'Respondeu', 'Negociando', 'Fechado', 'Descartado']
+KANBAN_BRIEFING_FIELDS = (
+    'logo',
+    'fotos',
+    'cores_marca',
+    'contatos',
+    'principais_servicos',
+    'observacoes',
+)
+
+
+def _briefing_lead_vazio():
+    return {campo: '' for campo in KANBAN_BRIEFING_FIELDS}
+
+
+def _parse_briefing_lead(raw_briefing, notas_legado=''):
+    briefing = _briefing_lead_vazio()
+    bruto = raw_briefing
+
+    if isinstance(bruto, str):
+        bruto = bruto.strip()
+        if bruto:
+            try:
+                bruto = json.loads(bruto)
+            except Exception:
+                bruto = {'observacoes': bruto}
+        else:
+            bruto = {}
+
+    if isinstance(bruto, dict):
+        for campo in KANBAN_BRIEFING_FIELDS:
+            valor = bruto.get(campo, '')
+            briefing[campo] = str(valor or '').strip()
+
+    notas_legado = str(notas_legado or '').strip()
+    if notas_legado and not briefing['observacoes']:
+        briefing['observacoes'] = notas_legado
+
+    return briefing
+
+
+def _briefing_lead_tem_conteudo(briefing):
+    return any(str((briefing or {}).get(campo, '') or '').strip() for campo in KANBAN_BRIEFING_FIELDS)
+
+
+def _resumir_texto_briefing(valor, limite=90):
+    texto = ' '.join(str(valor or '').split())
+    if len(texto) <= limite:
+        return texto
+    return texto[: limite - 3].rstrip() + '...'
+
+
+def _resumo_briefing_lead(briefing):
+    briefing = _parse_briefing_lead(briefing)
+    if not _briefing_lead_tem_conteudo(briefing):
+        return ''
+
+    partes = []
+    if briefing['logo']:
+        partes.append(f"Logo: {_resumir_texto_briefing(briefing['logo'], 60)}")
+    if briefing['fotos']:
+        qtd_fotos = len([item for item in re.split(r'[\n,;]+', briefing['fotos']) if item.strip()])
+        if qtd_fotos > 0:
+            partes.append(f"Fotos: {qtd_fotos} item(ns)")
+    if briefing['cores_marca']:
+        partes.append(f"Cores: {_resumir_texto_briefing(briefing['cores_marca'], 60)}")
+    if briefing['contatos']:
+        partes.append(f"Contatos: {_resumir_texto_briefing(briefing['contatos'], 70)}")
+    if briefing['principais_servicos']:
+        partes.append(f"Servicos: {_resumir_texto_briefing(briefing['principais_servicos'], 70)}")
+    if briefing['observacoes']:
+        partes.append(f"Obs: {_resumir_texto_briefing(briefing['observacoes'], 90)}")
+
+    return '\n'.join(partes[:6])
 
 
 def _kanban_filter_clause():
@@ -6150,17 +6265,31 @@ def kanban_salvar_responsavel(cid):
 
 @app.route('/api/kanban/<int:cid>/notas', methods=['PUT'])
 def kanban_salvar_notas(cid):
-    """Salva notas rápidas de um card."""
+    """Salva notas ou briefing estruturado de um card."""
     d = request.json or {}
-    notas = d.get('notas', '')
+    briefing = _parse_briefing_lead(d.get('briefing'), d.get('notas', ''))
+    briefing_json = json.dumps(briefing, ensure_ascii=False) if _briefing_lead_tem_conteudo(briefing) else None
+    notas_resumo = _resumo_briefing_lead(briefing) if briefing_json else str(d.get('notas', '') or '').strip()
     conn = get_db()
     conn.execute(
-        "UPDATE kanban_contatos SET notas_kanban=?, atualizado_em=CURRENT_TIMESTAMP WHERE id=?",
-        (notas, cid)
+        """UPDATE kanban_contatos
+              SET notas_kanban=?,
+                  briefing_lead=?,
+                  atualizado_em=CURRENT_TIMESTAMP
+            WHERE id=?""",
+        (notas_resumo or None, briefing_json, cid)
     )
     conn.commit()
+    row = conn.execute(
+        "SELECT id, notas_kanban, briefing_lead FROM kanban_contatos WHERE id=?",
+        (cid,)
+    ).fetchone()
     conn.close()
-    return jsonify({'ok': True})
+    return jsonify({
+        'ok': True,
+        'notas_kanban': row['notas_kanban'] if row else notas_resumo,
+        'briefing_lead': json.loads(row['briefing_lead']) if row and row['briefing_lead'] else briefing,
+    })
 
 @app.route('/api/kanban/mapear-lid', methods=['POST'])
 def kanban_mapear_lid():

@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagnostico Digital</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    :root {
+      --navy: #0f172a;
+      --navy-soft: #111c32;
+      --blue: #2d6bff;
+      --blue-soft: #eef4ff;
+      --gold: #c19143;
+      --green: #17a34a;
+      --orange: #f97316;
+      --red: #dc2626;
+      --paper: #fbfcfe;
+      --paper-alt: #f4f7fb;
+      --card: #ffffff;
+      --ink: #17253e;
+      --muted: #6b7a90;
+      --border: #dce5f0;
+      --shadow: rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .page {
+      width: 210mm;
+      height: 297mm;
+      padding: 18mm 16mm 14mm;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      background:
+        radial-gradient(circle at 92% 16%, rgba(45, 107, 255, 0.08) 0, rgba(45, 107, 255, 0.08) 13mm, transparent 13.2mm),
+        radial-gradient(circle at 98% 45%, rgba(193, 145, 67, 0.05) 0, rgba(193, 145, 67, 0.05) 14mm, transparent 14.2mm),
+        var(--paper);
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .top-band {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 18mm;
+      background: var(--navy);
+      border-bottom: 3px solid var(--blue);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .dark-card {
+      background: linear-gradient(180deg, #111c32 0%, #0f172a 100%);
+      color: #fff;
+      border: 1px solid #20314f;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .pill-navy { background: var(--navy); color: #fff; }
+    .pill-soft { background: var(--blue-soft); color: var(--ink); }
+    .pill-blue { background: var(--blue); color: #fff; }
+    .pill-gold { background: var(--gold); color: #fff; }
+    .pill-good { background: var(--green); color: #fff; }
+    .pill-warn { background: var(--orange); color: #fff; }
+    .pill-bad { background: var(--red); color: #fff; }
+
+    .logo {
+      height: 34px;
+      object-fit: contain;
+    }
+
+    .cover-grid {
+      margin-top: 22mm;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) 78mm;
+      gap: 12mm;
+      align-items: start;
+    }
+
+    .hero-title {
+      margin: 18px 0 10px;
+      font-size: 22px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+    }
+
+    .hero-copy {
+      max-width: 92%;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 0 0 14px;
+    }
+
+    .accent-line {
+      width: 82px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .company-card,
+    .highlight-card {
+      padding: 16px 18px;
+      margin-bottom: 12px;
+    }
+
+    .company-card {
+      border-top: 4px solid var(--gold);
+    }
+
+    .company-label,
+    .subtle-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .company-name {
+      margin: 6px 0 14px;
+      font-size: 18px;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .company-meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .highlight-card {
+      background: linear-gradient(180deg, #eef4ff 0%, #e9f1ff 100%);
+      border: 1px solid #cfddf7;
+    }
+
+    .highlight-title {
+      margin: 8px 0 6px;
+      font-size: 18px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .highlight-copy {
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .stat-card .rule {
+      width: 54px;
+      height: 3px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .stat-note {
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
+    .scope {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      max-width: 94%;
+    }
+
+    .summary-card {
+      padding: 16px;
+      border-top: 4px solid var(--gold);
+      min-height: 218mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .summary-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 8px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+
+    .score-main {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .score-max {
+      color: #c8d4ea;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .score-copy {
+      color: #d8e3ff;
+      font-size: 12px;
+      line-height: 1.45;
+      margin: 8px 0 14px;
+    }
+
+    .bar-block {
+      margin-bottom: 12px;
+    }
+
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      color: #d8e3ff;
+      font-size: 11px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(233, 238, 246, 0.18);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .signal-card {
+      background: rgba(31, 49, 79, 0.94);
+      border: 1px solid rgba(138, 184, 255, 0.12);
+      border-radius: 12px;
+      padding: 11px 12px 11px 16px;
+      position: relative;
+    }
+
+    .signal-card::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .signal-card.bad::before { background: var(--red); }
+    .signal-card.warn::before { background: var(--gold); }
+    .signal-card.good::before { background: var(--green); }
+
+    .signal-label {
+      color: #bed0f0;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-left: 10px;
+    }
+
+    .signal-value {
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 3px 0 0 10px;
+    }
+
+    .meta-card {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      overflow: hidden;
+    }
+
+    .meta-item {
+      padding: 14px 16px;
+      border-right: 1px solid var(--border);
+    }
+
+    .meta-item:last-child {
+      border-right: 0;
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .meta-value {
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .header-card {
+      margin-top: 10mm;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 58px 1fr 22px;
+      align-items: center;
+      gap: 12px;
+      border-radius: 18px;
+    }
+
+    .header-logo {
+      background: var(--navy-soft);
+      border-radius: 8px;
+      padding: 8px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .header-logo img {
+      width: 100%;
+      max-height: 28px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .page-badge {
+      width: 22px;
+      height: 44px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 16px 0 18px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 12px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #a8c3f3;
+      position: relative;
+    }
+
+    .section-head::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: -7px;
+      width: 14px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 999px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .diagnostic-card,
+    .review-card,
+    .wide-dark {
+      padding: 18px;
+    }
+
+    .wide-dark {
+      margin-top: 12px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .detail-box {
+      background: #f7f9fc;
+      border-radius: 12px;
+      padding: 12px 14px 12px 18px;
+      position: relative;
+    }
+
+    .detail-box::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .detail-box.wide {
+      grid-column: 1 / -1;
+    }
+
+    .detail-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .review-score {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin: 10px 0 8px;
+    }
+
+    .review-score strong {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .review-score span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .stars {
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .review-line {
+      display: grid;
+      grid-template-columns: 60px 1fr 28px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .review-line span {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .review-line strong {
+      font-size: 11px;
+      text-align: right;
+      color: var(--muted);
+    }
+
+    .wide-dark-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+      margin-top: 16px;
+    }
+
+    .white-copy {
+      color: #d8e3ff;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .white-list {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: #fff;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .accent-panel {
+      background: rgba(31, 49, 79, 0.94);
+      border: 1px solid rgba(138, 184, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px 16px;
+    }
+
+    .accent-panel .copy {
+      color: #d8e3ff;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+
+    .category-grid,
+    .priority-grid,
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .category-card,
+    .priority-card,
+    .roadmap-card {
+      padding: 16px;
+    }
+
+    .category-card {
+      text-align: center;
+      position: relative;
+    }
+
+    .category-card::before,
+    .priority-card::before,
+    .roadmap-card::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+      background: var(--blue);
+    }
+
+    .category-card.warn::before,
+    .priority-card.warn::before,
+    .roadmap-card.gold::before { background: var(--gold); }
+    .category-card.bad::before,
+    .priority-card.bad::before { background: var(--orange); }
+    .category-card.good::before,
+    .priority-card.good::before,
+    .roadmap-card.green::before { background: var(--green); }
+
+    .category-circle {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      border: 3px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .category-card.good { color: var(--green); }
+    .category-card.warn { color: var(--gold); }
+    .category-card.bad { color: var(--orange); }
+
+    .category-name {
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      color: var(--ink);
+    }
+
+    .score-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 26px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .score-tag.good { background: var(--green); }
+    .score-tag.warn { background: var(--gold); }
+    .score-tag.bad { background: var(--orange); }
+
+    .mini-line {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      margin: 8px 0 4px;
+    }
+
+    .chart-card {
+      padding: 16px;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .chart-title {
+      font-size: 17px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .chart-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .chart-pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bar-chart {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: end;
+      margin-top: 14px;
+      padding: 10px 6px 2px;
+      min-height: 152px;
+      background-image: linear-gradient(to top, rgba(220, 229, 240, 0.8) 1px, transparent 1px);
+      background-size: 100% 30px;
+      background-position: left bottom;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bars {
+      height: 112px;
+      display: flex;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .bar {
+      width: 32px;
+      border-radius: 10px 10px 4px 4px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .bar.current { background: var(--blue); }
+    .bar.potential { background: #334155; }
+
+    .delta {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .bar-label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .chart-signal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .signal-light {
+      background: var(--paper-alt);
+      border-radius: 12px;
+      padding: 12px 14px 12px 18px;
+      position: relative;
+      min-height: 66px;
+    }
+
+    .signal-light::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .signal-light.gold::before { background: var(--gold); }
+    .signal-light.green::before { background: var(--green); }
+
+    .signal-light .label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .signal-light .value {
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .priority-card {
+      min-height: 104px;
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .priority-card .index {
+      position: absolute;
+      right: 18px;
+      top: 16px;
+      font-size: 18px;
+      font-weight: 800;
+      color: inherit;
+      opacity: 0.85;
+    }
+
+    .priority-card.bad {
+      color: var(--red);
+      background: #fff5f5;
+    }
+
+    .priority-card.warn {
+      color: var(--orange);
+      background: #fff8ed;
+    }
+
+    .priority-card.good {
+      color: var(--blue);
+      background: #f0f7ff;
+    }
+
+    .priority-title {
+      margin: 10px 0 6px;
+      font-size: 15px;
+      line-height: 1.25;
+      font-weight: 800;
+      color: var(--ink);
+      padding-right: 44px;
+    }
+
+    .priority-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .roadmap-card {
+      min-height: 150px;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 24px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .roadmap-title {
+      margin: 12px 0 8px;
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+
+    .roadmap-copy {
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+
+    .result-card {
+      background: var(--paper-alt);
+      border-radius: 12px;
+      padding: 12px 14px 12px 18px;
+      position: relative;
+      min-height: 62px;
+    }
+
+    .result-card::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      bottom: 12px;
+      width: 4px;
+      border-radius: 999px;
+      background: var(--blue);
+    }
+
+    .roadmap-card.gold .result-card::before { background: var(--gold); }
+    .roadmap-card.green .result-card::before { background: var(--green); }
+
+    .result-card .label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 5px;
+    }
+
+    .result-card .value {
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .cta-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) 64mm;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .cta-box {
+      padding: 18px;
+    }
+
+    .cta-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 12px 0 10px;
+    }
+
+    .cta-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0 0 14px;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bullet-item {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .check {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .contact-box {
+      background: var(--paper-alt);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 18px 16px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .contact-logo {
+      height: 30px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .contact-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .contact-number {
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .contact-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 40px;
+      border-radius: 12px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+
+    .cta-button.disabled {
+      background: #cbd5e1;
+      color: var(--navy);
+    }
+
+    .footer {
+      position: absolute;
+      left: 16mm;
+      right: 16mm;
+      bottom: 10mm;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      border-top: 1px solid var(--border);
+      padding-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <section class="page">
+    <div class="top-band"></div>
+    <div class="cover-grid">
+      <div>
+        {% if logo_main %}
+          <img class="logo" src="{{ logo_main }}" alt="Logo">
+        {% endif %}
+        <div class="pill pill-navy" style="margin-top: 18px;">Analise consultiva</div>
+        <h1 class="hero-title">Diagnostico digital<br>com leitura executiva</h1>
+        <p class="hero-copy">Uma leitura organizada da presenca online, da reputacao local e do potencial comercial da empresa.</p>
+        <div class="accent-line"></div>
+        <div class="chip-row">
+          <div class="pill pill-soft">{{ cover_chips[0] }}</div>
+          <div class="pill pill-soft">{{ cover_chips[1] }}</div>
+          <div class="pill pill-soft" style="background:#fff;color:var(--blue);">{{ cover_chips[2] }}</div>
+        </div>
+
+        <div class="company-card card">
+          <div class="company-label">Empresa analisada</div>
+          <div class="company-name">{{ company_name }}</div>
+          <div class="company-meta">{{ category }} &nbsp;|&nbsp; {{ city }}</div>
+        </div>
+
+        <div class="highlight-card card">
+          <div class="pill pill-blue">Principal alavanca</div>
+          <div class="highlight-title">{{ main_gap }}</div>
+          <div class="highlight-copy">{{ opportunities[0] }}</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="rule" style="background: var(--orange);"></div>
+            <div class="subtle-label">Score atual</div>
+            <div class="stat-value">{{ score_total }}/100</div>
+            <div class="stat-note">Leitura executiva atual</div>
+          </div>
+          <div class="stat-card">
+            <div class="rule" style="background: var(--blue);"></div>
+            <div class="subtle-label">Avaliacoes</div>
+            <div class="stat-value">{{ google_reviews }}</div>
+            <div class="stat-note">Volume de prova social</div>
+          </div>
+          <div class="stat-card">
+            <div class="rule" style="background: var(--gold);"></div>
+            <div class="subtle-label">Fotos</div>
+            <div class="stat-value">{{ google_photos }}</div>
+            <div class="stat-note">Percepcao visual do perfil</div>
+          </div>
+        </div>
+
+        <div class="subtle-label" style="margin-bottom: 8px;">Escopo do diagnostico</div>
+        <div class="scope">Perfil do Google, presenca web, reputacao percebida e sinais de capacidade atual para transformar busca local em contato comercial.</div>
+      </div>
+
+      <div class="summary-card dark-card card">
+        <div>
+          <div class="summary-top">
+            <div class="summary-title">Resumo executivo</div>
+            {% if score_gain %}
+              <div class="pill pill-good">+{{ score_gain }} pts</div>
+            {% endif %}
+          </div>
+          <div class="score-row">
+            <div class="score-main">{{ score_total }}</div>
+            <div class="score-max">/ 100</div>
+          </div>
+          <div class="pill pill-{{ score_total_class }}">{{ score_total_label }}</div>
+          <div class="score-copy">{{ score_phrase }}</div>
+
+          {% for item in categories %}
+            <div class="bar-block">
+              <div class="bar-head">
+                <span>{{ item.title }}</span>
+                <span>{{ item.current }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width: {{ item.current }}%; background:
+                  {% if item.class_name == 'good' %}var(--green)
+                  {% elif item.class_name == 'warn' %}var(--gold)
+                  {% else %}var(--orange){% endif %};"></div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div>
+          <div class="signal-list">
+            <div class="signal-card {{ 'good' if has_website else 'bad' }}">
+              <div class="signal-label">Website</div>
+              <div class="signal-value">{{ 'Ativo e pronto para conversao' if has_website else 'Ausente e com alto impacto comercial' }}</div>
+            </div>
+            <div class="signal-card warn">
+              <div class="signal-label">Maior gap</div>
+              <div class="signal-value">{{ main_gap }}</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; color:#bed0f0; font-size:11px;">Potencial estimado: {{ potential_total }}/100</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta-card card">
+      {% for item in meta %}
+        <div class="meta-item">
+          <div class="meta-label">{{ item.label }}</div>
+          <div class="meta-value">{{ item.value }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }} &nbsp;|&nbsp; Documento comercial consultivo</span>
+      <span>Pagina 1 &nbsp;|&nbsp; {{ generated_at }}</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header-card card">
+      <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
+      <div>
+        <div class="header-title">Diagnostico da presenca digital</div>
+        <div class="header-subtitle">Leitura estruturada do contexto atual</div>
+      </div>
+      <div class="page-badge">02</div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="stat-card"><div class="rule" style="background:var(--red);"></div><div class="subtle-label">Website</div><div class="stat-value">{{ 'Ativo' if has_website else 'Ausente' }}</div><div class="stat-note">{{ website_url if website_url else 'Maior alavanca do diagnostico' }}</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--green);"></div><div class="subtle-label">Nota media</div><div class="stat-value">{{ google_rating }}</div><div class="stat-note">{{ stars_visual }}</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--blue);"></div><div class="subtle-label">Avaliacoes</div><div class="stat-value">{{ google_reviews }}</div><div class="stat-note">Volume de prova social</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--gold);"></div><div class="subtle-label">Fotos</div><div class="stat-value">{{ google_photos }}</div><div class="stat-note">Competitividade visual</div></div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-title">Diagnostico atual</div>
+      <div class="section-subtitle">Empresa e sinais principais</div>
+    </div>
+    <div class="two-col">
+      <div class="diagnostic-card card">
+        <div class="company-name" style="font-size:18px; margin:0 0 10px;">{{ company_name }}</div>
+        <div class="company-meta">{{ category }} &nbsp;|&nbsp; {{ city }}</div>
+        <div class="detail-grid">
+          <div class="detail-box"><div class="detail-label">Telefone</div><div class="detail-value">{{ phone }}</div></div>
+          <div class="detail-box"><div class="detail-label">Website</div><div class="detail-value">{{ website_url if website_url else 'Nao possui website' }}</div></div>
+          <div class="detail-box wide"><div class="detail-label">Endereco</div><div class="detail-value">{{ address }}</div></div>
+        </div>
+      </div>
+
+      <div class="review-card card">
+        <div class="company-name" style="font-size:18px; margin:0;">Reputacao no Google</div>
+        <div class="company-meta" style="margin-top:6px;">Como a empresa aparece para quem esta pesquisando agora</div>
+        <div class="review-score"><strong>{{ google_rating }}</strong><span>/ 5.0 &nbsp;|&nbsp; {{ google_reviews }} avaliacoes</span></div>
+        <div class="stars">{{ stars_visual }}</div>
+        {% for item in review_distribution %}
+          <div class="review-line">
+            <span>{{ item.label }}</span>
+            <div class="bar-track"><div class="bar-fill" style="width: {{ item.percent }}%; background: {% if loop.index == 1 %}var(--green){% elif loop.index == 2 %}var(--blue){% else %}var(--gold){% endif %};"></div></div>
+            <strong>{{ item.count }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="wide-dark dark-card card">
+      <div class="company-name" style="color:#fff; font-size:18px; margin:0 0 10px;">Leitura consultiva</div>
+      <div class="white-copy">{{ score_phrase }}</div>
+      <div class="wide-dark-grid">
+        <div>
+          <div class="subtle-label" style="color:#bed0f0;">Forcas identificadas</div>
+          <ul class="white-list">
+            <li>{{ strengths[0] }}</li>
+            <li>{{ strengths[1] }}</li>
+          </ul>
+        </div>
+        <div class="accent-panel">
+          <div class="signal-label">Principal alavanca</div>
+          <div class="signal-value">{{ main_gap }}</div>
+          <div class="copy">{{ opportunities[0] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }}</span>
+      <span>Pagina 2 &nbsp;|&nbsp; {{ generated_at }}</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header-card card">
+      <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
+      <div>
+        <div class="header-title">Analise de desempenho</div>
+        <div class="header-subtitle">Pontuacao, potencial e prioridades</div>
+      </div>
+      <div class="page-badge">03</div>
+    </div>
+
+    <div class="section-head" style="margin-top:16px;">
+      <div class="section-title">Pontuacao por categoria</div>
+      <div class="section-subtitle">Atual e potencial</div>
+    </div>
+    <div class="category-grid">
+      {% for item in categories %}
+        <div class="category-card card {{ item.class_name }}">
+          <div class="category-circle">{{ item.current }}</div>
+          <div class="category-name">{{ item.title }}</div>
+          <div class="score-tag {{ item.class_name }}">{{ item.label }}</div>
+          <div class="mini-line"><span>Atual</span><strong>{{ item.current }}</strong></div>
+          <div class="bar-track"><div class="bar-fill" style="width: {{ item.current }}%; background:
+            {% if item.class_name == 'good' %}var(--green)
+            {% elif item.class_name == 'warn' %}var(--gold)
+            {% else %}var(--orange){% endif %};"></div></div>
+          <div class="mini-line"><span>Potencial</span><strong>{{ item.potential }}</strong></div>
+          <div class="bar-track"><div class="bar-fill" style="width: {{ item.potential }}%; background: var(--blue);"></div></div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-head" style="margin-top:18px;">
+      <div class="section-title">Cenario potencial</div>
+      <div class="section-subtitle">Atual x potencial</div>
+    </div>
+    <div class="chart-card card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Onde a empresa pode chegar com uma estrutura mais profissional</div>
+          <div class="chart-copy">A estimativa considera presenca web, reputacao local e melhoria de sinais de confianca.</div>
+        </div>
+        <div class="chart-pill-row">
+          <div class="pill pill-warn">{{ score_total }}</div>
+          <div class="pill pill-good">{{ potential_total }}</div>
+          {% if score_gain %}<div class="pill pill-blue">+{{ score_gain }}</div>{% endif %}
+        </div>
+      </div>
+      <div class="bar-chart">
+        {% for item in categories %}
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar current" style="height: {{ item.current }}%;">{{ item.current }}</div>
+              <div class="bar potential" style="height: {{ item.potential }}%;">{{ item.potential }}</div>
+            </div>
+            <div class="delta">+{{ item.delta }}</div>
+            <div class="bar-label">{{ item.title }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="chart-signal-grid">
+        <div class="signal-light green"><div class="label">Maior ganho esperado</div><div class="value">{% if score_gain %}{{ score_gain }} pontos no score geral{% else %}Consolidacao de performance{% endif %}</div></div>
+        <div class="signal-light gold"><div class="label">Prioridade central</div><div class="value">{{ priorities[0].title }}</div></div>
+        <div class="signal-light"><div class="label">Objetivo</div><div class="value">Mais confianca e mais contato comercial</div></div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:18px;">
+      <div class="section-title">Prioridades recomendadas</div>
+      <div class="section-subtitle">Impacto e velocidade</div>
+    </div>
+    <div class="priority-grid" style="grid-template-columns: repeat({{ priorities|length }}, minmax(0, 1fr));">
+      {% for item in priorities %}
+        <div class="priority-card card {{ item.class_name }}">
+          <div class="pill pill-{{ item.class_name }}">{{ item.priority }}</div>
+          <div class="index">{{ item.index }}</div>
+          <div class="priority-title">{{ item.title }}</div>
+          <div class="priority-copy">{{ item.body }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }}</span>
+      <span>Pagina 3 &nbsp;|&nbsp; {{ generated_at }}</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header-card card">
+      <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
+      <div>
+        <div class="header-title">Plano de acao sugerido</div>
+        <div class="header-subtitle">Roteiro pratico e proximo passo recomendado</div>
+      </div>
+      <div class="page-badge">04</div>
+    </div>
+
+    <div class="section-head" style="margin-top:16px;">
+      <div class="section-title">Roteiro sugerido</div>
+      <div class="section-subtitle">Plano em 3 frentes</div>
+    </div>
+    <div class="roadmap-grid">
+      {% for item in roadmap %}
+        <div class="roadmap-card card {{ item.accent }}">
+          <div class="step-badge">{{ item.step }}</div>
+          <div class="roadmap-title">{{ item.title }}</div>
+          <div class="roadmap-copy">{{ item.body }}</div>
+          <div class="result-card">
+            <div class="label">Resultado esperado</div>
+            <div class="value">{{ item.result }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-head" style="margin-top:20px;">
+      <div class="section-title">Proximo passo recomendado</div>
+      <div class="section-subtitle">Apresentacao e contato</div>
+    </div>
+    <div class="cta-box card">
+      <div class="cta-grid">
+        <div>
+          <div class="pill pill-navy">Proposta visual</div>
+          <div class="cta-title">Proximo passo recomendado</div>
+          <p class="cta-copy">Se fizer sentido, eu posso montar uma demonstracao visual mais sofisticada da presenca digital da empresa e mostrar como o novo site pode elevar confianca, percepcao de valor e contato comercial.</p>
+          <div class="bullet-list">
+            <div class="bullet-item"><div class="check">V</div><div>Layout com hierarquia mais elegante e apresentacao mais premium</div></div>
+            <div class="bullet-item"><div class="check">V</div><div>Estrutura pensada para transformar visita em conversa no WhatsApp</div></div>
+            <div class="bullet-item"><div class="check">V</div><div>Apresentacao mais profissional para elevar confianca e percepcao de valor</div></div>
+          </div>
+          <div style="margin-top:14px; color:var(--muted); font-size:11px;">Diagnostico preparado por {{ prepared_by }}</div>
+        </div>
+
+        <div class="contact-box">
+          {% if logo_cta %}
+            <img class="contact-logo" src="{{ logo_cta }}" alt="Logo">
+          {% endif %}
+          <div class="contact-label">Contato direto</div>
+          <div class="contact-number">{{ whatsapp_display }}</div>
+          <div class="contact-copy">Solicite uma demonstracao sem compromisso para visualizar a nova apresentacao da empresa.</div>
+          {% if whatsapp_link %}
+            <a class="cta-button" href="{{ whatsapp_link }}">Agendar demonstracao</a>
+          {% else %}
+            <div class="cta-button disabled">Agendar demonstracao</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }}</span>
+      <span>Pagina 4 &nbsp;|&nbsp; {{ generated_at }}</span>
+    </div>
+  </section>
+</body>
+</html>
