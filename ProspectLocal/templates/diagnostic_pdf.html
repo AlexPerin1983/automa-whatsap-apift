@@ -10,21 +10,21 @@
     }
 
     :root {
-      --navy: #0f172a;
-      --navy-soft: #111c32;
-      --blue: #2d6bff;
-      --blue-soft: #eef4ff;
-      --gold: #c19143;
-      --green: #17a34a;
-      --orange: #f97316;
-      --red: #dc2626;
-      --paper: #fbfcfe;
-      --paper-alt: #f4f7fb;
+      --navy: #162235;
+      --navy-soft: #1d2b42;
+      --blue: #4a72d8;
+      --blue-soft: #eef3fb;
+      --gold: #a6b4c9;
+      --green: #4a72d8;
+      --orange: #a6b4c9;
+      --red: #162235;
+      --paper: #fcfdff;
+      --paper-alt: #f6f8fc;
       --card: #ffffff;
-      --ink: #17253e;
-      --muted: #6b7a90;
-      --border: #dce5f0;
-      --shadow: rgba(15, 23, 42, 0.06);
+      --ink: #1d2a3f;
+      --muted: #7a879b;
+      --border: #e3eaf3;
+      --shadow: rgba(15, 23, 42, 0.045);
       --radius: 18px;
     }
 
@@ -44,35 +44,499 @@
     .page {
       width: 210mm;
       height: 297mm;
-      padding: 18mm 16mm 18mm;
+      padding: 18mm 16mm 23mm;
       position: relative;
       overflow: hidden;
       page-break-after: always;
       background:
-        radial-gradient(circle at 92% 16%, rgba(45, 107, 255, 0.08) 0, rgba(45, 107, 255, 0.08) 13mm, transparent 13.2mm),
-        radial-gradient(circle at 98% 45%, rgba(193, 145, 67, 0.05) 0, rgba(193, 145, 67, 0.05) 14mm, transparent 14.2mm),
-        var(--paper);
+        radial-gradient(circle at 92% 8%, rgba(74, 114, 216, 0.05), transparent 18%),
+        radial-gradient(circle at 8% 92%, rgba(166, 180, 201, 0.06), transparent 16%),
+        linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
     }
 
     .page:last-child {
       page-break-after: auto;
     }
 
-    .top-band {
+    .page-cover {
+      padding-bottom: 23mm;
+    }
+
+    .page-performance {
+      padding-bottom: 25mm;
+    }
+
+    .page-cover::before {
+      content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 18mm;
-      background: var(--navy);
-      border-bottom: 3px solid var(--blue);
+      top: -28mm;
+      left: -30mm;
+      width: 120mm;
+      height: 120mm;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(74, 114, 216, 0.12) 0%, rgba(74, 114, 216, 0.04) 36%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .page-cover::after {
+      content: "";
+      position: absolute;
+      right: -34mm;
+      bottom: 8mm;
+      width: 92mm;
+      height: 92mm;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(166, 180, 201, 0.12) 0%, rgba(166, 180, 201, 0.05) 38%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .top-band {
+      position: relative;
+      margin-top: 0;
+      padding: 10mm 14mm 9mm;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(122, 168, 255, 0.18), transparent 18%),
+        radial-gradient(circle at 12% 100%, rgba(166, 180, 201, 0.16), transparent 22%),
+        linear-gradient(135deg, #0f172a 0%, #162235 52%, #1d2b42 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 42px rgba(11, 18, 31, 0.16);
+      overflow: hidden;
+    }
+
+    .top-band::before {
+      content: "";
+      position: absolute;
+      inset: auto -18mm -22mm auto;
+      width: 72mm;
+      height: 72mm;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .top-band::after {
+      content: "";
+      position: absolute;
+      left: 16mm;
+      bottom: 8mm;
+      width: 28mm;
+      height: 1.4mm;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.26);
+      pointer-events: none;
+    }
+
+    .top-band-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .top-band-copy {
+      min-width: 0;
+      max-width: 124mm;
+    }
+
+    .top-band-label {
+      color: #b9cdf6;
+      font-size: 8.8px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .cover-company-name {
+      color: #fff;
+      font-size: 30px;
+      line-height: 1.02;
+      font-weight: 900;
+      letter-spacing: -0.055em;
+      margin-bottom: 9px;
+      text-wrap: balance;
+    }
+
+    .top-band-title {
+      color: #eef3ff;
+      font-size: 13.4px;
+      line-height: 1.32;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 7px;
+    }
+
+    .top-band-note {
+      color: #ccdbf7;
+      font-size: 10.8px;
+      line-height: 1.5;
+      max-width: 92%;
+    }
+
+    .top-band-aside {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 60mm;
+    }
+
+    .cover-hero-logo {
+      height: 38px;
+      max-width: 54mm;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      opacity: 0.95;
+    }
+
+    .top-band-date {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .cover-premium-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #d9e6ff;
+      font-size: 9.8px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .page-cover {
+      padding: 16mm 16mm 22mm;
+      background:
+        radial-gradient(circle at 14% 16%, rgba(115, 149, 219, 0.24), transparent 22%),
+        radial-gradient(circle at 86% 78%, rgba(192, 202, 219, 0.10), transparent 20%),
+        linear-gradient(140deg, #07101d 0%, #0d1727 38%, #16253a 100%);
+      color: #f5f7fb;
+    }
+
+    .page-cover::before {
+      top: auto;
+      left: auto;
+      right: -18mm;
+      bottom: -16mm;
+      width: 148mm;
+      height: 148mm;
+      border-radius: 28mm;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
+        radial-gradient(circle at 30% 30%, rgba(112, 154, 236, 0.24), transparent 46%);
+      transform: rotate(-14deg);
+      opacity: 0.75;
+    }
+
+    .page-cover::after {
+      right: auto;
+      bottom: auto;
+      left: -22mm;
+      top: 112mm;
+      width: 108mm;
+      height: 108mm;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.015) 38%, transparent 72%);
+      opacity: 0.8;
+    }
+
+    .cover-shell {
+      position: relative;
+      z-index: 1;
+      min-height: 238mm;
+      border-radius: 30px;
+      padding: 14mm 14mm 10mm;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 24px 52px rgba(0, 0, 0, 0.24);
+      overflow: hidden;
+    }
+
+    .cover-shell::before {
+      content: "";
+      position: absolute;
+      left: 14mm;
+      top: 14mm;
+      width: 24mm;
+      height: 1.2mm;
+      border-radius: 999px;
+      background: rgba(214, 226, 245, 0.72);
+    }
+
+    .cover-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 20mm 20mm;
+      opacity: 0.16;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 72%);
+      pointer-events: none;
+    }
+
+    .cover-header-row,
+    .cover-meta-strip,
+    .cover-bottom-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cover-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      margin-bottom: 20mm;
+    }
+
+    .cover-kicker {
+      color: #dde7f6;
+      font-size: 8.4px;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .cover-brand-lockup {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 52mm;
+    }
+
+    .cover-brand-logo {
+      height: 20px;
+      max-width: 46mm;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+
+    .cover-brand-tag {
+      color: #cfdbef;
+      font-size: 8.2px;
+      line-height: 1.45;
+      text-align: right;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .cover-hero {
+      position: relative;
+      z-index: 1;
+      max-width: 136mm;
+      min-height: 122mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cover-eyebrow {
+      color: #d7e2f3;
+      font-size: 10.4px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 11px;
+    }
+
+    .cover-title-editorial {
+      margin: 0;
+      color: #ffffff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 35px;
+      line-height: 0.93;
+      letter-spacing: -0.05em;
+      font-weight: 700;
+      max-width: 120mm;
+      text-wrap: balance;
+    }
+
+    .cover-divider {
+      width: 32mm;
+      height: 1.3mm;
+      border-radius: 999px;
+      margin: 12mm 0 10mm;
+      background: linear-gradient(90deg, #f2f6fc 0%, rgba(242, 246, 252, 0.28) 100%);
+    }
+
+    .cover-subtitle {
+      margin: 0;
+      max-width: 98mm;
+      color: #d0dced;
+      font-size: 13.2px;
+      line-height: 1.68;
+      font-weight: 400;
+    }
+
+    .cover-bottom-panel {
+      margin-top: 8mm;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .cover-panel-main,
+    .cover-panel-grid {
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.035) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(4px);
+      min-height: 66mm;
+    }
+
+    .cover-panel-main {
+      padding: 18px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cover-panel-grid {
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(3, 1fr);
+      overflow: hidden;
+    }
+
+    .cover-panel-intro {
+      color: #bfd0ea;
+      font-size: 8.2px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .cover-panel-headline {
+      color: #ffffff;
+      font-size: 20px;
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      margin-bottom: 10px;
+      text-transform: none;
+    }
+
+    .cover-panel-copy {
+      color: #d4deed;
+      font-size: 10.6px;
+      line-height: 1.55;
+      max-width: 100%;
+    }
+
+    .cover-panel-item {
+      padding: 12px 16px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .cover-panel-item:last-child {
+      border-bottom: 0;
+    }
+
+    .cover-panel-value {
+      color: #ffffff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 5px;
+    }
+
+    .cover-panel-label {
+      color: #d4def1;
+      font-size: 8.8px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .cover-panel-note {
+      color: #c0d0e7;
+      font-size: 10px;
+      line-height: 1.42;
+      max-width: 92%;
+    }
+
+    .cover-meta-strip {
+      margin-top: 7mm;
+      display: grid;
+      grid-template-columns: 0.9fr 0.9fr 1.2fr;
+      gap: 9px;
+    }
+
+    .cover-meta-item {
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .cover-meta-item .label {
+      color: #b6c6dd;
+      font-size: 7.9px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .cover-meta-item .value {
+      color: #edf3fb;
+      font-size: 10.4px;
+      line-height: 1.32;
+      font-weight: 500;
+    }
+
+    .page-cover .footer {
+      position: static;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      margin-top: 4mm;
+      padding-top: 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      color: #c5d2e6;
+      font-size: 8px;
+      line-height: 1.2;
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: 0 8px 24px var(--shadow);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .dark-card {
@@ -97,63 +561,61 @@
     .pill-navy { background: var(--navy); color: #fff; }
     .pill-soft { background: var(--blue-soft); color: var(--ink); }
     .pill-blue { background: var(--blue); color: #fff; }
-    .pill-gold { background: var(--gold); color: #fff; }
-    .pill-good { background: var(--green); color: #fff; }
-    .pill-warn { background: var(--orange); color: #fff; }
-    .pill-bad { background: var(--red); color: #fff; }
+    .pill-gold { background: var(--gold); color: var(--navy); }
+    .pill-good { background: var(--blue); color: #fff; }
+    .pill-warn { background: var(--gold); color: var(--navy); }
+    .pill-bad { background: var(--navy); color: #fff; }
 
     .logo {
-      height: 34px;
+      height: 42px;
       object-fit: contain;
     }
 
     .cover-grid {
-      margin-top: 22mm;
+      margin-top: 9mm;
       display: grid;
-      grid-template-columns: minmax(0, 1.15fr) 78mm;
-      gap: 12mm;
+      grid-template-columns: minmax(0, 1.08fr) 76mm;
+      gap: 9mm;
       align-items: start;
     }
 
     .hero-title {
-      margin: 18px 0 10px;
-      font-size: 22px;
+      margin: 12px 0 8px;
+      font-size: 20px;
       line-height: 1.05;
       letter-spacing: -0.03em;
       font-weight: 800;
     }
 
     .hero-copy {
-      max-width: 92%;
+      max-width: 96%;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.4;
-      margin: 0 0 14px;
+      margin: 0 0 12px;
     }
 
-    .accent-line {
-      width: 82px;
-      height: 3px;
-      border-radius: 999px;
-      background: var(--gold);
-      margin-bottom: 16px;
+    .cover-intro {
+      padding: 16px 18px 18px;
+      margin-bottom: 10px;
+      border-top: 3px solid var(--blue);
     }
 
     .chip-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 18px;
+      margin-top: 12px;
     }
 
     .company-card,
     .highlight-card {
       padding: 16px 18px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .company-card {
-      border-top: 4px solid var(--gold);
+      border-top: 3px solid var(--blue);
     }
 
     .company-label,
@@ -178,8 +640,8 @@
     }
 
     .highlight-card {
-      background: linear-gradient(180deg, #eef4ff 0%, #e9f1ff 100%);
-      border: 1px solid #cfddf7;
+      background: linear-gradient(180deg, #f8fafd 0%, #f5f8fc 100%);
+      border: 1px solid var(--border);
     }
 
     .highlight-title {
@@ -206,7 +668,7 @@
       padding: 10px 12px;
       border-radius: 14px;
       border: 1px solid var(--border);
-      background: #fff;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
       box-shadow: 0 4px 12px var(--shadow);
     }
 
@@ -237,13 +699,53 @@
       max-width: 94%;
     }
 
+    .cover-scope {
+      margin-top: 12px;
+      padding: 16px 18px;
+    }
+
     .summary-card {
       padding: 16px;
-      border-top: 4px solid var(--gold);
-      min-height: 218mm;
+      border-top: 3px solid var(--blue);
+      min-height: 186mm;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+    }
+
+    .summary-card.dark-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .summary-card.dark-card .score-max,
+    .summary-card.dark-card .score-copy,
+    .summary-card.dark-card .bar-head,
+    .summary-card.dark-card .signal-label,
+    .summary-card.dark-card .signal-value {
+      color: var(--muted);
+    }
+
+    .summary-card.dark-card .score-main {
+      color: var(--ink);
+    }
+
+    .summary-card.dark-card .signal-card {
+      background: #f7f9fc;
+      border: 1px solid var(--border);
+    }
+
+    .summary-card.dark-card .signal-card::before {
+      background: var(--blue);
+    }
+
+    .summary-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
     }
 
     .summary-top {
@@ -317,8 +819,8 @@
     }
 
     .signal-card {
-      background: rgba(31, 49, 79, 0.94);
-      border: 1px solid rgba(138, 184, 255, 0.12);
+      background: rgba(31, 49, 79, 0.72);
+      border: 1px solid rgba(198, 213, 237, 0.12);
       border-radius: 12px;
       padding: 11px 12px 11px 16px;
       position: relative;
@@ -335,9 +837,9 @@
       background: var(--blue);
     }
 
-    .signal-card.bad::before { background: var(--red); }
+    .signal-card.bad::before { background: var(--navy); }
     .signal-card.warn::before { background: var(--gold); }
-    .signal-card.good::before { background: var(--green); }
+    .signal-card.good::before { background: var(--blue); }
 
     .signal-label {
       color: #bed0f0;
@@ -357,7 +859,7 @@
     }
 
     .meta-card {
-      margin-top: 10px;
+      margin-top: 8px;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       overflow: hidden;
@@ -389,47 +891,45 @@
 
     .header-card {
       margin-top: 10mm;
-      padding: 10px 12px;
+      padding: 12px 14px;
       display: grid;
-      grid-template-columns: 58px 1fr 22px;
+      grid-template-columns: 1fr 22px;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
+      border-top: 3px solid var(--blue);
+      overflow: hidden;
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .header-logo {
-      background: var(--navy-soft);
-      border-radius: 8px;
-      padding: 8px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
+      display: none;
     }
 
     .header-logo img {
-      width: 100%;
-      max-height: 28px;
-      object-fit: contain;
+      display: none;
     }
 
     .header-title {
       font-size: 16px;
       font-weight: 800;
       margin-bottom: 4px;
+      letter-spacing: -0.02em;
     }
 
     .header-subtitle {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 11.5px;
     }
 
     .page-badge {
       width: 22px;
       height: 44px;
       border-radius: 999px;
-      background: var(--navy);
-      color: #fff;
+      background: #f8fbff;
+      color: var(--navy);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -440,17 +940,17 @@
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin: 16px 0 18px;
+      gap: 12px;
+      margin: 18px 0 22px;
     }
 
     .section-head {
       display: flex;
       justify-content: space-between;
       align-items: end;
-      margin-bottom: 12px;
-      padding-bottom: 7px;
-      border-bottom: 1px solid #a8c3f3;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #d8e2f1;
       position: relative;
     }
 
@@ -458,52 +958,59 @@
       content: "";
       position: absolute;
       left: 0;
-      top: -7px;
-      width: 14px;
+      top: -8px;
+      width: 10px;
       height: 2px;
-      background: var(--gold);
+      background: #c9d5e7;
       border-radius: 999px;
     }
 
     .section-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 800;
-      letter-spacing: -0.01em;
-      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      text-transform: none;
     }
 
     .section-subtitle {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10.5px;
     }
 
     .two-col {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 14px;
     }
 
     .diagnostic-card,
     .review-card,
     .wide-dark {
-      padding: 18px;
+      padding: 22px;
     }
 
     .wide-dark {
-      margin-top: 12px;
+      margin-top: 16px;
+    }
+
+    .wide-dark.dark-card {
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
     }
 
     .detail-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 16px;
+      gap: 12px;
+      margin-top: 18px;
     }
 
     .detail-box {
-      background: #f7f9fc;
-      border-radius: 12px;
-      padding: 12px 14px 12px 18px;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 14px 16px 14px 20px;
       position: relative;
     }
 
@@ -541,7 +1048,7 @@
       display: flex;
       align-items: baseline;
       gap: 6px;
-      margin: 10px 0 8px;
+      margin: 14px 0 10px;
     }
 
     .review-score strong {
@@ -560,7 +1067,7 @@
       color: var(--gold);
       font-size: 15px;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
 
     .review-line {
@@ -568,7 +1075,7 @@
       grid-template-columns: 60px 1fr 28px;
       gap: 8px;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .review-line span {
@@ -586,37 +1093,41 @@
     .wide-dark-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 18px;
       align-items: start;
-      margin-top: 16px;
+      margin-top: 18px;
     }
 
     .white-copy {
-      color: #d8e3ff;
-      font-size: 13px;
-      line-height: 1.5;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.6;
     }
 
     .white-list {
-      margin: 14px 0 0;
+      margin: 16px 0 0;
       padding-left: 18px;
-      color: #fff;
-      font-size: 12px;
-      line-height: 1.55;
+      color: var(--ink);
+      font-size: 12.5px;
+      line-height: 1.65;
+    }
+
+    .summary-subtle-label {
+      color: var(--muted);
     }
 
     .accent-panel {
-      background: rgba(31, 49, 79, 0.94);
-      border: 1px solid rgba(138, 184, 255, 0.12);
-      border-radius: 16px;
-      padding: 14px 16px;
+      background: var(--paper-alt);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px 18px;
     }
 
     .accent-panel .copy {
-      color: #d8e3ff;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+      margin-top: 10px;
     }
 
     .category-grid,
@@ -624,16 +1135,16 @@
     .roadmap-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      gap: 14px;
     }
 
     .category-card,
     .roadmap-card {
-      padding: 16px;
+      padding: 20px;
     }
 
     .priority-card {
-      padding: 12px;
+      padding: 16px;
     }
 
     .category-card {
@@ -647,25 +1158,25 @@
       content: "";
       display: block;
       width: 100%;
-      height: 4px;
+      height: 2px;
       border-radius: 999px;
-      margin-bottom: 14px;
-      background: var(--blue);
+      margin-bottom: 16px;
+      background: #d7e0ee;
     }
 
     .category-card.warn::before,
     .priority-card.warn::before,
-    .roadmap-card.gold::before { background: var(--gold); }
+    .roadmap-card.gold::before { background: #d7e0ee; }
     .category-card.bad::before,
-    .priority-card.bad::before { background: var(--orange); }
+    .priority-card.bad::before { background: #d7e0ee; }
     .category-card.good::before,
     .priority-card.good::before,
-    .roadmap-card.green::before { background: var(--green); }
+    .roadmap-card.green::before { background: #d7e0ee; }
 
     .category-circle {
       width: 72px;
       height: 72px;
-      margin: 0 auto 10px;
+      margin: 0 auto 14px;
       border-radius: 50%;
       border: 3px solid currentColor;
       display: flex;
@@ -675,15 +1186,15 @@
       font-weight: 800;
     }
 
-    .category-card.good { color: var(--green); }
-    .category-card.warn { color: var(--gold); }
-    .category-card.bad { color: var(--orange); }
+    .category-card.good,
+    .category-card.warn,
+    .category-card.bad { color: var(--navy); }
 
     .category-name {
       font-size: 16px;
       font-weight: 800;
       line-height: 1.2;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       color: var(--ink);
     }
 
@@ -697,32 +1208,32 @@
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      color: #fff;
-      margin-bottom: 12px;
+      color: var(--navy);
+      background: #fff;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
     }
-
-    .score-tag.good { background: var(--green); }
-    .score-tag.warn { background: var(--gold); }
-    .score-tag.bad { background: var(--orange); }
 
     .mini-line {
       display: flex;
       justify-content: space-between;
       color: var(--muted);
       font-size: 11px;
-      margin: 8px 0 4px;
+      margin: 10px 0 5px;
     }
 
     .chart-card {
-      padding: 16px;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
     }
 
     .chart-header {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 108px;
       align-items: start;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
     .chart-title {
@@ -733,26 +1244,82 @@
 
     .chart-copy {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+      font-size: 12.5px;
+      line-height: 1.55;
     }
 
     .chart-pill-row {
-      display: flex;
+      display: grid;
       gap: 8px;
-      flex-wrap: wrap;
+      align-self: start;
+    }
+
+    .chart-summary-card {
+      padding: 10px 10px 9px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+      border: 1px solid var(--border);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .chart-summary-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .chart-summary-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .chart-summary-label {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .chart-summary-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .chart-summary-pill.soft {
+      background: #eef3fb;
+      color: var(--ink);
+    }
+
+    .chart-summary-pill.navy {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .chart-summary-pill.blue {
+      background: var(--blue);
+      color: #fff;
     }
 
     .bar-chart {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
+      gap: 22px;
       align-items: end;
-      margin-top: 14px;
-      padding: 10px 6px 2px;
-      min-height: 152px;
+      margin-top: 18px;
+      padding: 14px 10px 4px;
+      min-height: 164px;
       background-image: linear-gradient(to top, rgba(220, 229, 240, 0.8) 1px, transparent 1px);
-      background-size: 100% 30px;
+      background-size: 100% 32px;
       background-position: left bottom;
     }
 
@@ -760,14 +1327,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .bars {
-      height: 112px;
+      height: 120px;
       display: flex;
       align-items: end;
-      gap: 10px;
+      gap: 12px;
     }
 
     .bar {
@@ -787,7 +1354,7 @@
     .bar.potential { background: #334155; }
 
     .delta {
-      color: var(--green);
+      color: var(--blue);
       font-size: 12px;
       font-weight: 800;
     }
@@ -802,16 +1369,17 @@
     .chart-signal-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 14px;
+      gap: 12px;
+      margin-top: 18px;
     }
 
     .signal-light {
-      background: var(--paper-alt);
-      border-radius: 12px;
-      padding: 12px 14px 12px 18px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px 14px 20px;
       position: relative;
-      min-height: 66px;
+      min-height: 78px;
     }
 
     .signal-light::before {
@@ -822,11 +1390,11 @@
       bottom: 12px;
       width: 4px;
       border-radius: 999px;
-      background: var(--blue);
+      background: #cbd6e8;
     }
 
-    .signal-light.gold::before { background: var(--gold); }
-    .signal-light.green::before { background: var(--green); }
+    .signal-light.gold::before { background: #cbd6e8; }
+    .signal-light.green::before { background: #cbd6e8; }
 
     .signal-light .label {
       color: var(--muted);
@@ -839,20 +1407,21 @@
 
     .signal-light .value {
       font-size: 13px;
-      line-height: 1.35;
+      line-height: 1.5;
       font-weight: 700;
     }
 
     .priority-card {
-      min-height: 78px;
-      border-radius: 16px;
+      min-height: 116px;
+      border-radius: 18px;
       position: relative;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
     }
 
     .priority-card .index {
       position: absolute;
-      right: 14px;
-      top: 12px;
+      right: 16px;
+      top: 16px;
       font-size: 16px;
       font-weight: 800;
       color: inherit;
@@ -860,37 +1429,39 @@
     }
 
     .priority-card.bad {
-      color: var(--red);
-      background: #fff5f5;
+      color: var(--navy);
+      background: #ffffff;
     }
 
     .priority-card.warn {
-      color: var(--orange);
-      background: #fff8ed;
+      color: var(--navy);
+      background: #ffffff;
     }
 
     .priority-card.good {
-      color: var(--blue);
-      background: #f0f7ff;
+      color: var(--navy);
+      background: #ffffff;
     }
 
     .priority-title {
-      margin: 6px 0 4px;
-      font-size: 13px;
-      line-height: 1.25;
+      margin: 10px 0 6px;
+      font-size: 14px;
+      line-height: 1.3;
       font-weight: 800;
       color: var(--ink);
-      padding-right: 36px;
+      padding-right: 42px;
     }
 
     .priority-copy {
       color: var(--muted);
-      font-size: 10.8px;
-      line-height: 1.35;
+      font-size: 11.5px;
+      line-height: 1.55;
     }
 
     .roadmap-card {
-      min-height: 150px;
+      min-height: 180px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
     }
 
     .step-badge {
@@ -900,32 +1471,33 @@
       min-width: 36px;
       height: 24px;
       border-radius: 999px;
-      background: var(--navy);
-      color: #fff;
+      background: #fff;
+      color: var(--navy);
+      border: 1px solid var(--border);
       font-size: 11px;
       font-weight: 800;
     }
 
     .roadmap-title {
-      margin: 12px 0 8px;
+      margin: 14px 0 10px;
       font-size: 16px;
-      line-height: 1.25;
+      line-height: 1.3;
       font-weight: 800;
     }
 
     .roadmap-copy {
       color: var(--muted);
       font-size: 12.5px;
-      line-height: 1.45;
-      margin-bottom: 14px;
+      line-height: 1.6;
+      margin-bottom: 18px;
     }
 
     .result-card {
       background: var(--paper-alt);
-      border-radius: 12px;
-      padding: 12px 14px 12px 18px;
+      border-radius: 14px;
+      padding: 14px 16px 14px 20px;
       position: relative;
-      min-height: 62px;
+      min-height: 74px;
     }
 
     .result-card::before {
@@ -936,11 +1508,11 @@
       bottom: 12px;
       width: 4px;
       border-radius: 999px;
-      background: var(--blue);
+      background: #cbd6e8;
     }
 
-    .roadmap-card.gold .result-card::before { background: var(--gold); }
-    .roadmap-card.green .result-card::before { background: var(--green); }
+    .roadmap-card.gold .result-card::before { background: #cbd6e8; }
+    .roadmap-card.green .result-card::before { background: #cbd6e8; }
 
     .result-card .label {
       color: var(--muted);
@@ -952,33 +1524,46 @@
     }
 
     .result-card .value {
-      font-size: 12px;
-      line-height: 1.35;
+      font-size: 12.5px;
+      line-height: 1.5;
       font-weight: 700;
     }
 
     .cta-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.3fr) 64mm;
-      gap: 16px;
-      align-items: center;
+      gap: 22px;
+      align-items: start;
     }
 
     .cta-box {
-      padding: 18px;
+      padding: 24px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .cta-lead {
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 12px;
+      margin-bottom: 10px;
     }
 
     .cta-title {
-      font-size: 18px;
+      font-size: 19px;
       font-weight: 800;
       margin: 12px 0 10px;
+      line-height: 1.2;
     }
 
     .cta-copy {
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      margin: 0 0 14px;
+      font-size: 12.5px;
+      line-height: 1.65;
+      margin: 0 0 16px;
     }
 
     .bullet-list {
@@ -997,8 +1582,9 @@
       width: 18px;
       height: 18px;
       border-radius: 6px;
-      background: var(--blue);
-      color: #fff;
+      background: #fff;
+      color: var(--blue);
+      border: 1px solid #cfd9e8;
       font-size: 11px;
       font-weight: 800;
       display: flex;
@@ -1008,12 +1594,12 @@
     }
 
     .contact-box {
-      background: var(--paper-alt);
-      border-radius: 16px;
+      background: #ffffff;
+      border-radius: 18px;
       border: 1px solid var(--border);
-      padding: 18px 16px;
+      padding: 20px 18px;
       text-align: center;
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
     }
 
     .contact-logo {
@@ -1032,16 +1618,29 @@
     }
 
     .contact-number {
-      font-size: 18px;
-      line-height: 1.2;
+      font-size: 20px;
+      line-height: 1.15;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+    }
+
+    .contact-direct-line {
+      margin-bottom: 14px;
+      color: var(--navy);
+      font-size: 11.5px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .contact-direct-line span {
+      color: var(--muted);
+      font-weight: 600;
     }
 
     .contact-copy {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
+      font-size: 11.5px;
+      line-height: 1.5;
       margin-bottom: 14px;
     }
 
@@ -1066,11 +1665,566 @@
       color: var(--navy);
     }
 
+    .closing-box {
+      padding: 26px 28px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(74, 114, 216, 0.06), transparent 20%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .closing-kicker {
+      color: var(--blue);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .closing-title {
+      max-width: 132mm;
+      font-size: 24px;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--ink);
+    }
+
+    .closing-copy {
+      max-width: 134mm;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.72;
+    }
+
+    .closing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .closing-card {
+      padding: 16px 16px 15px;
+      border-radius: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .closing-card .label {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .closing-card .value {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .closing-note {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+      max-width: 132mm;
+    }
+
+    .intel-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .intel-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .intel-title {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .intel-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .intel-rank-row {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .intel-rank-badge {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 3px solid var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+      background: #fff;
+    }
+
+    .intel-rank-meta {
+      display: grid;
+      gap: 8px;
+    }
+
+    .intel-meta-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #edf2f8;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .intel-meta-line strong {
+      color: var(--ink);
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .intel-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .intel-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f4f8ff;
+      border: 1px solid #dfe8f5;
+      color: var(--ink);
+      font-size: 10.5px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .intel-score-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #162235 0%, #1f2e47 100%);
+      color: #fff;
+      border: 1px solid #23344f;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10);
+    }
+
+    .intel-score-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .intel-score-label {
+      color: #c8d8f1;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .intel-score-value {
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .intel-score-copy {
+      color: #d7e4f7;
+      font-size: 11.5px;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .intel-checklist {
+      display: grid;
+      gap: 8px;
+    }
+
+    .intel-check-item {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
+      align-items: start;
+      color: #eef4ff;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .intel-check-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .intel-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .cover-poster-page {
+      padding: 0;
+      background: #f5f7fb;
+      overflow: hidden;
+    }
+
+    .cover-poster-surface {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 18mm 18mm 15mm;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 84% 16%, rgba(74, 114, 216, 0.12), transparent 24%),
+        radial-gradient(circle at 18% 82%, rgba(201, 162, 39, 0.08), transparent 22%),
+        linear-gradient(180deg, #f7f9fc 0%, #eef3f9 100%);
+    }
+
+    .cover-poster-surface::before {
+      content: "";
+      position: absolute;
+      left: 18mm;
+      right: 18mm;
+      top: 15mm;
+      height: 1px;
+      background: linear-gradient(90deg, var(--navy), var(--blue));
+      opacity: 0.55;
+      z-index: 0;
+    }
+
+    .poster-title-block {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 74mm;
+      gap: 12mm;
+      align-items: start;
+      margin-top: 6mm;
+    }
+
+    .poster-left {
+      min-width: 0;
+      padding-right: 4mm;
+    }
+
+    .poster-company {
+      margin-top: 8px;
+      max-width: 128mm;
+      color: var(--navy);
+      font-size: 38px;
+      line-height: 0.98;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      word-break: break-word;
+    }
+
+    .poster-kicker {
+      color: var(--blue);
+      font-size: 9px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .poster-company-tag {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      max-width: 96%;
+    }
+
+    .poster-divider {
+      width: 84px;
+      height: 3px;
+      margin: 14px 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--gold));
+    }
+
+    .poster-scene,
+    .poster-board,
+    .board-bars,
+    .board-pie,
+    .board-lines,
+    .poster-laptop,
+    .poster-desk,
+    .poster-mug,
+    .poster-floating-logo {
+      display: none;
+    }
+
+    .poster-info-card {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+      padding: 20px;
+    }
+
+    .poster-info-block {
+      display: block;
+      width: 100%;
+      margin-bottom: 14px;
+    }
+
+    .poster-info-label {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .poster-info-value {
+      margin-top: 6px;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .poster-brand-wrap {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 34px;
+    }
+
+    .poster-brand-wrap img {
+      max-width: 122px;
+      max-height: 34px;
+      object-fit: contain;
+    }
+
+    .cover-poster-surface .logo {
+      height: 14mm;
+      width: auto;
+      margin-bottom: 10px;
+    }
+
+    .poster-footer {
+      position: absolute;
+      left: 18mm;
+      right: 18mm;
+      bottom: 7mm;
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 8.8px;
+      border-top: 1px solid rgba(106, 122, 144, 0.25);
+      padding-top: 5px;
+      z-index: 2;
+    }
+
+    .poster-hero-copy {
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.55;
+      margin: 0;
+      max-width: 92%;
+    }
+
+    .poster-chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .poster-summary-card {
+      margin-top: 16px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+      padding: 18px;
+    }
+
+    .poster-summary-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .poster-summary-label {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .poster-summary-score {
+      color: var(--ink);
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-top: 6px;
+    }
+
+    .poster-summary-score small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .poster-summary-copy {
+      color: var(--muted);
+      font-size: 11.8px;
+      line-height: 1.55;
+      margin: 10px 0 14px;
+    }
+
+    .poster-bar {
+      margin-bottom: 12px;
+    }
+
+    .poster-bar-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .poster-bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e9eef6;
+      overflow: hidden;
+    }
+
+    .poster-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .poster-gap {
+      margin-top: 14px;
+      padding: 12px 13px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .poster-gap-label {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .poster-gap-value {
+      margin-top: 6px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .poster-gap-copy {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .poster-meta-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .poster-meta-item {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .poster-meta-label {
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .poster-meta-value {
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
     .footer {
       position: absolute;
       left: 16mm;
       right: 16mm;
-      bottom: 6mm;
+      bottom: 7mm;
       display: flex;
       justify-content: space-between;
       color: var(--muted);
@@ -1081,142 +2235,93 @@
   </style>
 </head>
 <body>
-  <section class="page">
-    <div class="top-band"></div>
-    <div class="cover-grid">
-      <div>
-        {% if logo_main %}
-          <img class="logo" src="{{ logo_main }}" alt="Logo">
-        {% endif %}
-        <div class="pill pill-navy" style="margin-top: 18px;">Analise consultiva</div>
-        <h1 class="hero-title">Diagnostico digital<br>com leitura executiva</h1>
-        <p class="hero-copy">Uma leitura organizada da presenca online, da reputacao local e do potencial comercial da empresa.</p>
-        <div class="accent-line"></div>
-        <div class="chip-row">
-          <div class="pill pill-soft">{{ cover_chips[0] }}</div>
-          <div class="pill pill-soft">{{ cover_chips[1] }}</div>
-          <div class="pill pill-soft" style="background:#fff;color:var(--blue);">{{ cover_chips[2] }}</div>
+  <section class="page page-cover">
+    <div class="cover-shell">
+      <div class="cover-header-row">
+        <div class="cover-kicker">Diagnostico comercial</div>
+        <div class="cover-brand-lockup">
+          {% if logo_main %}
+            <img class="cover-brand-logo" src="{{ logo_main }}" alt="Logo">
+          {% endif %}
+          <div class="cover-brand-tag">Analise da presenca digital da empresa</div>
         </div>
-
-        <div class="company-card card">
-          <div class="company-label">Empresa analisada</div>
-          <div class="company-name">{{ company_name }}</div>
-          <div class="company-meta">{{ category }} &nbsp;|&nbsp; {{ city }}</div>
-        </div>
-
-        <div class="highlight-card card">
-          <div class="pill pill-blue">Principal alavanca</div>
-          <div class="highlight-title">{{ main_gap }}</div>
-          <div class="highlight-copy">{{ opportunities[0] }}</div>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="rule" style="background: var(--orange);"></div>
-            <div class="subtle-label">Score atual</div>
-            <div class="stat-value">{{ score_total }}/100</div>
-            <div class="stat-note">Leitura executiva atual</div>
-          </div>
-          <div class="stat-card">
-            <div class="rule" style="background: var(--blue);"></div>
-            <div class="subtle-label">Avaliacoes</div>
-            <div class="stat-value">{{ google_reviews }}</div>
-            <div class="stat-note">Volume de prova social</div>
-          </div>
-          <div class="stat-card">
-            <div class="rule" style="background: var(--gold);"></div>
-            <div class="subtle-label">Fotos</div>
-            <div class="stat-value">{{ google_photos }}</div>
-            <div class="stat-note">Percepcao visual do perfil</div>
-          </div>
-        </div>
-
-        <div class="subtle-label" style="margin-bottom: 8px;">Escopo do diagnostico</div>
-        <div class="scope">Perfil do Google, presenca web, reputacao percebida e sinais de capacidade atual para transformar busca local em contato comercial.</div>
       </div>
 
-      <div class="summary-card dark-card card">
-        <div>
-          <div class="summary-top">
-            <div class="summary-title">Resumo executivo</div>
-            {% if score_gain %}
-              <div class="pill pill-good">+{{ score_gain }} pts</div>
-            {% endif %}
-          </div>
-          <div class="score-row">
-            <div class="score-main">{{ score_total }}</div>
-            <div class="score-max">/ 100</div>
-          </div>
-          <div class="pill pill-{{ score_total_class }}">{{ score_total_label }}</div>
-          <div class="score-copy">{{ score_phrase }}</div>
+      <div class="cover-hero">
+        <div class="cover-eyebrow">{{ category }} &nbsp;|&nbsp; {{ city }}</div>
+        <h1 class="cover-title-editorial">{{ company_name }}</h1>
+        <div class="cover-divider"></div>
+        <p class="cover-subtitle">Um retrato claro de como a empresa aparece hoje e onde pode ganhar mais confianca, mais contato e mais oportunidades comerciais.</p>
+      </div>
 
-          {% for item in categories %}
-            <div class="bar-block">
-              <div class="bar-head">
-                <span>{{ item.title }}</span>
-                <span>{{ item.current }}</span>
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" style="width: {{ item.current }}%; background:
-                  {% if item.class_name == 'good' %}var(--green)
-                  {% elif item.class_name == 'warn' %}var(--gold)
-                  {% else %}var(--orange){% endif %};"></div>
-              </div>
-            </div>
-          {% endfor %}
+      <div class="cover-bottom-panel">
+        <div class="cover-panel-main">
+          <div class="cover-panel-intro">Principal oportunidade</div>
+          <div class="cover-panel-headline">{{ main_gap }}</div>
+          <div class="cover-panel-copy">{{ opportunities[0] }}</div>
         </div>
 
-        <div>
-          <div class="signal-list">
-            <div class="signal-card {{ 'good' if has_website else 'bad' }}">
-              <div class="signal-label">Website</div>
-              <div class="signal-value">{{ 'Ativo e pronto para conversao' if has_website else 'Ausente e com alto impacto comercial' }}</div>
-            </div>
-            <div class="signal-card warn">
-              <div class="signal-label">Maior gap</div>
-              <div class="signal-value">{{ main_gap }}</div>
-            </div>
+        <div class="cover-panel-grid">
+          <div class="cover-panel-item">
+            <div class="cover-panel-label">Nivel atual</div>
+            <div class="cover-panel-value">{{ score_total }}/100</div>
+            <div class="cover-panel-note">{{ score_phrase }}</div>
           </div>
-          <div style="margin-top:10px; color:#bed0f0; font-size:11px;">Potencial estimado: {{ potential_total }}/100</div>
+          <div class="cover-panel-item">
+            <div class="cover-panel-label">Onde pode chegar</div>
+            <div class="cover-panel-value">{{ potential_total }}/100</div>
+            <div class="cover-panel-note">{% if score_gain %}+{{ score_gain }} pontos de evolucao possivel.{% else %}A empresa ja esta proxima do nivel projetado.{% endif %}</div>
+          </div>
+          <div class="cover-panel-item">
+            <div class="cover-panel-label">Avaliacoes e credibilidade</div>
+            <div class="cover-panel-value">{{ google_reviews }}</div>
+            <div class="cover-panel-note">{{ google_photos }} fotos publicas e {{ 'site ativo' if has_website else 'site ainda ausente' }}.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cover-meta-strip">
+        <div class="cover-meta-item">
+          <div class="label">Data de emissao</div>
+          <div class="value">{{ generated_at }}</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">Preparado por</div>
+          <div class="value">{{ prepared_by }}</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="label">Analise</div>
+          <div class="value">Google, reputacao local e oportunidades de gerar mais contato.</div>
         </div>
       </div>
     </div>
 
-    <div class="meta-card card">
-      {% for item in meta %}
-        <div class="meta-item">
-          <div class="meta-label">{{ item.label }}</div>
-          <div class="meta-value">{{ item.value }}</div>
-        </div>
-      {% endfor %}
-    </div>
-
-    <div class="footer">
-      <span>Preparado por {{ prepared_by }} &nbsp;|&nbsp; Documento comercial consultivo</span>
+    <div class="footer" style="color:#d7e0f1;">
+      <span>Material preparado para apresentacao comercial</span>
       <span>Pagina 1 &nbsp;|&nbsp; {{ generated_at }}</span>
     </div>
   </section>
 
-  <section class="page">
+  <section class="page page-performance">
     <div class="header-card card">
       <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
       <div>
-        <div class="header-title">Diagnostico da presenca digital</div>
-        <div class="header-subtitle">Leitura estruturada do contexto atual</div>
+        <div class="header-title">Como a empresa aparece hoje no Google</div>
+        <div class="header-subtitle">Visibilidade, reputacao e percepcao inicial</div>
       </div>
       <div class="page-badge">02</div>
     </div>
 
     <div class="kpi-grid">
-      <div class="stat-card"><div class="rule" style="background:var(--red);"></div><div class="subtle-label">Website</div><div class="stat-value">{{ 'Ativo' if has_website else 'Ausente' }}</div><div class="stat-note">{{ website_url if website_url else 'Maior alavanca do diagnostico' }}</div></div>
-      <div class="stat-card"><div class="rule" style="background:var(--green);"></div><div class="subtle-label">Nota media</div><div class="stat-value">{{ google_rating }}</div><div class="stat-note">{{ stars_visual }}</div></div>
-      <div class="stat-card"><div class="rule" style="background:var(--blue);"></div><div class="subtle-label">Avaliacoes</div><div class="stat-value">{{ google_reviews }}</div><div class="stat-note">Volume de prova social</div></div>
-      <div class="stat-card"><div class="rule" style="background:var(--gold);"></div><div class="subtle-label">Fotos</div><div class="stat-value">{{ google_photos }}</div><div class="stat-note">Competitividade visual</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--navy);"></div><div class="subtle-label">Website</div><div class="stat-value">{{ 'Ativo' if has_website else 'Ausente' }}</div><div class="stat-note">{{ website_url if website_url else 'Hoje a empresa ainda nao tem site proprio' }}</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--blue);"></div><div class="subtle-label">Nota media</div><div class="stat-value">{{ google_rating }}</div><div class="stat-note">{{ stars_visual }}</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--blue);"></div><div class="subtle-label">Avaliacoes</div><div class="stat-value">{{ google_reviews }}</div><div class="stat-note">Nivel de credibilidade percebida</div></div>
+      <div class="stat-card"><div class="rule" style="background:var(--gold);"></div><div class="subtle-label">Fotos</div><div class="stat-value">{{ google_photos }}</div><div class="stat-note">Forca visual do perfil</div></div>
     </div>
 
     <div class="section-head">
-      <div class="section-title">Diagnostico atual</div>
-      <div class="section-subtitle">Empresa e sinais principais</div>
+      <div class="section-title">Cenario atual</div>
+      <div class="section-subtitle">O que um cliente encontra hoje</div>
     </div>
     <div class="two-col">
       <div class="diagnostic-card card">
@@ -1230,14 +2335,14 @@
       </div>
 
       <div class="review-card card">
-        <div class="company-name" style="font-size:18px; margin:0;">Reputacao no Google</div>
+        <div class="company-name" style="font-size:18px; margin:0;">Como a empresa transmite confianca</div>
         <div class="company-meta" style="margin-top:6px;">Como a empresa aparece para quem esta pesquisando agora</div>
         <div class="review-score"><strong>{{ google_rating }}</strong><span>/ 5.0 &nbsp;|&nbsp; {{ google_reviews }} avaliacoes</span></div>
         <div class="stars">{{ stars_visual }}</div>
         {% for item in review_distribution %}
           <div class="review-line">
             <span>{{ item.label }}</span>
-            <div class="bar-track"><div class="bar-fill" style="width: {{ item.percent }}%; background: {% if loop.index == 1 %}var(--green){% elif loop.index == 2 %}var(--blue){% else %}var(--gold){% endif %};"></div></div>
+            <div class="bar-track"><div class="bar-fill" style="width: {{ item.percent }}%; background: var(--blue);"></div></div>
             <strong>{{ item.count }}</strong>
           </div>
         {% endfor %}
@@ -1245,18 +2350,18 @@
     </div>
 
     <div class="wide-dark dark-card card">
-      <div class="company-name" style="color:#fff; font-size:18px; margin:0 0 10px;">Leitura consultiva</div>
+      <div class="company-name" style="font-size:18px; margin:0 0 10px;">O que esse diagnostico mostra</div>
       <div class="white-copy">{{ score_phrase }}</div>
       <div class="wide-dark-grid">
         <div>
-          <div class="subtle-label" style="color:#bed0f0;">Forcas identificadas</div>
+          <div class="subtle-label summary-subtle-label">Pontos positivos</div>
           <ul class="white-list">
             <li>{{ strengths[0] }}</li>
             <li>{{ strengths[1] }}</li>
           </ul>
         </div>
         <div class="accent-panel">
-          <div class="signal-label">Principal alavanca</div>
+          <div class="signal-label">Principal oportunidade</div>
           <div class="signal-value">{{ main_gap }}</div>
           <div class="copy">{{ opportunities[0] }}</div>
         </div>
@@ -1273,27 +2378,24 @@
     <div class="header-card card">
       <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
       <div>
-        <div class="header-title">Analise de desempenho</div>
-        <div class="header-subtitle">Pontuacao, potencial e prioridades</div>
+        <div class="header-title">Oportunidade de crescimento</div>
+        <div class="header-subtitle">Onde a empresa esta e o que pode melhorar</div>
       </div>
       <div class="page-badge">03</div>
     </div>
 
     <div class="section-head" style="margin-top:16px;">
-      <div class="section-title">Pontuacao por categoria</div>
-      <div class="section-subtitle">Atual e potencial</div>
+      <div class="section-title">Desempenho por categoria</div>
+      <div class="section-subtitle">Situacao atual e espaco de melhoria</div>
     </div>
     <div class="category-grid">
       {% for item in categories %}
         <div class="category-card card {{ item.class_name }}">
           <div class="category-circle">{{ item.current }}</div>
           <div class="category-name">{{ item.title }}</div>
-          <div class="score-tag {{ item.class_name }}">{{ item.label }}</div>
+          <div class="score-tag">{{ item.label }}</div>
           <div class="mini-line"><span>Atual</span><strong>{{ item.current }}</strong></div>
-          <div class="bar-track"><div class="bar-fill" style="width: {{ item.current }}%; background:
-            {% if item.class_name == 'good' %}var(--green)
-            {% elif item.class_name == 'warn' %}var(--gold)
-            {% else %}var(--orange){% endif %};"></div></div>
+          <div class="bar-track"><div class="bar-fill" style="width: {{ item.current }}%; background: var(--blue);"></div></div>
           <div class="mini-line"><span>Potencial</span><strong>{{ item.potential }}</strong></div>
           <div class="bar-track"><div class="bar-fill" style="width: {{ item.potential }}%; background: var(--blue);"></div></div>
         </div>
@@ -1301,19 +2403,32 @@
     </div>
 
     <div class="section-head" style="margin-top:18px;">
-      <div class="section-title">Cenario potencial</div>
-      <div class="section-subtitle">Atual x potencial</div>
+      <div class="section-title">Oportunidade de crescimento</div>
+      <div class="section-subtitle">Comparativo entre hoje e o proximo nivel</div>
     </div>
     <div class="chart-card card">
       <div class="chart-header">
         <div>
-          <div class="chart-title">Onde a empresa pode chegar com uma estrutura mais profissional</div>
-          <div class="chart-copy">A estimativa considera presenca web, reputacao local e melhoria de sinais de confianca.</div>
+          <div class="chart-title">O que pode melhorar com uma presenca mais forte e profissional</div>
+          <div class="chart-copy">Aqui esta o tamanho da oportunidade para ganhar mais confianca, mais visibilidade e mais contato comercial.</div>
         </div>
         <div class="chart-pill-row">
-          <div class="pill pill-warn">{{ score_total }}</div>
-          <div class="pill pill-good">{{ potential_total }}</div>
-          {% if score_gain %}<div class="pill pill-blue">+{{ score_gain }}</div>{% endif %}
+          <div class="chart-summary-card">
+            <div class="chart-summary-item">
+              <div class="chart-summary-label">Atual</div>
+              <div class="chart-summary-pill soft">{{ score_total }}</div>
+            </div>
+            <div class="chart-summary-item">
+              <div class="chart-summary-label">Potencial</div>
+              <div class="chart-summary-pill navy">{{ potential_total }}</div>
+            </div>
+            {% if score_gain %}
+              <div class="chart-summary-item">
+                <div class="chart-summary-label">Ganho</div>
+                <div class="chart-summary-pill blue">+{{ score_gain }}</div>
+              </div>
+            {% endif %}
+          </div>
         </div>
       </div>
       <div class="bar-chart">
@@ -1329,25 +2444,10 @@
         {% endfor %}
       </div>
       <div class="chart-signal-grid">
-        <div class="signal-light green"><div class="label">Maior ganho esperado</div><div class="value">{% if score_gain %}{{ score_gain }} pontos no score geral{% else %}Consolidacao de performance{% endif %}</div></div>
+        <div class="signal-light green"><div class="label">Maior ganho esperado</div><div class="value">{% if score_gain %}{{ score_gain }} pontos de evolucao no desempenho geral{% else %}Manter a boa performance atual{% endif %}</div></div>
         <div class="signal-light gold"><div class="label">Prioridade central</div><div class="value">{{ priorities[0].title }}</div></div>
-        <div class="signal-light"><div class="label">Objetivo</div><div class="value">Mais confianca e mais contato comercial</div></div>
+        <div class="signal-light"><div class="label">Resultado esperado</div><div class="value">Mais confianca, mais autoridade e mais contato comercial</div></div>
       </div>
-    </div>
-
-    <div class="section-head" style="margin-top:10px;">
-      <div class="section-title">Prioridades recomendadas</div>
-      <div class="section-subtitle">Impacto e velocidade</div>
-    </div>
-    <div class="priority-grid" style="grid-template-columns: repeat({{ priorities|length }}, minmax(0, 1fr)); gap: 8px;">
-      {% for item in priorities %}
-        <div class="priority-card card {{ item.class_name }}">
-          <div class="pill pill-{{ item.class_name }}">{{ item.priority }}</div>
-          <div class="index">{{ item.index }}</div>
-          <div class="priority-title">{{ item.title }}</div>
-          <div class="priority-copy">{{ item.body }}</div>
-        </div>
-      {% endfor %}
     </div>
 
     <div class="footer">
@@ -1360,15 +2460,141 @@
     <div class="header-card card">
       <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
       <div>
-        <div class="header-title">Plano de acao sugerido</div>
-        <div class="header-subtitle">Roteiro pratico e proximo passo recomendado</div>
+        <div class="header-title">Inteligencia local do perfil</div>
+        <div class="header-subtitle">Sinais que ajudam a explicar visibilidade e confianca</div>
       </div>
       <div class="page-badge">04</div>
     </div>
 
     <div class="section-head" style="margin-top:16px;">
-      <div class="section-title">Roteiro sugerido</div>
-      <div class="section-subtitle">Plano em 3 frentes</div>
+      <div class="section-title">Leitura de posicionamento</div>
+      <div class="section-subtitle">Busca capturada e sinais do perfil</div>
+    </div>
+
+    <div class="intel-grid">
+      <div class="intel-card card">
+        <div class="intel-title">Como o perfil apareceu na busca local</div>
+        <div class="intel-copy">Este bloco mostra a consulta capturada, a posicao observada e o contexto mais imediato da exibicao do perfil no Google.</div>
+        <div class="intel-rank-row">
+          <div class="intel-rank-badge">{{ search_rank if search_rank else '--' }}</div>
+          <div class="intel-rank-meta">
+            <div class="intel-meta-line"><span>Busca analisada</span><strong>{{ search_query }}</strong></div>
+            <div class="intel-meta-line"><span>Tipo de exibicao</span><strong>{{ 'Anuncio local' if is_ad else 'Resultado organico' }}</strong></div>
+            <div class="intel-meta-line"><span>Perfil reivindicado</span><strong>{{ 'Sim' if is_claimed else 'Nao' }}</strong></div>
+            <div class="intel-meta-line"><span>Horario cadastrado</span><strong>{{ 'Sim' if has_hours else 'Nao' }}</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="intel-score-card">
+        <div class="intel-score-top">
+          <div>
+            <div class="intel-score-label">Completude do perfil</div>
+            <div class="intel-score-value">{{ completeness_score }}/100</div>
+          </div>
+          <div class="pill pill-soft">{{ 'Bom' if completeness_score >= 70 else 'Regular' if completeness_score >= 40 else 'Baixo' }}</div>
+        </div>
+        <div class="intel-score-copy">Quanto mais completo e atualizado o perfil, maior a chance de transmitir relevancia, confianca e prontidao comercial.</div>
+        <div class="intel-checklist">
+          {% for item in completeness_ok %}
+            <div class="intel-check-item">
+              <div class="intel-check-dot">V</div>
+              <div>{{ item }}</div>
+            </div>
+          {% endfor %}
+          {% for item in completeness_missing %}
+            <div class="intel-check-item">
+              <div class="intel-check-dot">!</div>
+              <div>{{ item }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="intel-columns">
+      <div class="intel-card card">
+        <div class="intel-title">Temas e maturidade do perfil</div>
+        <div class="intel-copy">Assuntos recorrentes das avaliacoes e sinais que ajudam a qualificar a leitura do perfil alem da nota media.</div>
+        <div class="intel-chip-row">
+          {% for tag in reviews_tags %}
+            <div class="intel-chip">{{ tag }}</div>
+          {% endfor %}
+          {% if not reviews_tags %}
+            <div class="intel-chip">Sem temas destacados nas reviews coletadas</div>
+          {% endif %}
+        </div>
+        <div class="intel-chip-row">
+          {% for tag in image_categories %}
+            <div class="intel-chip">{{ tag }}</div>
+          {% endfor %}
+          {% if not image_categories %}
+            <div class="intel-chip">Categorias visuais nao identificadas</div>
+          {% endif %}
+        </div>
+        <div class="intel-chip-row">
+          <div class="intel-chip">{{ owner_responses_count }} respostas do proprietario</div>
+          <div class="intel-chip">{{ reviews_with_photos }} reviews com foto</div>
+          <div class="intel-chip">{{ recent_reviews_count }} reviews recentes</div>
+        </div>
+      </div>
+
+      <div class="intel-card card">
+        <div class="intel-title">Competicao e atributos percebidos</div>
+        <div class="intel-copy">Concorrentes sugeridos pelo proprio Google e atributos que ajudam a compor a percepcao de completude do perfil.</div>
+        <div class="intel-chip-row">
+          {% for name in people_also_search %}
+            <div class="intel-chip">{{ name }}</div>
+          {% endfor %}
+          {% if not people_also_search %}
+            <div class="intel-chip">Concorrentes relacionados nao identificados</div>
+          {% endif %}
+        </div>
+        <div class="intel-chip-row">
+          {% for item in additional_features %}
+            <div class="intel-chip">{{ item }}</div>
+          {% endfor %}
+          {% if not additional_features %}
+            <div class="intel-chip">Sem atributos complementares mapeados</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }}</span>
+      <span>Pagina 4 &nbsp;|&nbsp; {{ generated_at }}</span>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="header-card card">
+      <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
+      <div>
+        <div class="header-title">O que vale corrigir primeiro</div>
+        <div class="header-subtitle">Prioridades para melhorar a presenca comercial</div>
+      </div>
+      <div class="page-badge">05</div>
+    </div>
+
+    <div class="section-head" style="margin-top:16px;">
+      <div class="section-title">Prioridades recomendadas</div>
+      <div class="section-subtitle">O que mais pode destravar resultado</div>
+    </div>
+    <div class="priority-grid" style="grid-template-columns: repeat({{ priorities|length }}, minmax(0, 1fr)); gap: 8px;">
+      {% for item in priorities %}
+        <div class="priority-card card {{ item.class_name }}">
+          <div class="pill pill-soft">{{ item.priority }}</div>
+          <div class="index">{{ item.index }}</div>
+          <div class="priority-title">{{ item.title }}</div>
+          <div class="priority-copy">{{ item.body }}</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="section-head" style="margin-top:18px;">
+      <div class="section-title">Plano sugerido</div>
+      <div class="section-subtitle">Proximos passos para evoluir mais rapido</div>
     </div>
     <div class="roadmap-grid">
       {% for item in roadmap %}
@@ -1384,43 +2610,52 @@
       {% endfor %}
     </div>
 
-    <div class="section-head" style="margin-top:20px;">
-      <div class="section-title">Proximo passo recomendado</div>
-      <div class="section-subtitle">Apresentacao e contato</div>
+    <div class="footer">
+      <span>Preparado por {{ prepared_by }}</span>
+      <span>Pagina 5 &nbsp;|&nbsp; {{ generated_at }}</span>
     </div>
-    <div class="cta-box card">
-      <div class="cta-grid">
-        <div>
-          <div class="pill pill-navy">Proposta visual</div>
-          <div class="cta-title">Proximo passo recomendado</div>
-          <p class="cta-copy">Se fizer sentido, eu posso montar uma demonstracao visual mais sofisticada da presenca digital da empresa e mostrar como o novo site pode elevar confianca, percepcao de valor e contato comercial.</p>
-          <div class="bullet-list">
-            <div class="bullet-item"><div class="check">V</div><div>Layout com hierarquia mais elegante e apresentacao mais premium</div></div>
-            <div class="bullet-item"><div class="check">V</div><div>Estrutura pensada para transformar visita em conversa no WhatsApp</div></div>
-            <div class="bullet-item"><div class="check">V</div><div>Apresentacao mais profissional para elevar confianca e percepcao de valor</div></div>
-          </div>
-          <div style="margin-top:14px; color:var(--muted); font-size:11px;">Diagnostico preparado por {{ prepared_by }}</div>
-        </div>
+  </section>
 
-        <div class="contact-box">
-          {% if logo_cta %}
-            <img class="contact-logo" src="{{ logo_cta }}" alt="Logo">
-          {% endif %}
-          <div class="contact-label">Contato direto</div>
-          <div class="contact-number">{{ whatsapp_display }}</div>
-          <div class="contact-copy">Solicite uma demonstracao sem compromisso para visualizar a nova apresentacao da empresa.</div>
-          {% if whatsapp_link %}
-            <a class="cta-button" href="{{ whatsapp_link }}">Agendar demonstracao</a>
-          {% else %}
-            <div class="cta-button disabled">Agendar demonstracao</div>
-          {% endif %}
+  <section class="page">
+    <div class="header-card card">
+      <div class="header-logo">{% if logo_header %}<img src="{{ logo_header }}" alt="Logo">{% endif %}</div>
+      <div>
+        <div class="header-title">Conclusao do diagnostico</div>
+        <div class="header-subtitle">Leitura final sobre o momento da empresa</div>
+      </div>
+      <div class="page-badge">06</div>
+    </div>
+
+    <div class="section-head" style="margin-top:16px;">
+      <div class="section-title">Conclusao</div>
+      <div class="section-subtitle">O que este relatorio mostra com clareza</div>
+    </div>
+    <div class="closing-box card">
+      <div class="closing-kicker">Fechamento do relatorio</div>
+      <div class="closing-title">A empresa ja tem uma base real para crescer, mas ainda existe uma diferenca importante entre o nivel do negocio e a forma como ele se apresenta hoje no digital.</div>
+      <div class="closing-copy">Este diagnostico deixa claro que a oportunidade nao esta apenas em aparecer mais, mas em aparecer melhor. Quando a percepcao de confianca, a organizacao da presenca digital e a clareza da apresentacao evoluem juntas, a tendencia e aumentar o interesse, reduzir objecoes e abrir mais espaco para contato comercial de qualidade.</div>
+
+      <div class="closing-grid">
+        <div class="closing-card">
+          <div class="label">Ponto central</div>
+          <div class="value">{{ main_gap }}</div>
+        </div>
+        <div class="closing-card">
+          <div class="label">Leitura atual</div>
+          <div class="value">{{ score_phrase }}</div>
+        </div>
+        <div class="closing-card">
+          <div class="label">Oportunidade</div>
+          <div class="value">{% if score_gain %}Ha espaco para evoluir {{ score_gain }} pontos no desempenho geral e tornar a apresentacao da empresa mais convincente.{% else %}A empresa ja opera perto do potencial estimado e pode focar em consolidar a boa percepcao atual.{% endif %}</div>
         </div>
       </div>
+
+      <div class="closing-note">Mais do que um material tecnico, este relatorio funciona como uma leitura objetiva do momento da empresa e ajuda a enxergar onde pequenas melhorias podem gerar uma percepcao mais forte, uma presencia mais confiavel e uma capacidade maior de transformar interesse em oportunidade.</div>
     </div>
 
     <div class="footer">
       <span>Preparado por {{ prepared_by }}</span>
-      <span>Pagina 4 &nbsp;|&nbsp; {{ generated_at }}</span>
+      <span>Pagina 6 &nbsp;|&nbsp; {{ generated_at }}</span>
     </div>
   </section>
 </body>

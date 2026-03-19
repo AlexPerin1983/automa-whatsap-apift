@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import os
 import re
 import shutil
@@ -59,6 +60,63 @@ def _normalize_url(url):
     if url.startswith(("http://", "https://")):
         return url
     return f"https://{url}"
+
+
+def _safe_json_loads(value, default):
+    if isinstance(value, (dict, list)):
+        return value
+    if not value:
+        return default
+    try:
+        return json.loads(value)
+    except Exception:
+        return default
+
+
+def _extract_named_items(items, limit=6):
+    out = []
+    for item in items or []:
+        value = ""
+        if isinstance(item, str):
+            value = item.strip()
+        elif isinstance(item, dict):
+            value = str(
+                item.get("title")
+                or item.get("name")
+                or item.get("label")
+                or item.get("value")
+                or ""
+            ).strip()
+        if value and value not in out:
+            out.append(value)
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _flatten_additional_info(additional_info, limit=8):
+    labels = []
+    groups = []
+    if isinstance(additional_info, dict):
+        for group_name, group_items in additional_info.items():
+            if group_name:
+                groups.append(str(group_name).strip())
+            if isinstance(group_items, list):
+                for entry in group_items:
+                    if isinstance(entry, dict):
+                        for key, value in entry.items():
+                            truthy = value not in (False, None, "", [], {})
+                            if truthy and key and key not in labels:
+                                labels.append(str(key).strip())
+                    elif isinstance(entry, str) and entry.strip() and entry.strip() not in labels:
+                        labels.append(entry.strip())
+            elif isinstance(group_items, dict):
+                for key, value in group_items.items():
+                    truthy = value not in (False, None, "", [], {})
+                    if truthy and key and key not in labels:
+                        labels.append(str(key).strip())
+        return groups[:4], labels[:limit]
+    return [], []
 
 
 def _find_browser():
@@ -239,6 +297,51 @@ def _build_view_model(data):
         wa_num = f"55{wa_num}"
     wa_link = f"https://wa.me/{wa_num}?text=Quero%20ver%20uma%20demonstracao%20do%20meu%20site" if wa_num else ""
 
+    extras = _safe_json_loads(data.get("dados_extras"), {})
+    search_rank = extras.get("rank")
+    try:
+        search_rank = int(search_rank) if search_rank not in (None, "") else None
+    except Exception:
+        search_rank = None
+    search_query = str(extras.get("searchString") or "").strip()
+    search_page_url = str(extras.get("searchPageUrl") or "").strip()
+    is_ad = bool(extras.get("isAdvertisement"))
+    people_also_search = _extract_named_items(extras.get("peopleAlsoSearch"), limit=5)
+    reviews_tags = _extract_named_items(extras.get("reviewsTags"), limit=6)
+    image_categories = _extract_named_items(extras.get("imageCategories"), limit=5)
+    additional_groups, additional_features = _flatten_additional_info(extras.get("additionalInfo") or {}, limit=8)
+    owner_updates = extras.get("ownerUpdates") or []
+    qna_items = extras.get("questionsAndAnswers") or []
+    raw_reviews = extras.get("reviews") or []
+    owner_responses = sum(1 for rv in raw_reviews if (rv.get("responseFromOwnerText") or "").strip())
+    reviews_with_photos = sum(1 for rv in raw_reviews if rv.get("reviewImageUrls"))
+    recent_reviews = 0
+    for rv in raw_reviews:
+        published = str(rv.get("publishedAtDate") or "").strip()
+        if published.startswith(str(date.today().year)) or published.startswith(str(date.today().year - 1)):
+            recent_reviews += 1
+    opening_hours = _safe_json_loads(data.get("horario"), [])
+    has_hours = bool(opening_hours)
+    is_claimed = bool(data.get("reivindicado"))
+    has_menu = bool(data.get("menu_url"))
+    has_description = bool(str(data.get("descricao") or extras.get("description") or "").strip())
+    has_extra_categories = bool(_safe_json_loads(data.get("categorias"), []))
+    has_attributes = bool(additional_features)
+
+    completeness_checks = [
+        ("Perfil reivindicado", is_claimed),
+        ("Horario preenchido", has_hours),
+        ("Site conectado", tem_web),
+        ("Descricao do negocio", has_description),
+        ("Categorias complementares", has_extra_categories),
+        ("Atributos do perfil", has_attributes),
+        ("Galeria relevante", total_fotos >= 10),
+        ("CTA adicional", has_menu),
+    ]
+    completeness_score = round(sum(1 for _, ok in completeness_checks if ok) / max(len(completeness_checks), 1) * 100)
+    completeness_ok = [label for label, ok in completeness_checks if ok][:4]
+    completeness_missing = [label for label, ok in completeness_checks if not ok][:3]
+
     priorities = []
     priority_class = {"Alta": "bad", "Media": "warn", "Baixa": "good"}
     for idx, rec in enumerate(recs[:3], start=1):
@@ -319,6 +422,25 @@ def _build_view_model(data):
         "review_distribution": review_distribution,
         "negative_feedback_text": f"{neg} avaliacoes baixas ({negative_share}%)" if neg else "Sem concentracao relevante de notas baixas",
         "commercial_signal": "Perfil com boa base" if sc_rep >= 70 else "Confianca moderada" if sc_rep >= 40 else "Confianca fragil",
+        "search_rank": search_rank,
+        "search_query": search_query or "Busca local principal",
+        "search_page_url": search_page_url,
+        "is_ad": is_ad,
+        "people_also_search": people_also_search,
+        "reviews_tags": reviews_tags,
+        "image_categories": image_categories,
+        "additional_groups": additional_groups,
+        "additional_features": additional_features,
+        "owner_updates_count": len(owner_updates),
+        "qna_count": len(qna_items),
+        "owner_responses_count": owner_responses,
+        "reviews_with_photos": reviews_with_photos,
+        "recent_reviews_count": recent_reviews,
+        "completeness_score": completeness_score,
+        "completeness_ok": completeness_ok,
+        "completeness_missing": completeness_missing,
+        "has_hours": has_hours,
+        "is_claimed": is_claimed,
         "prepared_by": str(data.get("seu_nome") or "OtimizaAI"),
         "whatsapp_display": wa_display or "WhatsApp nao informado",
         "whatsapp_link": wa_link,
@@ -371,9 +493,11 @@ def build_diagnostic_pdf_html(data, output, ensure_logo_assets=None, draw_text_l
     template = env.get_template("diagnostic_pdf.html")
 
     vm = _build_view_model(data)
-    vm["logo_main"] = _file_to_data_uri(base_dir / "assets" / "logo_otimizaai.png")
-    vm["logo_header"] = _file_to_data_uri(base_dir / "assets" / "logo_otimizaai_header.png")
-    vm["logo_cta"] = _file_to_data_uri(base_dir / "assets" / "logo_otimizaai_cta.png")
+    logo_path = base_dir / "assets" / "Logo.png"
+    logo_data = _file_to_data_uri(logo_path)
+    vm["logo_main"] = logo_data
+    vm["logo_header"] = logo_data
+    vm["logo_cta"] = logo_data
 
     html = template.render(**vm)
     browser = _find_browser()

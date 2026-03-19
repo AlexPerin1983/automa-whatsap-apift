@@ -6,7 +6,7 @@ Extração rica via Apify Google Maps Scraper
 from flask import Flask, jsonify, request, send_from_directory, Response
 from apify_client import ApifyClient
 import sqlite3, json, os, threading, csv, io, re, time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ── PDF ──────────────────────────────────────────────────────────
 try:
@@ -123,6 +123,9 @@ def init_db():
             segmento         TEXT,
             categoria        TEXT,
             localizacao      TEXT,
+            grupo            TEXT,
+            campanha_id      INTEGER,
+            arquivada        INTEGER DEFAULT 0,
             total_encontrados INTEGER DEFAULT 0,
             novos            INTEGER DEFAULT 0,
             duplicatas       INTEGER DEFAULT 0,
@@ -133,7 +136,13 @@ def init_db():
         )
     ''')
     # Migração: colunas novas na tabela buscas
-    for col, tipo in [("novos", "INTEGER DEFAULT 0"), ("duplicatas", "INTEGER DEFAULT 0")]:
+    for col, tipo in [
+        ("novos", "INTEGER DEFAULT 0"),
+        ("duplicatas", "INTEGER DEFAULT 0"),
+        ("grupo", "TEXT"),
+        ("campanha_id", "INTEGER"),
+        ("arquivada", "INTEGER DEFAULT 0"),
+    ]:
         try:
             c.execute(f"ALTER TABLE buscas ADD COLUMN {col} {tipo}")
         except Exception:
@@ -347,6 +356,10 @@ def init_db():
         "ALTER TABLE kanban_contatos ADD COLUMN campanha_id INTEGER",
         "ALTER TABLE kanban_contatos ADD COLUMN campanha_item_id INTEGER",
         "ALTER TABLE kanban_contatos ADD COLUMN briefing_lead TEXT",
+        "ALTER TABLE kanban_contatos ADD COLUMN followup_horario_preferido TEXT",
+        "ALTER TABLE kanban_contatos ADD COLUMN followup_msg_custom TEXT",
+        "ALTER TABLE kanban_contatos ADD COLUMN site_enviado INTEGER DEFAULT 0",
+        "ALTER TABLE kanban_contatos ADD COLUMN pdf_enviado INTEGER DEFAULT 0",
         "ALTER TABLE empresas ADD COLUMN nome_responsavel TEXT",
     ]:
         try:
@@ -428,6 +441,9 @@ def init_db():
         'followup_hora_fim': '20',
         'followup_max_etapas': '3',
         'followup_botoes_ativos': '1',
+        'followup_colunas_ativas': 'Enviado,Respondeu',
+        'auto_reply_primeira_resposta_ativo': '1',
+        'auto_reply_negociando_ativo': '1',
         'pedir_nome_ativo': '1',
         'wa_quick_reply_footer': DEFAULT_WA_QUICK_REPLY_CONFIG['footer'],
         'wa_quick_reply_buttons': json.dumps(DEFAULT_WA_QUICK_REPLY_CONFIG['buttons'], ensure_ascii=False),
@@ -435,6 +451,14 @@ def init_db():
             "Perfeito. Só para eu personalizar a prévia direitinho: com quem eu estou falando?"
         ),
     }
+    msgs_default['msg_followup_etapa2'] = (
+        "{primeiro_nome}, so retomando por aqui para nao te perder.\n\n"
+        "Se ainda fizer sentido olhar a ideia que montei para a *{nome}* em {cidade}, me responde que eu te envio de forma objetiva."
+    )
+    msgs_default['msg_followup_etapa3'] = (
+        "Vou encerrar meu contato por aqui para nao insistir.\n\n"
+        "Se a *{nome}* quiser voltar a falar sobre captar mais clientes pelo Google e WhatsApp, e so me chamar."
+    )
     for chave, valor in msgs_default.items():
         c.execute("INSERT OR IGNORE INTO config (chave, valor) VALUES (?,?)", (chave, valor))
     updates_default = {
@@ -442,6 +466,8 @@ def init_db():
         'msg_resposta_sim': (old_msg_resposta_sim, msgs_default['msg_resposta_sim']),
         'msg_resposta_nao': (old_msg_resposta_nao, msgs_default['msg_resposta_nao']),
         'msg_followup': (old_msg_followup, msgs_default['msg_followup']),
+        'msg_followup_etapa2': ('', msgs_default['msg_followup_etapa2']),
+        'msg_followup_etapa3': ('', msgs_default['msg_followup_etapa3']),
         'msg_pedir_nome': (old_msg_pedir_nome, msgs_default['msg_pedir_nome']),
         'followup_horas': ('24', msgs_default['followup_horas']),
     }
@@ -616,6 +642,18 @@ AUTO_REPLY_PATTERNS = [
     'em que posso ajudar',
     'fale conosco',
     'atendimento virtual',
+    'obrigado por entrar em contato',
+    'retornaremos seu contato',
+    'retornaremos o contato',
+    'nosso horario de atendimento',
+    'nosso horÃ¡rio de atendimento',
+    'fora do horario',
+    'fora do horÃ¡rio',
+    'assim que possivel',
+    'deixe seu nome',
+    'deixe seu contato',
+    'logo responderemos',
+    'aguarde nosso retorno',
 ]
 
 OPEN_REPLY_PATTERNS = [
@@ -722,6 +760,46 @@ def _classificar_primeira_resposta(texto):
     return 'humana_generica'
 
 
+def _detectar_quarentena_auto_reply(conn, contato_id, texto):
+    texto_norm = _texto_normalizado(texto)
+    if not texto_norm or not contato_id:
+        return False
+    if _contains_any(texto_norm, AUTO_REPLY_PATTERNS):
+        return True
+    if (
+        _contains_any(texto_norm, INTEREST_PATTERNS)
+        or _contains_any(texto_norm, NEGATIVE_PATTERNS)
+        or _detectar_resposta_curta(texto, POSITIVE_REPLY_PATTERNS)
+        or _detectar_resposta_curta(texto, NEGATIVE_REPLY_PATTERNS)
+    ):
+        return False
+
+    ultima_saida = conn.execute(
+        """SELECT criado_em, contexto_envio
+             FROM wa_mensagens
+            WHERE contato_id = ?
+              AND direcao = 'enviada'
+            ORDER BY id DESC
+            LIMIT 1""",
+        (contato_id,),
+    ).fetchone()
+    if not ultima_saida:
+        return False
+
+    enviado_em = _parse_db_datetime(ultima_saida['criado_em'])
+    if not enviado_em:
+        return False
+
+    delta_segundos = (datetime.now() - enviado_em).total_seconds()
+    if delta_segundos < 0 or delta_segundos > 180:
+        return False
+
+    contexto = str(ultima_saida['contexto_envio'] or '').strip().lower()
+    contexto_sensivel = contexto in ('', 'lote_abertura', 'followup', 'chat_kanban')
+    resposta_generica = _contains_any(texto_norm, OPEN_REPLY_PATTERNS) or len(texto_norm) <= 24
+    return contexto_sensivel and resposta_generica
+
+
 def _classificar_resposta_negociacao(texto):
     texto_norm = _texto_normalizado(texto)
     if _contains_any(texto_norm, NEGATIVE_PATTERNS) or _detectar_resposta_curta(texto, NEGATIVE_REPLY_PATTERNS):
@@ -796,6 +874,94 @@ def _template_followup_por_etapa(etapa, nome, cidade, categoria, coluna='Enviado
 # ─────────────────────────────────────────
 # TEMPLATES MENSAGENS WHATSAPP — SEED
 # ─────────────────────────────────────────
+def _followup_template_key(etapa):
+    if etapa <= 1:
+        return 'msg_followup'
+    if etapa == 2:
+        return 'msg_followup_etapa2'
+    return 'msg_followup_etapa3'
+
+
+def _followup_templates(conn):
+    return {
+        'msg_followup': _cfg(conn, 'msg_followup', ''),
+        'msg_followup_etapa2': _cfg(conn, 'msg_followup_etapa2', ''),
+        'msg_followup_etapa3': _cfg(conn, 'msg_followup_etapa3', ''),
+    }
+
+
+def _followup_preview_text(texto, limite=140):
+    texto = ' '.join(str(texto or '').split())
+    if len(texto) <= limite:
+        return texto
+    return texto[: max(0, limite - 3)].rstrip() + '...'
+
+
+def _followup_preference_label(preferencia):
+    labels = {
+        '': 'Sem preferencia',
+        'livre': 'Sem preferencia',
+        'manha': 'Manha',
+        'tarde': 'Tarde',
+        'noite': 'Noite',
+    }
+    return labels.get(str(preferencia or '').strip().lower(), 'Sem preferencia')
+
+
+def _followup_apply_preference(previsto, preferencia, hora_inicio, hora_fim):
+    preferencia = str(preferencia or '').strip().lower()
+    preferred_hours = {'manha': 9, 'tarde': 14, 'noite': 19}
+    target_hour = preferred_hours.get(preferencia)
+    if target_hour is None:
+        return previsto
+
+    min_hour = int(hora_inicio)
+    max_hour = max(min_hour, int(hora_fim) - 1)
+    target_hour = max(min_hour, min(target_hour, max_hour))
+    aligned = previsto.replace(hour=target_hour, minute=0, second=0, microsecond=0)
+    if aligned < previsto:
+        aligned = aligned + timedelta(days=1)
+    return aligned
+
+
+def _followup_message_for_contact(conn, contato, etapa=None, coluna=None, cache=None):
+    etapa = int(etapa or 1)
+    coluna = coluna or contato.get('kanban_coluna') or 'Enviado'
+    nome = contato.get('nome') or 'sua empresa'
+    cidade = contato.get('cidade') or ''
+    categoria = contato.get('categoria') or 'seu segmento'
+    responsavel = (contato.get('nome_responsavel') or contato.get('responsavel') or 'time').strip()
+    primeiro_nome = (responsavel.split()[0] if responsavel else 'time').strip() or 'time'
+    custom_msg = str(contato.get('followup_msg_custom') or '').strip()
+    if custom_msg:
+        return _formatar_template(
+            custom_msg,
+            nome=nome,
+            cidade=cidade,
+            categoria=categoria,
+            responsavel=responsavel,
+            primeiro_nome=primeiro_nome,
+            coluna=coluna,
+            etapa=etapa,
+        )
+
+    templates = (cache or {}).get('templates') or _followup_templates(conn)
+    template_key = _followup_template_key(etapa)
+    template_cfg = str(templates.get(template_key) or '').strip()
+    if template_cfg:
+        return _formatar_template(
+            template_cfg,
+            nome=nome,
+            cidade=cidade,
+            categoria=categoria,
+            responsavel=responsavel,
+            primeiro_nome=primeiro_nome,
+            coluna=coluna,
+            etapa=etapa,
+        )
+    return _template_followup_por_etapa(etapa, nome, cidade, categoria, coluna=coluna)
+
+
 def _seed_wa_templates(c):
     templates = [
         ('Abertura - Indicação', 'abertura',
@@ -1754,6 +1920,8 @@ init_db()
 # ─────────────────────────────────────────
 def get_api_token():
     conn = get_db()
+    cfg_auto_reply_primeira = _cfg(conn, 'auto_reply_primeira_resposta_ativo', '1') == '1'
+    cfg_auto_reply_negociando = _cfg(conn, 'auto_reply_negociando_ativo', '1') == '1'
     row = conn.execute(
         "SELECT id, token, nome FROM apify_tokens WHERE ativo = 1 ORDER BY id DESC LIMIT 1"
     ).fetchone()
@@ -2180,12 +2348,15 @@ def iniciar_busca():
     # Reviews para geração de sites
     max_reviews    = int(body.get('max_reviews', 0))           # 0 = não coletar reviews
 
+    grupo = str(body.get('grupo', '') or '').strip()
     conn = get_db()
     cur = conn.execute(
-        "INSERT INTO buscas (keyword, segmento, categoria, localizacao, status) VALUES (?,?,?,?,?)",
-        (keyword, segmento, categoria, local, 'rodando')
+        "INSERT INTO buscas (keyword, segmento, categoria, localizacao, grupo, status) VALUES (?,?,?,?,?,?)",
+        (keyword, segmento, categoria, local, grupo, 'rodando')
     )
     busca_id = cur.lastrowid
+    grupo_busca = grupo or f"Busca {busca_id} - {(keyword or segmento or 'Google Maps').strip()} - {local}".strip()
+    conn.execute("UPDATE buscas SET grupo=? WHERE id=?", (grupo_busca, busca_id))
     conn.commit()
     conn.close()
 
@@ -2224,7 +2395,7 @@ def iniciar_busca():
                 # Filtro local: só com telefone (para prospecto via WhatsApp)
                 if so_com_tel and not (item.get('phone') or item.get('phoneUnformatted')):
                     continue
-                e = extrair_empresa(item, segmento, keyword, categoria, local, grupo)
+                e = extrair_empresa(item, segmento, keyword, categoria, local, grupo_busca)
                 cur2 = conn2.execute('''
                     INSERT OR IGNORE INTO empresas
                     (nome, subtitulo, descricao, categoria, categorias, preco,
@@ -2295,7 +2466,7 @@ def iniciar_busca():
             conn3.close()
 
     threading.Thread(target=rodar_apify, daemon=True).start()
-    return jsonify({'ok': True, 'busca_id': busca_id, 'query': f"{keyword or segmento} em {local}"})
+    return jsonify({'ok': True, 'busca_id': busca_id, 'query': f"{keyword or segmento} em {local}", 'grupo': grupo_busca})
 
 @app.route('/api/busca/<int:busca_id>/status')
 def status_busca(busca_id):
@@ -2306,12 +2477,216 @@ def status_busca(busca_id):
         return jsonify({'erro': 'Não encontrada'}), 404
     return jsonify(dict(row))
 
+@app.route('/api/busca/<int:busca_id>/empresas')
+def busca_empresas(busca_id):
+    conn = get_db()
+    busca = conn.execute(
+        """SELECT b.id, b.grupo, b.status, b.novos, b.campanha_id, b.arquivada,
+                  c.nome AS campanha_nome
+             FROM buscas b
+        LEFT JOIN campanhas c ON c.id = b.campanha_id
+            WHERE b.id=?""",
+        (busca_id,)
+    ).fetchone()
+    if not busca:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Busca nao encontrada'}), 404
+    grupo = str(busca['grupo'] or '').strip()
+    if not grupo:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Essa busca nao possui grupo associado'}), 400
+    empresas = conn.execute(
+        """SELECT id, nome, cidade, categoria, telefone_formatado, telefone
+             FROM empresas
+            WHERE grupo=?
+            ORDER BY id DESC
+            LIMIT 600""",
+        (grupo,)
+    ).fetchall()
+    conn.close()
+    return jsonify({
+        'ok': True,
+        'busca_id': busca_id,
+        'grupo': grupo,
+        'status': busca['status'],
+        'novos': int(busca['novos'] or 0),
+        'campanha_id': int(busca['campanha_id'] or 0),
+        'campanha_nome': busca['campanha_nome'] or '',
+        'arquivada': int(busca['arquivada'] or 0),
+        'empresa_ids': [int(row['id']) for row in empresas],
+        'empresas': [dict(row) for row in empresas],
+    })
+
 @app.route('/api/buscas')
 def listar_buscas():
     conn = get_db()
-    rows = conn.execute("SELECT * FROM buscas ORDER BY id DESC LIMIT 50").fetchall()
+    rows = conn.execute(
+        """SELECT b.*, c.nome AS campanha_nome,
+                  COALESCE((
+                      SELECT COUNT(*)
+                        FROM empresas e
+                       WHERE e.grupo = b.grupo
+                  ), 0) AS total_empresas_lote,
+                  COALESCE((
+                      SELECT COUNT(DISTINCT kc.empresa_id)
+                        FROM kanban_contatos kc
+                        JOIN empresas e ON e.id = kc.empresa_id
+                       WHERE e.grupo = b.grupo
+                  ), 0) AS empresas_no_kanban,
+                  COALESCE((
+                      SELECT COUNT(DISTINCT e.id)
+                        FROM empresas e
+                       WHERE e.grupo = b.grupo
+                         AND (
+                              LOWER(COALESCE(e.status_prospeccao, 'novo')) <> 'novo'
+                              OR EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+                              OR EXISTS (SELECT 1 FROM campanha_itens ci WHERE ci.empresa_id = e.id)
+                         )
+                  ), 0) AS empresas_trabalhadas
+             FROM buscas b
+        LEFT JOIN campanhas c ON c.id = b.campanha_id
+         ORDER BY b.id DESC
+            LIMIT 200"""
+    ).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
+
+
+@app.route('/api/buscas/<int:busca_id>/fila-operacional')
+def busca_fila_operacional(busca_id):
+    conn = get_db()
+    busca = conn.execute(
+        """SELECT b.*, c.nome AS campanha_nome
+             FROM buscas b
+        LEFT JOIN campanhas c ON c.id = b.campanha_id
+            WHERE b.id=?""",
+        (busca_id,)
+    ).fetchone()
+    if not busca:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Lote nao encontrado'}), 404
+
+    grupo = str(busca['grupo'] or '').strip()
+    if not grupo:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Esse lote nao possui grupo associado'}), 400
+
+    rows = conn.execute(
+        """SELECT e.id, e.nome, e.cidade, e.categoria, e.telefone_formatado, e.telefone,
+                  e.status_prospeccao, e.website, e.rating, e.reviews, e.criado_em
+             FROM empresas e
+            WHERE e.grupo=?
+              AND LOWER(COALESCE(e.status_prospeccao, 'novo')) = 'novo'
+              AND NOT EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+              AND NOT EXISTS (SELECT 1 FROM campanha_itens ci WHERE ci.empresa_id = e.id)
+         ORDER BY e.id DESC
+            LIMIT 300""",
+        (grupo,)
+    ).fetchall()
+
+    resumo = conn.execute(
+        """SELECT
+               COALESCE(COUNT(*), 0) AS total_lote,
+               COALESCE(SUM(CASE
+                   WHEN LOWER(COALESCE(e.status_prospeccao, 'novo')) = 'novo'
+                    AND NOT EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+                    AND NOT EXISTS (SELECT 1 FROM campanha_itens ci WHERE ci.empresa_id = e.id)
+                   THEN 1 ELSE 0 END), 0) AS pendentes,
+               COALESCE(SUM(CASE
+                   WHEN EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+                   THEN 1 ELSE 0 END), 0) AS no_kanban,
+               COALESCE(SUM(CASE
+                   WHEN LOWER(COALESCE(e.status_prospeccao, 'novo')) <> 'novo'
+                     OR EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+                     OR EXISTS (SELECT 1 FROM campanha_itens ci WHERE ci.empresa_id = e.id)
+                   THEN 1 ELSE 0 END), 0) AS trabalhadas
+           FROM empresas e
+          WHERE e.grupo=?""",
+        (grupo,)
+    ).fetchone()
+    conn.close()
+    return jsonify({
+        'ok': True,
+        'busca_id': busca_id,
+        'grupo': grupo,
+        'campanha_id': int(busca['campanha_id'] or 0),
+        'campanha_nome': busca['campanha_nome'] or '',
+        'arquivada': int(busca['arquivada'] or 0),
+        'resumo': dict(resumo or {}),
+        'empresas': [dict(r) for r in rows],
+    })
+
+
+@app.route('/api/buscas/arquivar-esgotadas', methods=['POST'])
+def arquivar_buscas_esgotadas():
+    conn = get_db()
+    rows = conn.execute(
+        """SELECT id
+             FROM buscas b
+            WHERE COALESCE(b.arquivada, 0) = 0
+              AND LOWER(COALESCE(b.status, '')) = 'concluido'
+              AND EXISTS (SELECT 1 FROM empresas e WHERE e.grupo = b.grupo)
+              AND NOT EXISTS (
+                    SELECT 1
+                      FROM empresas e
+                     WHERE e.grupo = b.grupo
+                       AND LOWER(COALESCE(e.status_prospeccao, 'novo')) = 'novo'
+                       AND NOT EXISTS (SELECT 1 FROM kanban_contatos kc WHERE kc.empresa_id = e.id)
+                       AND NOT EXISTS (SELECT 1 FROM campanha_itens ci WHERE ci.empresa_id = e.id)
+              )"""
+    ).fetchall()
+    ids = [int(r['id']) for r in rows]
+    if ids:
+        conn.executemany("UPDATE buscas SET arquivada=1 WHERE id=?", [(i,) for i in ids])
+        conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'arquivadas': len(ids), 'ids': ids})
+
+
+@app.route('/api/buscas/<int:busca_id>', methods=['PATCH'])
+def atualizar_busca(busca_id):
+    d = request.json or {}
+    conn = get_db()
+    busca = conn.execute("SELECT * FROM buscas WHERE id=?", (busca_id,)).fetchone()
+    if not busca:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Busca nao encontrada'}), 404
+
+    updates = []
+    params = []
+
+    if 'grupo' in d:
+        grupo_novo = str(d.get('grupo') or '').strip()
+        if not grupo_novo:
+            conn.close()
+            return jsonify({'ok': False, 'erro': 'Digite um nome valido para o lote'}), 400
+        grupo_antigo = str(busca['grupo'] or '').strip()
+        if grupo_antigo and grupo_antigo != grupo_novo:
+            conn.execute("UPDATE empresas SET grupo=? WHERE grupo=?", (grupo_novo, grupo_antigo))
+        updates.append("grupo=?")
+        params.append(grupo_novo)
+
+    if 'arquivada' in d:
+        arquivada = 1 if str(d.get('arquivada')).lower() in ('1', 'true', 'on', 'yes') else 0
+        updates.append("arquivada=?")
+        params.append(arquivada)
+
+    if 'campanha_id' in d:
+        campanha_id = d.get('campanha_id')
+        campanha_id = int(campanha_id) if str(campanha_id or '').isdigit() else None
+        updates.append("campanha_id=?")
+        params.append(campanha_id)
+
+    if not updates:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Nenhuma alteracao enviada'}), 400
+
+    params.append(busca_id)
+    conn.execute(f"UPDATE buscas SET {', '.join(updates)} WHERE id=?", tuple(params))
+    conn.commit()
+    row = conn.execute("SELECT * FROM buscas WHERE id=?", (busca_id,)).fetchone()
+    conn.close()
+    return jsonify({'ok': True, 'busca': dict(row)})
 
 # ─────────────────────────────────────────
 # ROTAS – EMPRESAS
@@ -2405,15 +2780,21 @@ def gerar_pdf_diagnostico(emp_id):
     # ── Monta dict de dados ──────────────────────────────────────
     dados = {
         'nome':              e.get('nome') or 'Empresa',
+        'descricao':         e.get('descricao') or '',
         'categoria':         e.get('categoria') or '',
+        'categorias':        e.get('categorias') or '[]',
         'telefone':          e.get('telefone_formatado') or e.get('telefone') or '',
         'endereco':          e.get('endereco') or '',
         'cidade':            ', '.join(filter(None, [e.get('cidade'), e.get('estado')])),
         'tem_website':       bool(e.get('tem_website')),
         'website_url':       e.get('website') or '',
+        'menu_url':          e.get('menu_url') or '',
         'avaliacao':         float(e.get('rating') or 0),
         'total_avaliacoes':  int(e.get('reviews') or 0),
         'total_fotos':       int(e.get('qtd_fotos') or 0),
+        'horario':           e.get('horario') or '[]',
+        'reivindicado':      int(e.get('reivindicado') or 0),
+        'dados_extras':      e.get('dados_extras') or '{}',
         'distribuicao_estrelas': {
             5: int(e.get('dist_5estrelas') or 0),
             4: int(e.get('dist_4estrelas') or 0),
@@ -2432,7 +2813,7 @@ def gerar_pdf_diagnostico(emp_id):
     buffer.seek(0)
 
     nome_arquivo = re.sub(r'[^\w\s-]', '', dados['nome']).strip().replace(' ', '_')
-    nome_arquivo = f"diagnostico_{nome_arquivo}.pdf"
+    nome_arquivo = f"diagnostico_digital_empresa_{nome_arquivo}.pdf"
 
     return Response(
         buffer.read(),
@@ -4173,6 +4554,136 @@ def _campanha_por_id(conn, campanha_id):
     return _campanha_payload(conn, row) if row else None
 
 
+def _adicionar_empresas_em_campanha(conn, campanha_id, empresa_ids, numero_ids, estrategia='round_robin'):
+    numero_ids_validos = [str(i).strip() for i in numero_ids if str(i).strip()]
+    if not empresa_ids:
+        return {'ok': False, 'erro': 'Selecione pelo menos uma empresa'}
+    if not numero_ids_validos:
+        return {'ok': False, 'erro': 'Nenhum numero valido encontrado'}
+
+    adicionados = []
+    atualizados = []
+    ja_existiam = []
+    bloqueados = []
+    sem_telefone = []
+    erros = []
+    distribuicao = {numero_id: 0 for numero_id in numero_ids_validos}
+
+    for idx, empresa_id in enumerate(empresa_ids):
+        numero_destino = numero_ids_validos[idx % len(numero_ids_validos)]
+        try:
+            emp = conn.execute(
+                "SELECT id, nome, telefone, telefone_formatado FROM empresas WHERE id = ?",
+                (empresa_id,)
+            ).fetchone()
+            if not emp:
+                erros.append(empresa_id)
+                continue
+            if _empresa_em_lista_negra(conn, empresa_id):
+                bloqueados.append({'id': empresa_id, 'nome': emp['nome']})
+                continue
+
+            ja_item = conn.execute(
+                "SELECT id FROM campanha_itens WHERE campanha_id=? AND empresa_id=? LIMIT 1",
+                (campanha_id, empresa_id)
+            ).fetchone()
+            if ja_item:
+                ja_existiam.append({'id': empresa_id, 'nome': emp['nome'], 'coluna': 'campanha'})
+                continue
+
+            tel_raw = emp['telefone_formatado'] or emp['telefone'] or ''
+            tel_limpo = re.sub(r'\D', '', tel_raw)
+            if not tel_limpo:
+                sem_telefone.append({'id': empresa_id, 'nome': emp['nome']})
+                continue
+
+            contato = conn.execute(
+                "SELECT id, kanban_coluna FROM kanban_contatos WHERE empresa_id = ?",
+                (empresa_id,)
+            ).fetchone()
+
+            if contato and contato['kanban_coluna'] not in ('Fila',):
+                ja_existiam.append({'id': empresa_id, 'nome': emp['nome'], 'coluna': contato['kanban_coluna']})
+                continue
+
+            if contato:
+                conn.execute(
+                    """UPDATE kanban_contatos
+                          SET telefone_wa=?,
+                              numero_wa_id=?,
+                              campanha_id=?,
+                              atualizado_em=CURRENT_TIMESTAMP
+                        WHERE id=?""",
+                    (tel_limpo, numero_destino, campanha_id, contato['id'])
+                )
+                contato_id = contato['id']
+                atualizados.append({'id': empresa_id, 'nome': emp['nome'], 'numero_id': numero_destino})
+            else:
+                cur_contato = conn.execute(
+                    """INSERT INTO kanban_contatos (empresa_id, telefone_wa, kanban_coluna, numero_wa_id, campanha_id)
+                       VALUES (?, ?, 'Fila', ?, ?)""",
+                    (empresa_id, tel_limpo, numero_destino, campanha_id)
+                )
+                contato_id = cur_contato.lastrowid
+                adicionados.append({'id': empresa_id, 'nome': emp['nome'], 'numero_id': numero_destino})
+
+            cur_item = conn.execute(
+                """INSERT INTO campanha_itens (campanha_id, empresa_id, contato_id, numero_wa_id, ordem, status)
+                   VALUES (?, ?, ?, ?, ?, 'fila')""",
+                (campanha_id, empresa_id, contato_id, numero_destino, idx + 1)
+            )
+            campanha_item_id = cur_item.lastrowid
+            conn.execute(
+                "UPDATE kanban_contatos SET campanha_item_id=? WHERE id=?",
+                (campanha_item_id, contato_id)
+            )
+            distribuicao[numero_destino] += 1
+        except Exception:
+            erros.append(empresa_id)
+
+    for numero_id, qtd in distribuicao.items():
+        row = conn.execute(
+            "SELECT total_previsto FROM campanha_numeros WHERE campanha_id=? AND numero_wa_id=?",
+            (campanha_id, numero_id)
+        ).fetchone()
+        if row:
+            conn.execute(
+                """UPDATE campanha_numeros
+                      SET total_previsto=COALESCE(total_previsto,0)+?,
+                          atualizado_em=CURRENT_TIMESTAMP
+                    WHERE campanha_id=? AND numero_wa_id=?""",
+                (qtd, campanha_id, numero_id)
+            )
+        else:
+            conn.execute(
+                """INSERT INTO campanha_numeros (campanha_id, numero_wa_id, total_previsto, enviados, erros, status, atualizado_em)
+                   VALUES (?, ?, ?, 0, 0, 'planejada', CURRENT_TIMESTAMP)""",
+                (campanha_id, numero_id, qtd)
+            )
+
+    total_validos = len(adicionados) + len(atualizados)
+    conn.execute(
+        """UPDATE campanhas
+              SET total_empresas=COALESCE(total_empresas,0)+?,
+                  total_numeros=?,
+                  estrategia=?,
+                  atualizado_em=CURRENT_TIMESTAMP
+            WHERE id=?""",
+        (total_validos, len(numero_ids_validos), estrategia, campanha_id)
+    )
+
+    return {
+        'ok': True,
+        'adicionados': len(adicionados),
+        'atualizados': len(atualizados),
+        'ja_existiam': len(ja_existiam),
+        'bloqueados': len(bloqueados),
+        'sem_telefone': len(sem_telefone),
+        'erros': len(erros),
+        'distribuicao': distribuicao,
+    }
+
+
 @app.route('/api/campanhas', methods=['GET'])
 def campanhas_listar():
     conn = get_db()
@@ -4368,6 +4879,48 @@ def campanhas_criar():
     })
 
 
+@app.route('/api/campanhas/<int:campanha_id>/adicionar-empresas', methods=['POST'])
+def campanhas_adicionar_empresas(campanha_id):
+    d = request.json or {}
+    empresa_ids = [int(i) for i in (d.get('empresa_ids') or []) if str(i).isdigit()]
+    conn = get_db()
+    campanha = conn.execute("SELECT * FROM campanhas WHERE id=?", (campanha_id,)).fetchone()
+    if not campanha:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Campanha nao encontrada'}), 404
+
+    numero_rows = conn.execute(
+        "SELECT numero_wa_id FROM campanha_numeros WHERE campanha_id=? ORDER BY id",
+        (campanha_id,)
+    ).fetchall()
+    numero_ids = [str(row['numero_wa_id']).strip() for row in numero_rows if str(row['numero_wa_id']).strip()]
+    if not numero_ids:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Essa campanha nao possui numeros vinculados'}), 400
+
+    resultado = _adicionar_empresas_em_campanha(
+        conn,
+        campanha_id,
+        empresa_ids,
+        numero_ids,
+        estrategia=str(campanha['estrategia'] or 'round_robin')
+    )
+    if not resultado.get('ok'):
+        conn.close()
+        return jsonify(resultado), 400
+
+    conn.commit()
+    payload = _campanha_por_id(conn, campanha_id)
+    conn.close()
+    return jsonify({
+        'ok': True,
+        'campanha_id': campanha_id,
+        'nome': campanha['nome'],
+        'resultado': resultado,
+        'campanha': payload,
+    })
+
+
 @app.route('/api/campanhas/<int:campanha_id>', methods=['GET'])
 def campanhas_detalhe(campanha_id):
     conn = get_db()
@@ -4376,6 +4929,29 @@ def campanhas_detalhe(campanha_id):
     if not payload:
         return jsonify({'ok': False, 'erro': 'Campanha nao encontrada'}), 404
     return jsonify(payload)
+
+
+@app.route('/api/campanhas/<int:campanha_id>', methods=['DELETE'])
+def campanhas_deletar(campanha_id):
+    conn = get_db()
+    row = conn.execute("SELECT id FROM campanhas WHERE id=?", (campanha_id,)).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Campanha nao encontrada'}), 404
+    # Marca numeros como pausado para que workers parem naturalmente
+    conn.execute(
+        "UPDATE campanha_numeros SET status='pausado', atualizado_em=CURRENT_TIMESTAMP WHERE campanha_id=?",
+        (campanha_id,)
+    )
+    conn.commit()
+    # Deleta todos os registros da campanha
+    conn.execute("DELETE FROM campanha_itens WHERE campanha_id=?", (campanha_id,))
+    conn.execute("DELETE FROM campanha_numeros WHERE campanha_id=?", (campanha_id,))
+    conn.execute("UPDATE kanban_contatos SET campanha_id=NULL, campanha_item_id=NULL WHERE campanha_id=?", (campanha_id,))
+    conn.execute("DELETE FROM campanhas WHERE id=?", (campanha_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'deletado': campanha_id})
 
 
 @app.route('/api/campanhas/<int:campanha_id>/disparar', methods=['POST'])
@@ -4785,6 +5361,142 @@ def _kanban_filter_clause():
         return " WHERE kc.campanha_id = ? ", [int(campanha_id)]
     return "", []
 
+
+def _cfg_int(conn, chave, default):
+    try:
+        return int(str(_cfg(conn, chave, default)).strip())
+    except Exception:
+        return int(default)
+
+
+def _followup_colunas_ativas(conn):
+    permitidas = {'Enviado', 'Respondeu', 'Negociando'}
+    raw = str(_cfg(conn, 'followup_colunas_ativas', 'Enviado,Respondeu') or '')
+    cols = [item.strip() for item in raw.split(',') if item.strip() in permitidas]
+    return cols or ['Enviado', 'Respondeu']
+
+
+def _followup_stage_wait_hours(coluna, etapa_atual, horas_cfg):
+    idx = min(max(int(etapa_atual or 0), 0), 2)
+    if coluna == 'Enviado':
+        return [horas_cfg, 120, 240][idx]
+    return [48, 120, 240][idx]
+
+
+def _parse_db_datetime(valor):
+    if not valor:
+        return None
+    try:
+        return datetime.fromisoformat(str(valor).replace('Z', ''))
+    except Exception:
+        return None
+
+
+def _followup_status_label(status, coluna):
+    labels = {
+        'pronto': 'Pronto para enviar',
+        'aguardando': 'Aguardando janela',
+        'adiado': 'Adiado manualmente',
+        'pausado': 'Pausado no lead',
+        'sistema_pausado': 'Sistema pausado',
+        'aguardando_horario': 'Fora do horário',
+        'bloqueado_coluna': f'Sem automação em {coluna}',
+        'concluido': 'Fluxo concluído',
+        'warm_only': 'Aguardando resposta real',
+        'fora_fluxo': 'Fora do fluxo',
+    }
+    return labels.get(status, status)
+
+
+def _followup_snapshot(row, conn, cache=None, agora=None):
+    agora = agora or datetime.now()
+    cfg = cache or {
+        'ativo': _cfg(conn, 'followup_ativo', '1') == '1',
+        'warm_only': _cfg(conn, 'followup_so_warm_leads', '1') == '1',
+        'horas_cfg': _cfg_int(conn, 'followup_horas', '48'),
+        'max_etapas': _cfg_int(conn, 'followup_max_etapas', '3'),
+        'hora_inicio': _cfg_int(conn, 'followup_hora_inicio', '8'),
+        'hora_fim': _cfg_int(conn, 'followup_hora_fim', '20'),
+        'colunas_ativas': set(_followup_colunas_ativas(conn)),
+        'templates': _followup_templates(conn),
+    }
+
+    coluna = row.get('kanban_coluna') or ''
+    etapa_atual = int(row.get('followup_etapa') or 0)
+    pausado = bool(row.get('followup_pausado') or 0)
+    ja_respondeu = bool(row.get('ja_respondeu') or 0)
+    preferencia_horario = str(row.get('followup_horario_preferido') or 'livre').strip().lower()
+    previsto = None
+
+    if coluna not in ('Enviado', 'Respondeu', 'Negociando'):
+        status = 'fora_fluxo'
+    elif etapa_atual >= cfg['max_etapas']:
+        status = 'concluido'
+    elif coluna not in cfg['colunas_ativas']:
+        status = 'bloqueado_coluna'
+    elif cfg['warm_only'] and not ja_respondeu:
+        status = 'warm_only'
+    elif pausado:
+        status = 'pausado'
+    else:
+        horas_espera = _followup_stage_wait_hours(coluna, etapa_atual, cfg['horas_cfg'])
+        base = _parse_db_datetime(row.get('atualizado_em')) or agora
+        previsto = base.timestamp() + (horas_espera * 3600)
+        previsto = datetime.fromtimestamp(previsto)
+        previsto = _followup_apply_preference(previsto, preferencia_horario, cfg['hora_inicio'], cfg['hora_fim'])
+        adiado_ate = _parse_db_datetime(row.get('followup_adiar_ate'))
+        if adiado_ate and adiado_ate > previsto:
+            previsto = adiado_ate
+        pronto = previsto <= agora
+        fora_horario = not (cfg['hora_inicio'] <= agora.hour < cfg['hora_fim'])
+        if pronto:
+            if not cfg['ativo']:
+                status = 'sistema_pausado'
+            elif fora_horario:
+                status = 'aguardando_horario'
+            else:
+                status = 'pronto'
+        elif adiado_ate:
+            status = 'adiado'
+        else:
+            status = 'aguardando'
+
+    horas_restantes = 0
+    previsto_em = ''
+    previsto_iso = ''
+    if previsto:
+        previsto_em = previsto.strftime('%d/%m/%Y %H:%M')
+        previsto_iso = previsto.strftime('%Y-%m-%dT%H:%M')
+        horas_restantes = max(0, round((previsto - agora).total_seconds() / 3600, 1))
+
+    proxima_etapa = min(etapa_atual + 1, cfg['max_etapas'])
+    texto_previsto = ''
+    if coluna in ('Enviado', 'Respondeu', 'Negociando') and status not in ('concluido', 'fora_fluxo'):
+        texto_previsto = _followup_message_for_contact(
+            conn,
+            row,
+            etapa=proxima_etapa,
+            coluna=coluna,
+            cache=cfg,
+        )
+
+    return {
+        'followup_status': status,
+        'followup_status_label': _followup_status_label(status, coluna),
+        'followup_previsto_em': previsto_em,
+        'followup_previsto_iso': previsto_iso,
+        'followup_horas_restantes': horas_restantes,
+        'followup_proxima_etapa': proxima_etapa,
+        'followup_max_etapas': cfg['max_etapas'],
+        'followup_coluna_ativa': coluna in cfg['colunas_ativas'],
+        'followup_texto_previsto': texto_previsto,
+        'followup_texto_resumo': _followup_preview_text(texto_previsto, limite=110),
+        'followup_horario_preferido': preferencia_horario,
+        'followup_horario_preferido_label': _followup_preference_label(preferencia_horario),
+        'followup_msg_custom': str(row.get('followup_msg_custom') or ''),
+        'followup_msg_custom_ativo': bool(str(row.get('followup_msg_custom') or '').strip()),
+    }
+
 def extrair_nome_responsavel(dados_extras_str):
     """
     Opção 1 — Tenta extrair o nome do responsável a partir dos dados do Google Maps.
@@ -4859,6 +5571,17 @@ def kanban_listar():
 
     # Agrupar por coluna e injetar nome_indicacao
     conn2 = get_db()
+    agora = datetime.now()
+    followup_cfg = {
+        'ativo': _cfg(conn2, 'followup_ativo', '1') == '1',
+        'warm_only': _cfg(conn2, 'followup_so_warm_leads', '1') == '1',
+        'horas_cfg': _cfg_int(conn2, 'followup_horas', '48'),
+        'max_etapas': _cfg_int(conn2, 'followup_max_etapas', '3'),
+        'hora_inicio': _cfg_int(conn2, 'followup_hora_inicio', '8'),
+        'hora_fim': _cfg_int(conn2, 'followup_hora_fim', '20'),
+        'colunas_ativas': set(_followup_colunas_ativas(conn2)),
+        'templates': _followup_templates(conn2),
+    }
     resultado = {col: [] for col in KANBAN_COLUNAS}
     for r in rows:
         d = dict(r)
@@ -4867,6 +5590,7 @@ def kanban_listar():
             resultado[col] = []
         # Adicionar nome de indicação via review
         d['nome_indicacao'] = get_nome_indicacao(d.get('empresa_id'), conn2)
+        d.update(_followup_snapshot(d, conn2, cache=followup_cfg, agora=agora))
         resultado[col].append(d)
     conn2.close()
 
@@ -5302,6 +6026,7 @@ def _mensagem_recebida_impl():
     contato_id = None
     auto_reply = None  # mensagem automática para enviar de volta
     nova_coluna = None
+    coluna_atual = ''
 
     if contato:
         contato_id = contato['id']
@@ -5430,15 +6155,21 @@ def _mensagem_recebida_impl():
                             _ed = dict(_emp_pdf)
                             _dados_pdf = {
                                 'nome':             _ed.get('nome') or 'Empresa',
+                                'descricao':        _ed.get('descricao') or '',
                                 'categoria':        _ed.get('categoria') or '',
+                                'categorias':       _ed.get('categorias') or '[]',
                                 'telefone':         _ed.get('telefone_formatado') or _ed.get('telefone') or '',
                                 'endereco':         _ed.get('endereco') or '',
                                 'cidade':           ', '.join(filter(None, [_ed.get('cidade'), _ed.get('estado')])),
                                 'tem_website':      bool(_ed.get('tem_website')),
                                 'website_url':      _ed.get('website') or '',
+                                'menu_url':         _ed.get('menu_url') or '',
                                 'avaliacao':        float(_ed.get('rating') or 0),
                                 'total_avaliacoes': int(_ed.get('reviews') or 0),
                                 'total_fotos':      int(_ed.get('qtd_fotos') or 0),
+                                'horario':          _ed.get('horario') or '[]',
+                                'reivindicado':     int(_ed.get('reivindicado') or 0),
+                                'dados_extras':     _ed.get('dados_extras') or '{}',
                                 'distribuicao_estrelas': {
                                     5: int(_ed.get('dist_5estrelas') or 0),
                                     4: int(_ed.get('dist_4estrelas') or 0),
@@ -5454,7 +6185,7 @@ def _mensagem_recebida_impl():
                             _build_pdf(_dados_pdf, _buf2)
                             _pdf_b64 = _b64.b64encode(_buf2.getvalue()).decode()
                             _fname2 = re.sub(r'[^\w\s-]', '', _ed.get('nome', 'empresa')).strip().replace(' ', '_')
-                            _fname2 = f"diagnostico_{_fname2}.pdf"
+                            _fname2 = f"diagnostico_digital_empresa_{_fname2}.pdf"
                             _wa_url2 = _cfg2.get('wa_service_url', 'http://localhost:3001')
                             _num_id2 = contato['numero_wa_id']
                             _tel2    = contato['telefone_wa']
@@ -5476,7 +6207,7 @@ def _mensagem_recebida_impl():
                                 _wa_res2 = json.loads(_resp2.read())
                             if _wa_res2.get('ok'):
                                 print(f'[DiagPDF] PDF enviado com sucesso para contato {contato_id}')
-                                conn.execute("UPDATE kanban_contatos SET pending_pdf=0 WHERE id=?", (contato_id,))
+                                conn.execute("UPDATE kanban_contatos SET pending_pdf=0, pdf_enviado=1 WHERE id=?", (contato_id,))
                             else:
                                 print(f'[DiagPDF] Falha WA ao enviar PDF: {_wa_res2.get("error")}')
                         except Exception as _ep:
@@ -5506,6 +6237,8 @@ def _mensagem_recebida_impl():
                 cidade = empresa['cidade'] if empresa else ''
                 classificacao_negociacao = _classificar_resposta_negociacao(texto)
                 primeira_classificacao = _classificar_primeira_resposta(texto)
+                if _detectar_quarentena_auto_reply(conn, contato_id, texto):
+                    primeira_classificacao = 'automatica'
 
                 if classificacao_negociacao == 'sim':
                     conn.execute(
@@ -5675,15 +6408,21 @@ def _mensagem_recebida_impl():
                         emp_dict = dict(empresa)
                         dados_pdf = {
                             'nome':              emp_dict.get('nome') or 'Empresa',
+                            'descricao':         emp_dict.get('descricao') or '',
                             'categoria':         emp_dict.get('categoria') or '',
+                            'categorias':        emp_dict.get('categorias') or '[]',
                             'telefone':          emp_dict.get('telefone_formatado') or emp_dict.get('telefone') or '',
                             'endereco':          emp_dict.get('endereco') or '',
                             'cidade':            ', '.join(filter(None, [emp_dict.get('cidade'), emp_dict.get('estado')])),
                             'tem_website':       bool(emp_dict.get('tem_website')),
                             'website_url':       emp_dict.get('website') or '',
+                            'menu_url':          emp_dict.get('menu_url') or '',
                             'avaliacao':         float(emp_dict.get('rating') or 0),
                             'total_avaliacoes':  int(emp_dict.get('reviews') or 0),
                             'total_fotos':       int(emp_dict.get('qtd_fotos') or 0),
+                            'horario':           emp_dict.get('horario') or '[]',
+                            'reivindicado':      int(emp_dict.get('reivindicado') or 0),
+                            'dados_extras':      emp_dict.get('dados_extras') or '{}',
                             'distribuicao_estrelas': {
                                 5: int(emp_dict.get('dist_5estrelas') or 0),
                                 4: int(emp_dict.get('dist_4estrelas') or 0),
@@ -5699,7 +6438,7 @@ def _mensagem_recebida_impl():
                         _build_pdf(dados_pdf, buf_pdf)
                         pdf_b64 = _b64.b64encode(buf_pdf.getvalue()).decode()
                         file_name = re.sub(r'[^\w\s-]', '', emp_dict.get('nome', 'empresa')).strip().replace(' ', '_')
-                        file_name = f"diagnostico_{file_name}.pdf"
+                        file_name = f"diagnostico_digital_empresa_{file_name}.pdf"
 
                         wa_url = cfg_pdf.get('wa_service_url', 'http://localhost:3001')
                         numero_id = contato['numero_wa_id'] or ''
@@ -5729,7 +6468,7 @@ def _mensagem_recebida_impl():
 
                         if wa_pdf_result.get('ok'):
                             print(f'[DiagPDF] PDF enviado com sucesso para contato {contato_id}')
-                            conn.execute("UPDATE kanban_contatos SET pending_pdf=0 WHERE id=?", (contato_id,))
+                            conn.execute("UPDATE kanban_contatos SET pending_pdf=0, pdf_enviado=1 WHERE id=?", (contato_id,))
                         else:
                             print(f'[DiagPDF] Falha ao enviar PDF: {wa_pdf_result.get("error")}')
                     except Exception as pdf_err:
@@ -5837,6 +6576,13 @@ def _mensagem_recebida_impl():
     finally:
         conn.close()
 
+    if auto_reply and coluna_atual == 'Enviado' and _classificar_primeira_resposta(texto) == 'automatica':
+        auto_reply = None
+    if auto_reply and coluna_atual == 'Enviado' and not cfg_auto_reply_primeira:
+        auto_reply = None
+    if auto_reply and (nova_coluna == 'Negociando' or coluna_atual == 'Negociando') and not cfg_auto_reply_negociando:
+        auto_reply = None
+
     resultado = {'ok': True, 'contato_id': contato_id}
     if auto_reply:
         resultado['auto_reply'] = auto_reply
@@ -5878,7 +6624,7 @@ def kanban_mensagem_enviada():
             conn.execute(
                 """UPDATE kanban_contatos
                    SET kanban_coluna='Enviado', mensagem_enviada=?, numero_wa_id=?,
-                       followup_etapa=0, followup_enviado_em=NULL, followup_adiar_ate=NULL, resposta_classificacao=NULL,
+                       followup_etapa=0, followup_enviado_em=NULL, followup_adiar_ate=NULL, followup_msg_custom=NULL, resposta_classificacao=NULL,
                        template_origem=CASE WHEN COALESCE(template_origem, '') = '' THEN ? ELSE template_origem END,
                        ultimo_template_nome=CASE WHEN ? != '' THEN ? ELSE ultimo_template_nome END,
                        ultimo_contexto_envio=CASE WHEN ? != '' THEN ? ELSE ultimo_contexto_envio END,
@@ -5956,102 +6702,73 @@ def _contato_bloqueado_envio(contato):
 
 @app.route('/api/kanban/check-followup', methods=['POST'])
 def kanban_check_followup():
-    """Verifica leads parados e retorna lista para follow-up — com todas as proteções anti-bloqueio."""
-    from datetime import datetime as _dt
+    """Verifica leads parados e retorna lista para follow-up."""
     conn = get_db()
     try:
-        # ── Proteção 1: sistema desativado ──
-        if _cfg(conn, 'followup_ativo', '1') != '1':
+        agora = datetime.now()
+        followup_cfg = {
+            'ativo': _cfg(conn, 'followup_ativo', '1') == '1',
+            'warm_only': _cfg(conn, 'followup_so_warm_leads', '1') == '1',
+            'horas_cfg': _cfg_int(conn, 'followup_horas', '48'),
+            'max_etapas': _cfg_int(conn, 'followup_max_etapas', '3'),
+            'hora_inicio': _cfg_int(conn, 'followup_hora_inicio', '8'),
+            'hora_fim': _cfg_int(conn, 'followup_hora_fim', '20'),
+            'colunas_ativas': set(_followup_colunas_ativas(conn)),
+            'templates': _followup_templates(conn),
+        }
+        hora_atual = agora.hour
+        if not followup_cfg['ativo']:
             return jsonify({'ok': True, 'followups': [], 'msg': 'Follow-up desativado'})
-
-        # ── Proteção 2: horário seguro (não enviar de madrugada) ──
-        hora_inicio = int(_cfg(conn, 'followup_hora_inicio', '8'))
-        hora_fim    = int(_cfg(conn, 'followup_hora_fim', '20'))
-        hora_atual  = _dt.now().hour
-        if not (hora_inicio <= hora_atual < hora_fim):
-            return jsonify({'ok': True, 'followups': [],
-                            'msg': f'Fora do horário permitido ({hora_inicio}h–{hora_fim}h). Agora: {hora_atual}h'})
-
-        horas        = int(_cfg(conn, 'followup_horas', '48'))
-        max_etapas   = int(_cfg(conn, 'followup_max_etapas', '3'))
-        so_warm      = _cfg(conn, 'followup_so_warm_leads', '1') == '1'
-        tpl          = _cfg(conn, 'msg_followup',
-            "Oi, pessoal da *{nome}*.\n\n"
-            "Passando só para confirmar se vale a pena eu te mostrar a ideia que montei para ajudar vocês a gerar mais contatos em {cidade}.\n\n"
-            "Se fizer sentido, me responde com *posso ver* e eu envio por aqui.")
-
-        # ── Busca leads candidatos ──
-        # Proteção 3: respeitar followup_pausado por contato
-        # Proteção 4: só warm leads (ja_respondeu=1) se ativado
-        warm_filter = "AND COALESCE(kc.ja_respondeu, 0) = 1" if so_warm else ""
-
-        pendentes = conn.execute(f"""
-            SELECT kc.id, kc.telefone_wa, kc.numero_wa_id,
-                   COALESCE(kc.followup_etapa, 0) AS followup_etapa,
-                   kc.kanban_coluna, kc.atualizado_em, kc.followup_adiar_ate,
-                   COALESCE(kc.ja_respondeu, 0) AS ja_respondeu,
-                   e.nome, e.cidade, e.categoria
+        if not (followup_cfg['hora_inicio'] <= hora_atual < followup_cfg['hora_fim']):
+            return jsonify({
+                'ok': True,
+                'followups': [],
+                'msg': f"Fora do hor?rio permitido ({followup_cfg['hora_inicio']}h?{followup_cfg['hora_fim']}h). Agora: {hora_atual}h"
+            })
+        pendentes = conn.execute("""
+            SELECT kc.*, e.nome, e.cidade, e.categoria
             FROM kanban_contatos kc
             JOIN empresas e ON e.id = kc.empresa_id
             WHERE kc.kanban_coluna IN ('Enviado', 'Respondeu', 'Negociando')
               AND COALESCE(kc.resposta_classificacao, '') NOT IN ('automatica', 'nao', 'recusou')
               AND COALESCE(kc.followup_etapa, 0) < ?
               AND COALESCE(kc.pending_pdf, 0) = 0
-              AND COALESCE(kc.followup_pausado, 0) = 0
               AND COALESCE(kc.optout_global, 0) = 0
-              {warm_filter}
-        """, (max_etapas,)).fetchall()
+        """, (followup_cfg['max_etapas'],)).fetchall()
 
         followups = []
         for p in pendentes:
-            etapa_atual  = p['followup_etapa']
-            coluna       = p['kanban_coluna']
-            nome_emp     = p['nome'] or 'sua empresa'
-            cidade       = p['cidade'] or ''
-            categoria    = p['categoria'] or 'seu segmento'
-
-            # Tempos de espera por etapa
-            if coluna == 'Enviado':
-                horas_espera = [horas, 120, 240][min(etapa_atual, 2)]
-            else:
-                horas_espera = [48, 120, 240][min(etapa_atual, 2)]
-
-            pronto = conn.execute(
-                "SELECT 1 FROM kanban_contatos WHERE id=? AND datetime(atualizado_em) <= datetime('now', ? || ' hours')",
-                (p['id'], f'-{horas_espera}')
-            ).fetchone()
-            if not pronto:
+            snap = _followup_snapshot(dict(p), conn, cache=followup_cfg, agora=agora)
+            if snap['followup_status'] != 'pronto':
                 continue
 
-            if p['followup_adiar_ate']:
-                ainda_adiado = conn.execute(
-                    "SELECT CASE WHEN datetime(?) > datetime('now') THEN 1 ELSE 0 END AS ativo",
-                    (p['followup_adiar_ate'],)
-                ).fetchone()['ativo']
-                if ainda_adiado:
-                    continue
-
-            if etapa_atual == 0 and coluna == 'Enviado':
-                msg = _formatar_template(tpl, nome=nome_emp, cidade=cidade, categoria=categoria)
-            else:
-                msg = _template_followup_por_etapa(etapa_atual + 1, nome_emp, cidade, categoria, coluna=coluna)
+            etapa_atual = int(p['followup_etapa'] or 0)
+            coluna = p['kanban_coluna']
+            nome_emp = p['nome'] or 'sua empresa'
+            msg = _followup_message_for_contact(
+                conn,
+                dict(p),
+                etapa=etapa_atual + 1,
+                coluna=coluna,
+                cache=followup_cfg,
+            )
 
             conn.execute(
-                "UPDATE kanban_contatos SET followup_enviado_em=CURRENT_TIMESTAMP, followup_etapa=followup_etapa+1, followup_adiar_ate=NULL WHERE id=?",
+                "UPDATE kanban_contatos SET followup_enviado_em=CURRENT_TIMESTAMP, followup_etapa=followup_etapa+1, followup_adiar_ate=NULL, followup_msg_custom=NULL WHERE id=?",
                 (p['id'],)
             )
             followups.append({
-                'contato_id':  p['id'],
-                'telefone':    p['telefone_wa'],
-                'numero_wa_id':p['numero_wa_id'],
-                'mensagem':    msg,
-                'coluna':      coluna,
-                'etapa':       etapa_atual + 1,
-                'nome':        nome_emp,
+                'contato_id': p['id'],
+                'telefone': p['telefone_wa'],
+                'numero_wa_id': p['numero_wa_id'],
+                'mensagem': msg,
+                'coluna': coluna,
+                'etapa': etapa_atual + 1,
+                'nome': nome_emp,
             })
 
         conn.commit()
-        print(f'[FollowUp] {len(followups)} follow-up(s) | warm_only={so_warm} | hora={hora_atual}h')
+        print(f"[FollowUp] {len(followups)} follow-up(s) | colunas={','.join(sorted(followup_cfg['colunas_ativas']))} | hora={hora_atual}h")
         return jsonify({'ok': True, 'followups': followups})
     except Exception as e:
         print(f'[FollowUp] Erro: {e}')
@@ -6062,24 +6779,29 @@ def kanban_check_followup():
 
 @app.route('/api/followup/fila')
 def followup_fila():
-    """Retorna a fila de follow-ups pendentes com previsão de envio."""
-    from datetime import datetime as _dt, timedelta as _td
+    """Retorna a fila de follow-ups pendentes com previs?o de envio."""
     conn = get_db()
     try:
-        cfg_so_warm  = _cfg(conn, 'followup_so_warm_leads', '1') == '1'
-        horas_cfg    = int(_cfg(conn, 'followup_horas', '48'))
-        max_etapas   = int(_cfg(conn, 'followup_max_etapas', '3'))
-        hora_inicio  = int(_cfg(conn, 'followup_hora_inicio', '8'))
-        hora_fim     = int(_cfg(conn, 'followup_hora_fim', '20'))
-        ativo        = _cfg(conn, 'followup_ativo', '1') == '1'
-        warm_filter  = "AND COALESCE(kc.ja_respondeu, 0) = 1" if cfg_so_warm else ""
+        followup_cfg = {
+            'ativo': _cfg(conn, 'followup_ativo', '1') == '1',
+            'warm_only': _cfg(conn, 'followup_so_warm_leads', '1') == '1',
+            'horas_cfg': _cfg_int(conn, 'followup_horas', '48'),
+            'max_etapas': _cfg_int(conn, 'followup_max_etapas', '3'),
+            'hora_inicio': _cfg_int(conn, 'followup_hora_inicio', '8'),
+            'hora_fim': _cfg_int(conn, 'followup_hora_fim', '20'),
+            'colunas_ativas': set(_followup_colunas_ativas(conn)),
+            'templates': _followup_templates(conn),
+        }
 
-        todos = conn.execute(f"""
+        todos = conn.execute("""
             SELECT kc.id, kc.telefone_wa,
                    COALESCE(kc.followup_etapa, 0) AS followup_etapa,
                    kc.kanban_coluna, kc.atualizado_em, kc.followup_adiar_ate,
                    COALESCE(kc.followup_pausado, 0) AS followup_pausado,
                    COALESCE(kc.ja_respondeu, 0) AS ja_respondeu,
+                   COALESCE(kc.followup_horario_preferido, 'livre') AS followup_horario_preferido,
+                   COALESCE(kc.followup_msg_custom, '') AS followup_msg_custom,
+                   COALESCE(kc.nome_responsavel, '') AS nome_responsavel,
                    e.nome, e.cidade, e.categoria
             FROM kanban_contatos kc
             JOIN empresas e ON e.id = kc.empresa_id
@@ -6088,68 +6810,47 @@ def followup_fila():
               AND COALESCE(kc.followup_etapa, 0) < ?
               AND COALESCE(kc.pending_pdf, 0) = 0
               AND COALESCE(kc.optout_global, 0) = 0
-              {warm_filter}
             ORDER BY kc.atualizado_em ASC
-            LIMIT 50
-        """, (max_etapas,)).fetchall()
+            LIMIT 120
+        """, (followup_cfg['max_etapas'],)).fetchall()
 
-        agora = _dt.now()
+        agora = datetime.now()
         itens = []
         for p in todos:
-            etapa = p['followup_etapa']
-            coluna = p['kanban_coluna']
-            if coluna == 'Enviado':
-                h = [horas_cfg, 120, 240][min(etapa, 2)]
-            else:
-                h = [48, 120, 240][min(etapa, 2)]
-
-            try:
-                atualizado = _dt.fromisoformat(p['atualizado_em'].replace('Z',''))
-            except:
-                atualizado = agora
-
-            previsto = atualizado + _td(hours=h)
-            if p['followup_adiar_ate']:
-                try:
-                    adiado_ate = _dt.fromisoformat(str(p['followup_adiar_ate']).replace('Z', ''))
-                    if adiado_ate > previsto:
-                        previsto = adiado_ate
-                except:
-                    pass
-            pronto   = previsto <= agora
-            pausado  = bool(p['followup_pausado'])
-            bloqueado_horario = not (hora_inicio <= agora.hour < hora_fim)
-
-            status = 'pausado' if pausado else ('pronto' if pronto else 'aguardando')
-            if not pausado and not pronto and p['followup_adiar_ate']:
-                status = 'adiado'
-            if status == 'pronto' and (bloqueado_horario or not ativo):
-                status = 'aguardando_horario' if bloqueado_horario else 'sistema_pausado'
-
+            row = dict(p)
+            snap = _followup_snapshot(row, conn, cache=followup_cfg, agora=agora)
             itens.append({
-                'contato_id':   p['id'],
-                'nome':         p['nome'],
-                'telefone':     p['telefone_wa'],
-                'coluna':       coluna,
-                'etapa':        etapa + 1,
-                'max_etapas':   max_etapas,
-                'ja_respondeu': bool(p['ja_respondeu']),
-                'pausado':      pausado,
-                'status':       status,
-                'previsto_em':  previsto.strftime('%d/%m/%Y %H:%M'),
-                'horas_restantes': max(0, round((previsto - agora).total_seconds() / 3600, 1)) if not pronto else 0,
+                'contato_id': row['id'],
+                'nome': row['nome'],
+                'telefone': row['telefone_wa'],
+                'coluna': row['kanban_coluna'],
+                'etapa': snap['followup_proxima_etapa'],
+                'max_etapas': snap['followup_max_etapas'],
+                'ja_respondeu': bool(row['ja_respondeu']),
+                'pausado': bool(row['followup_pausado']),
+                'status': snap['followup_status'],
+                'status_label': snap['followup_status_label'],
+                'previsto_em': snap['followup_previsto_em'],
+                'previsto_iso': snap['followup_previsto_iso'],
+                'horas_restantes': snap['followup_horas_restantes'],
+                'mensagem_prevista': snap['followup_texto_resumo'],
+                'mensagem_completa': snap['followup_texto_previsto'],
+                'horario_preferido': snap['followup_horario_preferido'],
+                'horario_preferido_label': snap['followup_horario_preferido_label'],
+                'mensagem_custom_ativa': snap['followup_msg_custom_ativo'],
             })
 
         return jsonify({
             'ok': True,
-            'sistema_ativo':    ativo,
-            'so_warm_leads':    cfg_so_warm,
-            'horario_permitido':f'{hora_inicio}h–{hora_fim}h',
-            'total':            len(itens),
-                'prontos':      sum(1 for i in itens if i['status'] == 'pronto'),
-                'aguardando':   sum(1 for i in itens if i['status'] in ('aguardando', 'adiado', 'aguardando_horario', 'sistema_pausado')),
-                'pausados':     sum(1 for i in itens if i['status'] == 'pausado'),
-            'itens':            itens,
+            'sistema_ativo': followup_cfg['ativo'],
+            'so_warm_leads': followup_cfg['warm_only'],
+            'horario_permitido': f"{followup_cfg['hora_inicio']}h ate {followup_cfg['hora_fim']}h",
+            'colunas_ativas': sorted(followup_cfg['colunas_ativas']),
+            'total': len(itens),
+            'prontos': sum(1 for i in itens if i['status'] == 'pronto'),
+            'aguardando': sum(1 for i in itens if i['status'] in ('aguardando', 'adiado', 'aguardando_horario', 'sistema_pausado', 'bloqueado_coluna', 'warm_only')),
+            'pausados': sum(1 for i in itens if i['status'] == 'pausado'),
+            'itens': itens,
         })
     except Exception as ex:
         return jsonify({'ok': False, 'erro': str(ex)})
@@ -6164,8 +6865,42 @@ def followup_config_get():
     chaves = ['followup_ativo', 'followup_horas', 'followup_max_etapas',
               'followup_so_warm_leads', 'followup_hora_inicio', 'followup_hora_fim',
               'msg_followup', 'msg_followup_etapa2', 'msg_followup_etapa3',
-              'followup_botoes_ativos']
-    result = {c: _cfg(conn, c, '') for c in chaves}
+              'followup_botoes_ativos', 'followup_colunas_ativas',
+              'auto_reply_primeira_resposta_ativo', 'auto_reply_negociando_ativo']
+    defaults = {
+        'followup_ativo': '1',
+        'msg_followup_etapa2': (
+            "{primeiro_nome}, so retomando por aqui para nao te perder.\n\n"
+            "Se ainda fizer sentido olhar a ideia que montei para a *{nome}* em {cidade}, me responde que eu te envio de forma objetiva."
+        ),
+        'msg_followup_etapa3': (
+            "Vou encerrar meu contato por aqui para nao insistir.\n\n"
+            "Se a *{nome}* quiser voltar a falar sobre captar mais clientes pelo Google e WhatsApp, e so me chamar."
+        ),
+        'followup_horas': '48',
+        'followup_max_etapas': '3',
+        'followup_so_warm_leads': '1',
+        'followup_hora_inicio': '8',
+        'followup_hora_fim': '20',
+        'msg_followup': (
+            "Oi, pessoal da *{nome}*.\n\n"
+            "Passando so para confirmar se vale a pena eu te mostrar a ideia que montei para ajudar voces a gerar mais contatos em {cidade}.\n\n"
+            "Se fizer sentido, me responde com *posso ver* e eu envio por aqui."
+        ),
+        'msg_followup_etapa2': (
+            "{primeiro_nome}, so retomando por aqui para nao te perder.\n\n"
+            "Se ainda fizer sentido olhar a ideia que montei para a *{nome}* em {cidade}, me responde que eu te envio de forma objetiva."
+        ),
+        'msg_followup_etapa3': (
+            "Vou encerrar meu contato por aqui para nao insistir.\n\n"
+            "Se a *{nome}* quiser voltar a falar sobre captar mais clientes pelo Google e WhatsApp, e so me chamar."
+        ),
+        'followup_botoes_ativos': '1',
+        'followup_colunas_ativas': 'Enviado,Respondeu',
+        'auto_reply_primeira_resposta_ativo': '1',
+        'auto_reply_negociando_ativo': '1',
+    }
+    result = {c: _cfg(conn, c, defaults.get(c, '')) for c in chaves}
     conn.close()
     return jsonify(result)
 
@@ -6178,7 +6913,8 @@ def followup_config_set():
     chaves_permitidas = ['followup_ativo', 'followup_horas', 'followup_max_etapas',
                          'followup_so_warm_leads', 'followup_hora_inicio', 'followup_hora_fim',
                          'msg_followup', 'msg_followup_etapa2', 'msg_followup_etapa3',
-                         'followup_botoes_ativos']
+                         'followup_botoes_ativos', 'followup_colunas_ativas',
+                         'auto_reply_primeira_resposta_ativo', 'auto_reply_negociando_ativo']
     for chave in chaves_permitidas:
         if chave in d:
             conn.execute("INSERT OR REPLACE INTO config (chave, valor) VALUES (?,?)", (chave, str(d[chave])))
@@ -6197,6 +6933,101 @@ def followup_pausar_contato(contato_id):
     conn.commit()
     conn.close()
     return jsonify({'ok': True, 'pausado': pausar})
+
+
+@app.route('/api/followup/agendar/<int:contato_id>', methods=['POST'])
+def followup_agendar_contato(contato_id):
+    """Agenda ou libera o proximo follow-up de um contato especifico."""
+    d = request.json or {}
+    conn = get_db()
+    try:
+        limpar = bool(d.get('limpar'))
+        retomar = d.get('retomar', True)
+        quando = str(d.get('quando') or '').strip()
+        horario_preferido = str(d.get('horario_preferido') or 'livre').strip().lower()
+        mensagem_custom = d.get('mensagem_custom')
+        limpar_mensagem_custom = bool(d.get('limpar_mensagem_custom'))
+        if horario_preferido not in ('', 'livre', 'manha', 'tarde', 'noite'):
+            horario_preferido = 'livre'
+        mensagem_custom = '' if mensagem_custom is None else str(mensagem_custom).strip()
+
+        if limpar:
+            conn.execute(
+                """UPDATE kanban_contatos
+                      SET followup_adiar_ate=NULL,
+                          followup_pausado=?,
+                          followup_horario_preferido=?,
+                          followup_msg_custom=CASE WHEN ? THEN NULL WHEN ? != '' THEN ? ELSE followup_msg_custom END
+                    WHERE id=?""",
+                (0 if retomar else 1, horario_preferido or 'livre', 1 if limpar_mensagem_custom else 0, mensagem_custom, mensagem_custom, contato_id),
+            )
+        else:
+            if not quando:
+                conn.execute(
+                    """UPDATE kanban_contatos
+                          SET followup_pausado=?,
+                              followup_horario_preferido=?,
+                              followup_msg_custom=CASE WHEN ? THEN NULL WHEN ? != '' THEN ? ELSE followup_msg_custom END
+                        WHERE id=?""",
+                    (
+                        0 if retomar else 1,
+                        horario_preferido or 'livre',
+                        1 if limpar_mensagem_custom else 0,
+                        mensagem_custom,
+                        mensagem_custom,
+                        contato_id,
+                    ),
+                )
+            else:
+                try:
+                    agendar_em = datetime.fromisoformat(quando.replace('Z', ''))
+                except Exception:
+                    return jsonify({'ok': False, 'erro': 'Data/hora invalida.'}), 400
+                conn.execute(
+                    """UPDATE kanban_contatos
+                          SET followup_adiar_ate=?,
+                              followup_pausado=?,
+                              followup_horario_preferido=?,
+                              followup_msg_custom=CASE WHEN ? THEN NULL WHEN ? != '' THEN ? ELSE followup_msg_custom END
+                        WHERE id=?""",
+                    (
+                        agendar_em.strftime('%Y-%m-%d %H:%M:%S'),
+                        0 if retomar else 1,
+                        horario_preferido or 'livre',
+                        1 if limpar_mensagem_custom else 0,
+                        mensagem_custom,
+                        mensagem_custom,
+                        contato_id,
+                    ),
+                )
+
+        conn.commit()
+        row = conn.execute("""
+            SELECT kc.*, e.nome, e.cidade, e.categoria,
+                   COALESCE(kc.nome_responsavel, '') AS nome_responsavel
+            FROM kanban_contatos kc
+            JOIN empresas e ON e.id = kc.empresa_id
+            WHERE kc.id = ?
+        """, (contato_id,)).fetchone()
+        if not row:
+            return jsonify({'ok': False, 'erro': 'Contato nao encontrado.'}), 404
+
+        followup_cfg = {
+            'ativo': _cfg(conn, 'followup_ativo', '1') == '1',
+            'warm_only': _cfg(conn, 'followup_so_warm_leads', '1') == '1',
+            'horas_cfg': _cfg_int(conn, 'followup_horas', '48'),
+            'max_etapas': _cfg_int(conn, 'followup_max_etapas', '3'),
+            'hora_inicio': _cfg_int(conn, 'followup_hora_inicio', '8'),
+            'hora_fim': _cfg_int(conn, 'followup_hora_fim', '20'),
+            'colunas_ativas': set(_followup_colunas_ativas(conn)),
+            'templates': _followup_templates(conn),
+        }
+        snap = _followup_snapshot(dict(row), conn, cache=followup_cfg, agora=datetime.now())
+        return jsonify({'ok': True, 'snapshot': snap})
+    except Exception as ex:
+        return jsonify({'ok': False, 'erro': str(ex)}), 500
+    finally:
+        conn.close()
 
 
 @app.route('/api/wa-quick-reply-config', methods=['GET'])
@@ -6263,6 +7094,33 @@ def kanban_salvar_responsavel(cid):
     conn.close()
     return jsonify({'ok': True})
 
+@app.route('/api/kanban/<int:cid>/confirmar-humana', methods=['POST'])
+def kanban_confirmar_resposta_humana(cid):
+    conn = get_db()
+    row = conn.execute(
+        "SELECT id FROM kanban_contatos WHERE id=?",
+        (cid,),
+    ).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'ok': False, 'erro': 'Contato nao encontrado.'}), 404
+
+    nova_coluna = 'Respondeu'
+    conn.execute(
+        """UPDATE kanban_contatos
+              SET kanban_coluna=?,
+                  ja_respondeu=1,
+                  resposta_classificacao='humana_confirmada',
+                  followup_pausado=0,
+                  atualizado_em=CURRENT_TIMESTAMP
+            WHERE id=?""",
+        (nova_coluna, cid),
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'ok': True, 'nova_coluna': nova_coluna})
+
+
 @app.route('/api/kanban/<int:cid>/notas', methods=['PUT'])
 def kanban_salvar_notas(cid):
     """Salva notas ou briefing estruturado de um card."""
@@ -6289,6 +7147,34 @@ def kanban_salvar_notas(cid):
         'ok': True,
         'notas_kanban': row['notas_kanban'] if row else notas_resumo,
         'briefing_lead': json.loads(row['briefing_lead']) if row and row['briefing_lead'] else briefing,
+    })
+
+
+@app.route('/api/kanban/<int:cid>/entregas', methods=['PUT'])
+def kanban_atualizar_entregas(cid):
+    d = request.json or {}
+    site_enviado = 1 if str(d.get('site_enviado', '0')) in ('1', 'true', 'True') else 0
+    pdf_enviado = 1 if str(d.get('pdf_enviado', '0')) in ('1', 'true', 'True') else 0
+    conn = get_db()
+    conn.execute(
+        """UPDATE kanban_contatos
+              SET site_enviado=?,
+                  pdf_enviado=?,
+                  atualizado_em=CURRENT_TIMESTAMP
+            WHERE id=?""",
+        (site_enviado, pdf_enviado, cid)
+    )
+    conn.commit()
+    row = conn.execute(
+        "SELECT id, COALESCE(site_enviado, 0) AS site_enviado, COALESCE(pdf_enviado, 0) AS pdf_enviado FROM kanban_contatos WHERE id=?",
+        (cid,)
+    ).fetchone()
+    conn.close()
+    return jsonify({
+        'ok': True,
+        'contato_id': cid,
+        'site_enviado': int(row['site_enviado']) if row else site_enviado,
+        'pdf_enviado': int(row['pdf_enviado']) if row else pdf_enviado,
     })
 
 @app.route('/api/kanban/mapear-lid', methods=['POST'])

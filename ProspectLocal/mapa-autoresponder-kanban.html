@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProspectLocal - Mapa do Autoresponder & Kanban</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1px solid #334155; padding: 24px 32px; }
+  .header h1 { font-size: 24px; font-weight: 700; color: #f8fafc; }
+  .header p { color: #94a3b8; margin-top: 4px; font-size: 14px; }
+
+  .tabs { display: flex; gap: 8px; padding: 16px 32px; background: #1e293b; border-bottom: 1px solid #334155; overflow-x: auto; }
+  .tab { padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; background: transparent; border: 1px solid #334155; color: #94a3b8; transition: all 0.2s; white-space: nowrap; }
+  .tab:hover { border-color: #3b82f6; color: #93c5fd; }
+  .tab.active { background: #3b82f6; border-color: #3b82f6; color: white; }
+
+  .content { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Kanban Flow */
+  .kanban-flow { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; }
+  .kanban-col { min-width: 240px; flex: 1; background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+  .kanban-col.col-fila { border-top: 3px solid #6366f1; }
+  .kanban-col.col-enviado { border-top: 3px solid #f59e0b; }
+  .kanban-col.col-respondeu { border-top: 3px solid #22c55e; }
+  .kanban-col.col-negociando { border-top: 3px solid #3b82f6; }
+  .kanban-col.col-fechado { border-top: 3px solid #10b981; }
+  .kanban-col.col-descartado { border-top: 3px solid #ef4444; }
+
+  .col-header { padding: 16px; border-bottom: 1px solid #334155; }
+  .col-header h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .col-header .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+
+  .col-body { padding: 12px; }
+  .msg-card { background: #0f172a; border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid; font-size: 13px; }
+  .msg-card.auto { border-left-color: #f59e0b; }
+  .msg-card.manual { border-left-color: #3b82f6; }
+  .msg-card.trigger { border-left-color: #22c55e; }
+  .msg-card.stop { border-left-color: #ef4444; }
+
+  .msg-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 4px; }
+  .msg-card .label.auto-label { color: #f59e0b; }
+  .msg-card .label.manual-label { color: #3b82f6; }
+  .msg-card .label.trigger-label { color: #22c55e; }
+  .msg-card .label.stop-label { color: #ef4444; }
+  .msg-card .text { color: #cbd5e1; line-height: 1.5; }
+  .msg-card .timing { color: #64748b; font-size: 11px; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+
+  .arrow-down { text-align: center; color: #475569; font-size: 20px; padding: 4px 0; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 40px; }
+  .timeline::before { content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: #334155; }
+  .timeline-item { position: relative; margin-bottom: 24px; }
+  .timeline-item::before { content: ''; position: absolute; left: -29px; top: 4px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+  .timeline-item.step-fila::before { border-color: #6366f1; background: #6366f1; }
+  .timeline-item.step-enviado::before { border-color: #f59e0b; background: #f59e0b; }
+  .timeline-item.step-respondeu::before { border-color: #22c55e; background: #22c55e; }
+  .timeline-item.step-negociando::before { border-color: #3b82f6; background: #3b82f6; }
+  .timeline-item.step-fechado::before { border-color: #10b981; background: #10b981; }
+  .timeline-item.step-descartado::before { border-color: #ef4444; background: #ef4444; }
+
+  .tl-card { background: #1e293b; border-radius: 10px; padding: 16px; border: 1px solid #334155; }
+  .tl-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .tl-card p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .tl-card .msg-preview { background: #0f172a; border-radius: 6px; padding: 10px; margin-top: 8px; font-size: 12px; color: #cbd5e1; border-left: 3px solid #f59e0b; font-style: italic; }
+  .tl-card .condition { background: #1a1a2e; border-radius: 6px; padding: 8px 10px; margin-top: 8px; font-size: 12px; color: #a78bfa; display: flex; align-items: flex-start; gap: 6px; }
+  .tl-card .condition::before { content: '⚡'; flex-shrink: 0; }
+
+  /* Rules Table */
+  .rules-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .rules-table th, .rules-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #334155; font-size: 13px; }
+  .rules-table th { background: #1e293b; color: #94a3b8; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; }
+  .rules-table td { color: #cbd5e1; }
+  .rules-table tr:hover td { background: #1e293b; }
+
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .status-dot.green { background: #22c55e; }
+  .status-dot.yellow { background: #f59e0b; }
+  .status-dot.red { background: #ef4444; }
+  .status-dot.blue { background: #3b82f6; }
+
+  /* Decision Tree */
+  .decision-tree { background: #1e293b; border-radius: 12px; padding: 24px; border: 1px solid #334155; }
+  .dt-node { background: #0f172a; border-radius: 8px; padding: 14px 18px; margin: 8px 0; border: 1px solid #334155; }
+  .dt-node.question { border-color: #8b5cf6; background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); }
+  .dt-node.action { border-color: #22c55e; }
+  .dt-node.warning { border-color: #ef4444; }
+  .dt-branch { padding-left: 24px; border-left: 2px dashed #334155; margin-left: 16px; }
+  .dt-label { font-size: 11px; color: #94a3b8; font-weight: 600; margin: 8px 0 4px 0; text-transform: uppercase; }
+
+  /* Config Panel */
+  .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+  .config-card { background: #1e293b; border-radius: 10px; padding: 20px; border: 1px solid #334155; }
+  .config-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .config-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 13px; }
+  .config-item:last-child { border-bottom: none; }
+  .config-key { color: #94a3b8; }
+  .config-val { color: #f8fafc; font-weight: 500; font-family: 'Courier New', monospace; font-size: 12px; }
+
+  /* Problems section */
+  .problem-card { background: #1e293b; border-radius: 10px; padding: 20px; border: 1px solid #334155; margin-bottom: 16px; border-left: 4px solid; }
+  .problem-card.critical { border-left-color: #ef4444; }
+  .problem-card.warning { border-left-color: #f59e0b; }
+  .problem-card.info { border-left-color: #3b82f6; }
+  .problem-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .problem-card p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+  .problem-card .fix { background: #0f172a; border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 12px; color: #22c55e; }
+  .problem-card .fix::before { content: '✅ Solução: '; font-weight: 600; }
+
+  .highlight { background: #fbbf2420; padding: 2px 6px; border-radius: 4px; color: #fbbf24; font-family: monospace; font-size: 12px; }
+
+  /* Flowchart section */
+  .flow-container { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 20px; }
+  .flow-box { padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 500; text-align: center; min-width: 220px; }
+  .flow-box.start { background: #6366f1; color: white; border-radius: 20px; }
+  .flow-box.process { background: #1e293b; border: 1px solid #334155; color: #e2e8f0; }
+  .flow-box.decision { background: #1e1b4b; border: 1px solid #7c3aed; color: #c4b5fd; transform: rotate(0deg); clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); padding: 30px 40px; }
+  .flow-box.end-good { background: #166534; color: #86efac; border-radius: 20px; }
+  .flow-box.end-bad { background: #7f1d1d; color: #fca5a5; border-radius: 20px; }
+  .flow-arrow { color: #475569; font-size: 18px; }
+  .flow-branch { display: flex; gap: 40px; align-items: flex-start; }
+  .flow-branch-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .flow-label { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .content { padding: 16px; }
+    .kanban-flow { flex-direction: column; }
+    .kanban-col { min-width: 100%; }
+    .config-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🗺️ ProspectLocal — Mapa Completo do Autoresponder</h1>
+  <p>Visualize exatamente qual mensagem cada lead recebe, quando, e por quê</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showSection('overview')">📋 Visão Geral Kanban</div>
+  <div class="tab" onclick="showSection('timeline')">⏱️ Linha do Tempo do Lead</div>
+  <div class="tab" onclick="showSection('responses')">💬 Árvore de Respostas</div>
+  <div class="tab" onclick="showSection('rules')">📏 Tabela de Regras</div>
+  <div class="tab" onclick="showSection('config')">⚙️ Configurações Atuais</div>
+  <div class="tab" onclick="showSection('problems')">⚠️ Problemas & Soluções</div>
+</div>
+
+<!-- ============ SEÇÃO 1: VISÃO GERAL KANBAN ============ -->
+<div class="content">
+<div class="section active" id="overview">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">Mensagens automáticas por coluna do Kanban</h2>
+  <p style="font-size:13px; color:#94a3b8; margin-bottom:20px;">Cada coluna mostra as mensagens que o lead pode receber enquanto está naquela etapa. Amarelo = automático, Azul = manual, Verde = gatilho de resposta, Vermelho = parada.</p>
+
+  <div class="kanban-flow">
+    <!-- FILA -->
+    <div class="kanban-col col-fila">
+      <div class="col-header">
+        <h3>📥 Fila <span class="badge" style="background:#6366f120; color:#a5b4fc;">Aguardando</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card manual">
+          <div class="label manual-label">Nenhuma mensagem automática</div>
+          <div class="text">Lead está na fila aguardando ser incluído em uma campanha ou envio manual.</div>
+          <div class="timing">⏳ Sem disparos automáticos</div>
+        </div>
+        <div class="msg-card trigger">
+          <div class="label trigger-label">Próxima ação</div>
+          <div class="text">Enviar lote (campanha) ou envio manual → move para <strong>Enviado</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENVIADO -->
+    <div class="kanban-col col-enviado">
+      <div class="col-header">
+        <h3>📤 Enviado <span class="badge" style="background:#f59e0b20; color:#fbbf24;">Ativo</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card auto">
+          <div class="label auto-label">Mensagem de abertura ✉️</div>
+          <div class="text">Template escolhido na campanha (ex: "Diagnóstico Local", "Google Forte", "Sem Website")</div>
+          <div class="timing">📨 Enviada no momento da campanha</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 0</div>
+          <div class="text">Mensagem genérica de follow-up relembrando a proposta</div>
+          <div class="timing">⏰ Após 48 horas sem resposta</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 1</div>
+          <div class="text">Follow-up mais direto, mencionando benefícios</div>
+          <div class="timing">⏰ Após +5 dias (120h) sem resposta</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 2 (Final)</div>
+          <div class="text">Última tentativa, tom de encerramento</div>
+          <div class="timing">⏰ Após +10 dias (240h) sem resposta</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card stop">
+          <div class="label stop-label">🛑 Parada automática</div>
+          <div class="text">Max 3 follow-ups atingido. Nenhuma mensagem mais será enviada automaticamente.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESPONDEU -->
+    <div class="kanban-col col-respondeu">
+      <div class="col-header">
+        <h3>💬 Respondeu <span class="badge" style="background:#22c55e20; color:#86efac;">Quente</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card trigger">
+          <div class="label trigger-label">Auto-resposta imediata</div>
+          <div class="text">Depende do que o lead respondeu (ver aba "Árvore de Respostas")</div>
+          <div class="timing">⚡ Imediato ao receber mensagem</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 0</div>
+          <div class="text">Follow-up reconhecendo a interação anterior</div>
+          <div class="timing">⏰ Após 48h se não avançou</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 1</div>
+          <div class="text">Segunda tentativa de retomar conversa</div>
+          <div class="timing">⏰ Após +5 dias (120h)</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-up Etapa 2 (Final)</div>
+          <div class="text">Última tentativa</div>
+          <div class="timing">⏰ Após +10 dias (240h)</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card stop">
+          <div class="label stop-label">🛑 Parada automática</div>
+          <div class="text">Max follow-ups atingido.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEGOCIANDO -->
+    <div class="kanban-col col-negociando">
+      <div class="col-header">
+        <h3>🤝 Negociando <span class="badge" style="background:#3b82f620; color:#93c5fd;">Manual</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card auto">
+          <div class="label auto-label">Follow-ups continuam!</div>
+          <div class="text">⚠️ O sistema CONTINUA enviando follow-ups mesmo nesta coluna, nos mesmos intervalos.</div>
+          <div class="timing">⏰ Mesma lógica de Enviado/Respondeu</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card manual">
+          <div class="label manual-label">Chat manual</div>
+          <div class="text">Você pode enviar mensagens manuais pelo chat do Kanban.</div>
+          <div class="timing">✋ Quando você quiser</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="msg-card stop">
+          <div class="label stop-label">⚠️ Risco de conflito</div>
+          <div class="text">Se você está negociando manualmente E o follow-up automático dispara ao mesmo tempo, o lead pode receber mensagens duplicadas/contraditórias!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FECHADO -->
+    <div class="kanban-col col-fechado">
+      <div class="col-header">
+        <h3>✅ Fechado <span class="badge" style="background:#10b98120; color:#6ee7b7;">Concluído</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card stop">
+          <div class="label stop-label">🛑 Nenhuma mensagem</div>
+          <div class="text">Automação para. Nenhuma mensagem automática será enviada.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESCARTADO -->
+    <div class="kanban-col col-descartado">
+      <div class="col-header">
+        <h3>🚫 Descartado <span class="badge" style="background:#ef444420; color:#fca5a5;">Bloqueado</span></h3>
+      </div>
+      <div class="col-body">
+        <div class="msg-card stop">
+          <div class="label stop-label">🛑 Bloqueio total</div>
+          <div class="text">Se optout_global=1, NUNCA mais receberá mensagens. Nem manual, nem automática.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEÇÃO 2: LINHA DO TEMPO ============ -->
+<div class="section" id="timeline">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">Jornada completa de um lead (do início ao fim)</h2>
+  <p style="font-size:13px; color:#94a3b8; margin-bottom:24px;">Este é o caminho que um lead típico percorre, com todas as mensagens que recebe em cada momento.</p>
+
+  <div class="timeline">
+    <div class="timeline-item step-fila">
+      <div class="tl-card">
+        <h4 style="color:#a5b4fc;">📥 Etapa 1 — Entra na Fila</h4>
+        <p>Lead é criado via raspagem do Google Maps, importação CSV ou cadastro manual.</p>
+        <div class="condition">Nenhuma mensagem é enviada. O lead apenas existe no sistema.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-enviado">
+      <div class="tl-card">
+        <h4 style="color:#fbbf24;">📤 Etapa 2 — Primeira Mensagem (Abertura)</h4>
+        <p>Você dispara via campanha em lote ou envio manual. O lead move para "Enviado".</p>
+        <div class="msg-preview">"Olá! Vi que o {nome} em {cidade} tem ótimas avaliações no Google. Preparei um diagnóstico gratuito da presença digital de vocês..."</div>
+        <div class="condition">followup_etapa = 0 | followup_enviado_em = agora | template_origem = template usado</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-enviado">
+      <div class="tl-card">
+        <h4 style="color:#fbbf24;">⏰ Etapa 3 — Follow-up #1 (48h depois)</h4>
+        <p>Se o lead NÃO respondeu em 48 horas, o sistema envia automaticamente.</p>
+        <div class="msg-preview">Mensagem genérica de follow-up relembrando a proposta inicial.</div>
+        <div class="condition">Só dispara se: followup_ativo=1 AND horário entre 8h-20h AND followup_pausado=0 AND optout_global=0</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-enviado">
+      <div class="tl-card">
+        <h4 style="color:#fbbf24;">⏰ Etapa 4 — Follow-up #2 (5 dias depois)</h4>
+        <p>Se ainda não respondeu, segunda tentativa automática.</p>
+        <div class="msg-preview">Follow-up mais direto, mencionando benefícios específicos.</div>
+        <div class="condition">followup_etapa = 1 | 120 horas após o último follow-up</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-enviado">
+      <div class="tl-card">
+        <h4 style="color:#fbbf24;">⏰ Etapa 5 — Follow-up #3 Final (10 dias depois)</h4>
+        <p>Última tentativa automática. Tom de encerramento.</p>
+        <div class="msg-preview">Última mensagem com tom de encerramento e porta aberta.</div>
+        <div class="condition">followup_etapa = 2 | 240 horas | Após isto: AUTOMAÇÃO PARA COMPLETAMENTE</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-respondeu">
+      <div class="tl-card">
+        <h4 style="color:#86efac;">💬 Alternativa — Lead Responde!</h4>
+        <p>Em qualquer momento que o lead responder, ele move para "Respondeu" e o sistema processa a resposta.</p>
+        <div class="condition">Ver aba "Árvore de Respostas" para detalhes de cada cenário de resposta.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-negociando">
+      <div class="tl-card">
+        <h4 style="color:#93c5fd;">🤝 Etapa 6 — Negociação (manual)</h4>
+        <p>Você move manualmente o lead para "Negociando". <strong style="color:#fbbf24;">⚠️ ATENÇÃO: follow-ups automáticos CONTINUAM nesta coluna!</strong></p>
+        <div class="condition">Para evitar conflito, use followup_pausado=1 ao mover para Negociando, ou ajuste o código.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item step-fechado">
+      <div class="tl-card">
+        <h4 style="color:#6ee7b7;">✅ Etapa 7 — Fechado</h4>
+        <p>Deal fechado! Toda automação para.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item step-descartado">
+      <div class="tl-card">
+        <h4 style="color:#fca5a5;">🚫 Alternativa — Descartado</h4>
+        <p>Lead clicou "Sair", pediu para parar, ou você descartou manualmente. Bloqueio total e permanente.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEÇÃO 3: ÁRVORE DE RESPOSTAS ============ -->
+<div class="section" id="responses">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">O que acontece quando o lead responde?</h2>
+  <p style="font-size:13px; color:#94a3b8; margin-bottom:24px;">Árvore de decisão automática baseada no conteúdo da resposta do lead.</p>
+
+  <div class="decision-tree">
+    <div class="dt-node question" style="text-align:center;">
+      <strong>📩 Lead envia mensagem no WhatsApp</strong><br>
+      <span style="font-size:12px; color:#a78bfa;">O sistema analisa o texto e os botões clicados</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:16px;">
+      <!-- Coluna esquerda: Botões -->
+      <div>
+        <h3 style="font-size:14px; color:#a78bfa; margin-bottom:12px;">🔘 Se clicou em um BOTÃO:</h3>
+
+        <div class="dt-branch">
+          <div class="dt-label" style="color:#22c55e;">✅ Botão "Quero ver"</div>
+          <div class="dt-node action">
+            <strong>Ação:</strong> Envia o PDF do diagnóstico<br>
+            <span style="font-size:12px; color:#94a3b8;">pending_pdf = 1 | Move para Respondeu | ja_respondeu = 1</span>
+          </div>
+
+          <div class="dt-label" style="color:#f59e0b;">⏰ Botão "Depois"</div>
+          <div class="dt-node action">
+            <strong>Ação:</strong> "Sem problema! Fico à disposição..."<br>
+            <span style="font-size:12px; color:#94a3b8;">followup_adiar_ate = agora + 48h | Adia follow-ups</span>
+          </div>
+
+          <div class="dt-label" style="color:#ef4444;">🚫 Botão "Não tenho interesse" / "Sair"</div>
+          <div class="dt-node warning">
+            <strong>Ação:</strong> BLOQUEIO TOTAL<br>
+            <span style="font-size:12px; color:#fca5a5;">optout_global = 1 | Move para Descartado | NUNCA mais envia</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna direita: Texto -->
+      <div>
+        <h3 style="font-size:14px; color:#a78bfa; margin-bottom:12px;">✍️ Se escreveu TEXTO:</h3>
+
+        <div class="dt-branch">
+          <div class="dt-label" style="color:#22c55e;">Contém "sim", "posso ver", "show", "quero"</div>
+          <div class="dt-node action">
+            <strong>Ação:</strong> Envia msg_resposta_sim (configurável)<br>
+            <span style="font-size:12px; color:#94a3b8;">Normalmente prepara envio do diagnóstico PDF</span>
+          </div>
+
+          <div class="dt-label" style="color:#ef4444;">Contém "não", "nao", "no"</div>
+          <div class="dt-node action">
+            <strong>Ação:</strong> Envia msg_resposta_nao (configurável)<br>
+            <span style="font-size:12px; color:#94a3b8;">resposta_classificacao = 'nao' | Mensagem educada de encerramento</span>
+          </div>
+
+          <div class="dt-label" style="color:#3b82f6;">Qualquer outro texto</div>
+          <div class="dt-node action">
+            <strong>Ação:</strong> Move para "Respondeu", sem auto-resposta<br>
+            <span style="font-size:12px; color:#94a3b8;">ja_respondeu = 1 | Aguarda intervenção manual OU follow-up automático</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEÇÃO 4: TABELA DE REGRAS ============ -->
+<div class="section" id="rules">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">Regras completas de disparo automático</h2>
+
+  <div style="overflow-x:auto;">
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>Coluna Kanban</th>
+          <th>Tipo de Mensagem</th>
+          <th>Quando Dispara</th>
+          <th>Condições</th>
+          <th>Pode Parar?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="status-dot" style="background:#6366f1;"></span>Fila</td>
+          <td>Nenhuma</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#f59e0b;"></span>Enviado</td>
+          <td>Abertura (template)</td>
+          <td>No momento do envio da campanha</td>
+          <td>Campanha ativa OU envio manual</td>
+          <td>Pausar campanha</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#f59e0b;"></span>Enviado</td>
+          <td>Follow-up #1</td>
+          <td>48h após abertura</td>
+          <td>followup_ativo=1, horário 8h-20h, não respondeu, não optout</td>
+          <td>followup_pausado=1 ou followup_ativo=0</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#f59e0b;"></span>Enviado</td>
+          <td>Follow-up #2</td>
+          <td>120h (5 dias) após FU#1</td>
+          <td>Mesmas condições + followup_etapa=1</td>
+          <td>followup_pausado=1</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#f59e0b;"></span>Enviado</td>
+          <td>Follow-up #3 (final)</td>
+          <td>240h (10 dias) após FU#2</td>
+          <td>Mesmas condições + followup_etapa=2</td>
+          <td>Automático: para após este</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#22c55e;"></span>Respondeu</td>
+          <td>Auto-resposta</td>
+          <td>Imediato (ao receber msg)</td>
+          <td>Baseado em keywords/botões (ver Árvore)</td>
+          <td>Editar msg_resposta_sim/nao na config</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#22c55e;"></span>Respondeu</td>
+          <td>Follow-ups #1 a #3</td>
+          <td>48h / 120h / 240h</td>
+          <td>Mesmas regras de follow-up</td>
+          <td>followup_pausado=1</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#3b82f6;"></span>Negociando</td>
+          <td>Follow-ups #1 a #3</td>
+          <td>48h / 120h / 240h</td>
+          <td>⚠️ MESMAS regras! Não para automaticamente!</td>
+          <td>followup_pausado=1 (deve ser manual)</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#10b981;"></span>Fechado</td>
+          <td>Nenhuma</td>
+          <td>—</td>
+          <td>Automação encerrada</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><span class="status-dot" style="background:#ef4444;"></span>Descartado</td>
+          <td>Nenhuma</td>
+          <td>—</td>
+          <td>optout_global=1 → bloqueio total</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:24px; background:#1e293b; border-radius:10px; padding:20px; border:1px solid #334155;">
+    <h3 style="font-size:15px; margin-bottom:12px;">📊 Resumo rápido: "Quando o lead PARA de receber mensagens?"</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:12px;">
+      <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:3px solid #ef4444;">
+        <strong style="color:#fca5a5;">🛑 Clicou "Sair" / Optout</strong><br>
+        <span style="font-size:12px; color:#94a3b8;">Para IMEDIATAMENTE e PERMANENTEMENTE</span>
+      </div>
+      <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:3px solid #f59e0b;">
+        <strong style="color:#fbbf24;">⏰ 3 Follow-ups sem resposta</strong><br>
+        <span style="font-size:12px; color:#94a3b8;">Para após ~15 dias total (48h + 120h + 240h)</span>
+      </div>
+      <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:3px solid #10b981;">
+        <strong style="color:#6ee7b7;">✅ Movido para "Fechado"</strong><br>
+        <span style="font-size:12px; color:#94a3b8;">Para (deal concluído)</span>
+      </div>
+      <div style="background:#0f172a; padding:12px; border-radius:8px; border-left:3px solid #3b82f6;">
+        <strong style="color:#93c5fd;">⏸️ followup_pausado = 1</strong><br>
+        <span style="font-size:12px; color:#94a3b8;">Para até você reativar manualmente</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEÇÃO 5: CONFIGURAÇÕES ============ -->
+<div class="section" id="config">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">Configurações que controlam o autoresponder</h2>
+  <p style="font-size:13px; color:#94a3b8; margin-bottom:20px;">Estas configurações estão na tabela <span class="highlight">config</span> do banco de dados. Acessíveis via API <span class="highlight">GET/POST /api/config</span></p>
+
+  <div class="config-grid">
+    <div class="config-card">
+      <h4>⏰ Timing dos Follow-ups</h4>
+      <div class="config-item"><span class="config-key">followup_ativo</span> <span class="config-val">1 (ligado)</span></div>
+      <div class="config-item"><span class="config-key">followup_horas</span> <span class="config-val">48 horas</span></div>
+      <div class="config-item"><span class="config-key">followup_hora_inicio</span> <span class="config-val">08:00</span></div>
+      <div class="config-item"><span class="config-key">followup_hora_fim</span> <span class="config-val">20:00</span></div>
+      <div class="config-item"><span class="config-key">followup_max_etapas</span> <span class="config-val">3</span></div>
+      <div class="config-item"><span class="config-key">followup_so_warm_leads</span> <span class="config-val">0 (todos)</span></div>
+    </div>
+
+    <div class="config-card">
+      <h4>💬 Mensagens Automáticas</h4>
+      <div class="config-item"><span class="config-key">msg_resposta_sim</span> <span class="config-val">(configurável)</span></div>
+      <div class="config-item"><span class="config-key">msg_resposta_nao</span> <span class="config-val">(configurável)</span></div>
+      <div class="config-item"><span class="config-key">msg_followup</span> <span class="config-val">(configurável)</span></div>
+      <div class="config-item"><span class="config-key">msg_segunda_abordagem</span> <span class="config-val">(configurável)</span></div>
+      <div class="config-item"><span class="config-key">msg_pedir_nome</span> <span class="config-val">(configurável)</span></div>
+    </div>
+
+    <div class="config-card">
+      <h4>🔘 Botões Quick-Reply</h4>
+      <div class="config-item"><span class="config-key">followup_botoes_ativos</span> <span class="config-val">1 (ligado)</span></div>
+      <div class="config-item"><span class="config-key">wa_quick_reply_footer</span> <span class="config-val">"Toque em uma opção"</span></div>
+      <div class="config-item"><span class="config-key">Botão 1</span> <span class="config-val">✅ Quero ver</span></div>
+      <div class="config-item"><span class="config-key">Botão 2</span> <span class="config-val">⏰ Depois</span></div>
+      <div class="config-item"><span class="config-key">Botão 3</span> <span class="config-val">🚫 Não tenho interesse</span></div>
+    </div>
+
+    <div class="config-card">
+      <h4>🚀 Campanha (Anti-throttle)</h4>
+      <div class="config-item"><span class="config-key">intervalo_min_ms</span> <span class="config-val">2200ms</span></div>
+      <div class="config-item"><span class="config-key">intervalo_max_ms</span> <span class="config-val">4200ms</span></div>
+      <div class="config-item"><span class="config-key">estrategia</span> <span class="config-val">round_robin</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px; background:#1e293b; border-radius:10px; padding:20px; border:1px solid #f59e0b;">
+    <h3 style="font-size:15px; margin-bottom:8px; color:#fbbf24;">⚠️ Onde editar essas configurações?</h3>
+    <p style="font-size:13px; color:#94a3b8;">Atualmente, a maioria dessas configurações só pode ser alterada diretamente no banco de dados (tabela <span class="highlight">config</span>) ou via API. Não há um painel visual completo para gerenciar todas elas no frontend.</p>
+  </div>
+</div>
+
+<!-- ============ SEÇÃO 6: PROBLEMAS & SOLUÇÕES ============ -->
+<div class="section" id="problems">
+  <h2 style="font-size:18px; margin-bottom:16px; color:#f8fafc;">Problemas identificados & Soluções recomendadas</h2>
+
+  <div class="problem-card critical">
+    <h4>🔴 Problema #1: Follow-ups disparam em "Negociando"</h4>
+    <p>O check-followup processa leads em Enviado, Respondeu E Negociando com a mesma lógica. Quando você está negociando manualmente e o follow-up automático dispara, o lead recebe mensagens genéricas que não fazem sentido no contexto da negociação.</p>
+    <div class="fix">Ao mover um lead para "Negociando", o sistema deveria automaticamente setar <span class="highlight">followup_pausado = 1</span>. Isso precisa ser adicionado na rota <span class="highlight">POST /api/kanban/mover-coluna</span>.</div>
+  </div>
+
+  <div class="problem-card critical">
+    <h4>🔴 Problema #2: Sem visibilidade da próxima mensagem no Kanban</h4>
+    <p>Você não consegue ver, olhando para um card do lead no Kanban, qual será a próxima mensagem automática que ele vai receber e quando. Tudo está no backend (followup_etapa, followup_enviado_em) sem exposição visual.</p>
+    <div class="fix">Adicionar no card do Kanban um indicador visual mostrando: etapa atual do follow-up (0/1/2/3), tempo até o próximo disparo, e um botão para pausar/retomar follow-ups.</div>
+  </div>
+
+  <div class="problem-card warning">
+    <h4>🟡 Problema #3: Não há preview da mensagem que será enviada</h4>
+    <p>Antes de um follow-up ser disparado, não existe forma de ver qual será o texto exato. As mensagens de follow-up são geradas dinamicamente e não há uma tela para visualizá-las antes.</p>
+    <div class="fix">Criar uma seção no card do lead que mostre um "preview" da próxima mensagem de follow-up que será enviada, com as variáveis já preenchidas.</div>
+  </div>
+
+  <div class="problem-card warning">
+    <h4>🟡 Problema #4: Detecção de keywords muito simplista</h4>
+    <p>A auto-resposta é baseada em keywords simples como "sim", "não", "posso ver". Se o lead escrever algo como "não sei se posso ver agora", o sistema pode interpretar incorretamente como positivo (por conter "posso ver") ou negativo (por conter "não").</p>
+    <div class="fix">Melhorar a lógica de detecção para checar a intenção completa, não apenas keywords isoladas. Ordem de prioridade importa (checar "não" antes de "sim" se ambos estiverem presentes).</div>
+  </div>
+
+  <div class="problem-card info">
+    <h4>🔵 Problema #5: Configurações espalhadas entre código e banco</h4>
+    <p>Algumas regras estão hardcoded no app.py (como os intervalos 48h/120h/240h entre follow-ups), enquanto outras estão na tabela config. Isso dificulta ajustes rápidos.</p>
+    <div class="fix">Mover TODOS os timings e textos para a tabela config e criar um painel de configuração completo no frontend.</div>
+  </div>
+
+  <div class="problem-card info">
+    <h4>🔵 Problema #6: Falta log visual de o que foi enviado automaticamente</h4>
+    <p>As mensagens automáticas ficam registradas na tabela wa_mensagens com contexto_envio, mas no chat do lead não fica claro visualmente quais foram automáticas vs manuais.</p>
+    <div class="fix">No chat do Kanban, adicionar um badge visual (🤖 Auto / ✋ Manual) em cada mensagem para diferenciar disparos automáticos de manuais.</div>
+  </div>
+
+  <div style="margin-top:24px; background:linear-gradient(135deg, #1e293b 0%, #1e1b4b 100%); border-radius:12px; padding:24px; border:1px solid #7c3aed;">
+    <h3 style="font-size:16px; margin-bottom:12px; color:#c4b5fd;">💡 Recomendação Principal: Painel de Controle no Card do Kanban</h3>
+    <p style="font-size:13px; color:#94a3b8; line-height:1.7;">O ideal seria adicionar em cada card do lead no Kanban um mini-painel mostrando:</p>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-top:12px;">
+      <div style="background:#0f172a; padding:10px; border-radius:6px; font-size:12px; color:#e2e8f0;">
+        <strong>📊 Status Follow-up:</strong><br>Etapa 1 de 3
+      </div>
+      <div style="background:#0f172a; padding:10px; border-radius:6px; font-size:12px; color:#e2e8f0;">
+        <strong>⏰ Próximo envio:</strong><br>Em 23h (amanhã 14:30)
+      </div>
+      <div style="background:#0f172a; padding:10px; border-radius:6px; font-size:12px; color:#e2e8f0;">
+        <strong>💬 Próxima msg:</strong><br>"Olá {nome}, passando..."
+      </div>
+      <div style="background:#0f172a; padding:10px; border-radius:6px; font-size:12px; color:#e2e8f0;">
+        <strong>⏸️ Controle:</strong><br>[Pausar] [Pular] [Editar]
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

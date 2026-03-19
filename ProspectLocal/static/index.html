@@ -169,34 +169,129 @@ a{color:var(--accent2);text-decoration:none}
 .hidden{display:none}
 
 /* ── KANBAN ── */
-.kanban-board{display:flex;gap:10px;padding-bottom:8px;min-height:520px;align-items:flex-start;width:100%}
-.kanban-col{background:var(--card);border:1px solid var(--border);border-radius:12px;flex:1 1 0;min-width:160px;display:flex;flex-direction:column}
-.kanban-col-header{padding:10px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-radius:12px 12px 0 0}
-.kanban-col-title{font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.kanban-col-count{font-size:.7rem;background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:1px 7px;color:var(--muted);flex-shrink:0}
-.kanban-col-body{flex:1;padding:7px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:calc(100vh - 340px);min-height:80px}
-@media(max-width:1100px){.kanban-board{overflow-x:auto}.kanban-col{min-width:190px;flex-shrink:0}}
-.kanban-col-body.drag-over{background:rgba(108,99,255,.12);border-radius:0 0 10px 10px}
-.kanban-card{background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:9px 66px 9px 9px;cursor:grab;transition:.15s;user-select:none;position:relative}
-.kanban-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.kanban-board{display:flex;gap:14px;padding:4px 0 10px;min-height:520px;align-items:flex-start;width:100%}
+.kanban-board.is-compact .kanban-card{padding:11px 12px;border-radius:16px}
+.kanban-board.is-compact .kanban-card-nome{font-size:.88rem;line-height:1.22}
+.kanban-board.is-compact .kanban-card-cat{font-size:.68rem}
+.kanban-board.is-compact .kanban-card-primary{padding:9px 10px;margin-top:9px}
+.kanban-board.is-compact .kanban-card-primary-value{font-size:.72rem;line-height:1.35}
+.kanban-board.is-compact .kanban-card-actions{margin-top:10px;padding-top:9px}
+.kanban-board.is-compact .kanban-card-open{padding-top:8px;margin-top:8px;font-size:.67rem}
+.kanban-board.has-focus .kanban-col{display:none}
+.kanban-board.has-focus .kanban-col.is-focus{display:flex;flex:1 1 auto;min-width:100%;opacity:1;transform:none}
+.kanban-col{background:linear-gradient(180deg,rgba(14,22,38,.96),rgba(10,18,32,.98));border:1px solid rgba(114,199,255,.1);border-radius:18px;flex:1 1 0;min-width:220px;display:flex;flex-direction:column;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.kanban-col-header{padding:12px 13px;border-bottom:1px solid rgba(114,199,255,.08);display:flex;align-items:center;justify-content:space-between;border-radius:18px 18px 0 0;background:linear-gradient(180deg,rgba(255,255,255,.015),transparent)}
+.kanban-col-title{font-size:.74rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#e7f0fb}
+.kanban-col-count{font-size:.69rem;background:rgba(148,163,184,.08);border:1px solid rgba(148,163,184,.12);border-radius:999px;padding:2px 8px;color:#a9bdd8;flex-shrink:0}
+.kanban-col-tools{display:flex;align-items:center;gap:7px}
+.kanban-col-focus-btn{width:26px;height:26px;border-radius:8px;border:1px solid rgba(114,199,255,.12);background:rgba(255,255,255,.03);color:#9eb4d0;font-size:.74rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+.kanban-col-focus-btn:hover{color:#eef6ff;border-color:rgba(114,199,255,.24);background:rgba(114,199,255,.08)}
+.kanban-col.is-focus .kanban-col-focus-btn{color:#7dd3fc;border-color:rgba(56,189,248,.34);background:rgba(56,189,248,.08)}
+.kanban-col-body{flex:1;padding:12px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:calc(100vh - 340px);min-height:80px}
+@media(max-width:1100px){.kanban-board{overflow-x:auto}.kanban-col{min-width:260px;flex-shrink:0}}
+.kanban-col-body.drag-over{background:rgba(56,189,248,.08);border-radius:0 0 16px 16px}
+.kanban-card{background:linear-gradient(180deg,rgba(28,40,67,.92),rgba(21,31,52,.94));border:1px solid rgba(115,138,176,.12);border-radius:20px;padding:15px;cursor:grab;transition:.18s;user-select:none;position:relative;box-shadow:0 6px 18px rgba(2,6,23,.14)}
+.kanban-card:hover{border-color:rgba(114,199,255,.24);transform:translateY(-1px);box-shadow:0 14px 26px rgba(2,6,23,.18)}
+.kanban-card.is-active{border-color:rgba(56,189,248,.42);box-shadow:0 0 0 1px rgba(56,189,248,.14),0 18px 34px rgba(2,6,23,.24)}
 .kanban-card.dragging{opacity:.4;transform:scale(.96)}
-.kanban-card-nome{font-size:.81rem;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.kanban-card-cat{font-size:.7rem;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.kanban-card-rating{display:inline-flex;align-items:center;gap:6px;margin:1px 0 4px;padding:3px 7px;border-radius:999px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.26);font-size:.66rem;color:#fcd34d;font-weight:700}
+.kanban-card-nome{font-size:1rem;font-weight:800;line-height:1.28;margin:0;padding-right:60px;word-break:break-word;color:#f5f9ff;letter-spacing:-.015em}
+.kanban-card-cat{font-size:.72rem;color:#8ea4c3;margin:4px 0 0;white-space:normal;line-height:1.4}
+.kanban-card-rating{display:inline-flex;align-items:center;gap:6px;margin:2px 0 2px;padding:4px 9px;border-radius:999px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);font-size:.64rem;color:#fcd34d;font-weight:700}
 .kanban-card-rating small{color:rgba(253,230,138,.82);font-weight:600;font-size:.64rem}
-.kanban-card-tel{font-size:.7rem;color:var(--green)}
-.kanban-card-msg{font-size:.68rem;color:var(--accent2);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic}
-.kanban-card-actions{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
-.kanban-card-top-actions{position:absolute;top:9px;right:9px;display:flex;gap:6px;align-items:center}
-.kanban-card-top-link{width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;text-decoration:none;background:rgba(14,165,233,.12);border:1px solid rgba(14,165,233,.32);color:#7dd3fc;font-size:.78rem;box-shadow:0 2px 10px rgba(2,6,23,.22);transition:.15s}
-.kanban-card-top-link:hover{transform:translateY(-1px) scale(1.03);border-color:#38bdf8;background:rgba(14,165,233,.18);color:#bae6fd}
-.kanban-card-top-btn{background:rgba(99,102,241,.12);border-color:rgba(129,140,248,.35);color:#c7d2fe}
-.kanban-card-top-btn:hover{border-color:#818cf8;background:rgba(99,102,241,.18);color:#e0e7ff}
-.kbtn{padding:3px 8px;font-size:.68rem;border-radius:5px;border:none;cursor:pointer;font-family:inherit;font-weight:600;transition:.15s}
-.kbtn-g{background:var(--green);color:#fff}.kbtn-g:hover{opacity:.8}
-.kbtn-b{background:var(--blue);color:#fff}.kbtn-b:hover{opacity:.8}
-.kbtn-r{background:var(--red);color:#fff}.kbtn-r:hover{opacity:.8}
-.kbtn-p{background:var(--accent);color:#fff}.kbtn-p:hover{opacity:.8}
+.kanban-card-tel{font-size:.8rem;color:#34d399;font-weight:650}
+.kanban-card-msg{font-size:.7rem;color:#8fd3ff;margin-top:6px;white-space:normal;line-height:1.4;font-style:italic}
+.kanban-card-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(115,138,176,.1);align-items:center}
+.kanban-card-main{display:block}
+.kanban-card-content{min-width:0}
+.kanban-card-sidechecks{margin-top:10px}
+.kanban-check-card{background:rgba(10,19,34,.44);border:1px solid rgba(115,138,176,.12);border-radius:12px;padding:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kanban-check-title{font-size:.58rem;color:#7f95b8;text-transform:uppercase;letter-spacing:.12em;min-width:max-content}
+.kanban-check-item{display:inline-flex;align-items:center;gap:6px;font-size:.7rem;color:#d9e4f5;cursor:pointer;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid rgba(115,138,176,.12)}
+.kanban-check-item input{width:14px;height:14px;accent-color:#22c55e;cursor:pointer;margin:0}
+.kanban-check-item.is-on{color:#dcfce7;border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.1)}
+.kanban-check-item small{display:none}
+.kanban-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:8px}
+.kanban-card-head-main{min-width:0;flex:1}
+.kanban-card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+.kanban-card-line{display:flex;align-items:flex-start;gap:7px;margin-top:7px;font-size:.73rem;color:#c8d5ea}
+.kanban-card-line .ico{width:14px;flex:0 0 14px;opacity:.72;margin-top:1px}
+.kanban-card-line .txt{min-width:0;white-space:normal;line-height:1.4;word-break:break-word}
+.kanban-card-top-actions{position:absolute;top:12px;right:12px;display:flex;gap:6px;align-items:center}
+.kanban-card-top-link{width:28px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;text-decoration:none;background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);color:#8bd9ff;font-size:.76rem;box-shadow:none;transition:.15s}
+.kanban-card-top-link:hover{transform:translateY(-1px);border-color:rgba(56,189,248,.38);background:rgba(14,165,233,.14);color:#d9f4ff}
+.kanban-card-top-btn{background:rgba(99,102,241,.08);border-color:rgba(129,140,248,.22);color:#d5ddff}
+.kanban-card-top-btn:hover{border-color:rgba(129,140,248,.42);background:rgba(99,102,241,.14);color:#eef2ff}
+.kanban-card-open{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:11px 0 0;border-top:1px solid rgba(115,138,176,.1);font-size:.71rem;color:#8ea4c5;background:none;border-left:none;border-right:none;border-bottom:none;cursor:pointer;width:100%}
+.kanban-card-open strong{color:#eef6ff;font-size:.78rem}
+.kanban-card-open:hover{color:#c6d6ea}
+.kanban-card-primary{margin-top:12px;padding:12px;border-radius:14px;background:linear-gradient(180deg,rgba(11,19,34,.44),rgba(11,19,34,.28));border:1px solid rgba(114,199,255,.1);display:grid;gap:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
+.kanban-card-primary-label{font-size:.56rem;text-transform:uppercase;letter-spacing:.14em;color:#76b9ff}
+.kanban-card-primary-value{font-size:.8rem;line-height:1.5;color:#eef5ff;font-weight:700}
+.kanban-card-secondary{display:grid;gap:7px;margin-top:10px}
+.kanban-card-secondary .kanban-card-line{margin-top:0}
+.kanban-card-chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.kanban-mini-chip{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:.62rem;font-weight:800;border:1px solid rgba(115,138,176,.12);background:rgba(255,255,255,.035);color:#d8e7fb}
+.kanban-mini-chip.warn{color:#f8db77;border-color:rgba(245,158,11,.16);background:rgba(245,158,11,.06)}
+.kanban-mini-chip.danger{color:#ffb4b4;border-color:rgba(239,68,68,.18);background:rgba(239,68,68,.06)}
+.kanban-drawer-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.62);backdrop-filter:blur(4px);z-index:170;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.kanban-drawer-backdrop.show{opacity:1;pointer-events:auto}
+.kanban-drawer{position:fixed;top:0;right:0;width:min(430px,100vw);height:100vh;background:linear-gradient(180deg,rgba(9,16,28,.98),rgba(12,20,35,.98));border-left:1px solid rgba(114,199,255,.12);box-shadow:-24px 0 44px rgba(0,0,0,.34);z-index:180;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .24s ease}
+.kanban-drawer.show{transform:translateX(0)}
+.kanban-drawer-header{padding:18px 18px 14px;border-bottom:1px solid rgba(114,199,255,.1);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.kanban-drawer-kicker{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:#7f95b8;margin-bottom:6px}
+.kanban-drawer-title{font-size:1.05rem;font-weight:800;line-height:1.3;color:#f7fbff}
+.kanban-drawer-subtitle{font-size:.78rem;color:#9eb1cc;margin-top:5px;line-height:1.45}
+.kanban-drawer-close{width:34px;height:34px;border-radius:10px;border:1px solid rgba(114,199,255,.12);background:rgba(114,199,255,.05);color:#dbeafe;cursor:pointer;font-size:1rem;flex-shrink:0}
+.kanban-drawer-close:hover{background:rgba(114,199,255,.12)}
+.kanban-drawer-body{flex:1;overflow-y:auto;padding:18px;display:grid;gap:14px}
+.kanban-drawer-card{background:rgba(15,23,42,.56);border:1px solid rgba(115,138,176,.12);border-radius:16px;padding:14px}
+.kanban-drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kanban-drawer-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:#7f95b8;margin-bottom:5px}
+.kanban-drawer-value{font-size:.81rem;line-height:1.5;color:#e5edf9;word-break:break-word}
+.kanban-drawer-list{display:grid;gap:10px}
+.kanban-drawer-list-item{padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(115,138,176,.1)}
+.kanban-drawer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kanban-drawer-actions .btn{justify-content:center}
+.kanban-drawer-empty{padding:30px 18px;color:var(--muted);font-size:.84rem}
+.kanban-summary-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.kanban-summary-box{padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(115,138,176,.12)}
+.kanban-summary-label{font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;color:#7f95b8;margin-bottom:5px}
+.kanban-summary-value{font-size:.84rem;font-weight:800;color:#f8fbff;line-height:1.3}
+.kanban-summary-value.is-hot{color:#fda4af}
+.kanban-summary-value.is-warm{color:#fde68a}
+.kanban-summary-value.is-cool{color:#86efac}
+.kanban-timeline{display:grid;gap:8px}
+.kanban-timeline-item{padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(115,138,176,.1);display:grid;gap:3px}
+.kanban-timeline-title{font-size:.74rem;font-weight:700;color:#e5edf9}
+.kanban-timeline-meta{font-size:.68rem;color:#8fa5c8}
+.kanban-timeline-text{font-size:.76rem;line-height:1.45;color:#cfdced}
+.kanban-toolbar{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(150px,.75fr)) auto auto;gap:10px;margin:0 0 14px}
+.kanban-toolbar .field{gap:6px}
+.kanban-toolbar .field input,.kanban-toolbar .field select{padding:10px 12px;border-radius:12px;background:rgba(17,27,46,.92)}
+.kanban-toolbar-btn{align-self:end;min-height:42px}
+.kanban-toolbar-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+.kanban-toolbar-chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(115,138,176,.1);font-size:.72rem;color:#c9d9ec}
+.kanban-toolbar-chip strong{color:#f8fbff;margin-left:4px}
+.kanban-quick-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.kanban-quick-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;border:1px solid rgba(115,138,176,.12);background:rgba(255,255,255,.03);color:#dbe7f7;font-size:.77rem;font-weight:700;cursor:pointer;transition:.16s}
+.kanban-quick-btn:hover{transform:translateY(-1px);border-color:rgba(114,199,255,.24);background:rgba(114,199,255,.08)}
+.kanban-quick-btn strong{color:#fff}
+.kbtn{padding:7px 10px;font-size:.72rem;border-radius:11px;border:none;cursor:pointer;font-family:inherit;font-weight:800;transition:.15s;min-width:38px;box-shadow:0 6px 16px rgba(2,6,23,.16)}
+@media(max-width:700px){
+  .kanban-card{padding:12px}
+  .kanban-check-card{padding:7px}
+  .kanban-card-actions{gap:6px}
+  .kanban-drawer{width:100vw}
+  .kanban-drawer-grid,.kanban-drawer-actions,.kanban-summary-strip{grid-template-columns:1fr}
+}
+@media(max-width:1250px){
+  .kanban-toolbar{grid-template-columns:repeat(2,minmax(180px,1fr))}
+  .kanban-toolbar-btn{align-self:stretch}
+}
+.kbtn-g{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}.kbtn-g:hover{transform:translateY(-1px)}
+.kbtn-b{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff}.kbtn-b:hover{transform:translateY(-1px)}
+.kbtn-r{background:linear-gradient(135deg,#fb7185,#ef4444);color:#fff}.kbtn-r:hover{transform:translateY(-1px)}
+.kbtn-p{background:linear-gradient(135deg,#38bdf8,#1d9bf0);color:#fff}.kbtn-p:hover{transform:translateY(-1px)}
 .kbtn-o{background:transparent;border:1px solid var(--border);color:var(--text)}.kbtn-o:hover{border-color:var(--accent)}
 .lead-briefing-preview{width:100%;margin:5px 0 2px;padding:9px 10px;border-radius:10px;border:1px solid rgba(245,158,11,.22);background:linear-gradient(180deg,rgba(120,53,15,.22),rgba(120,53,15,.1));color:inherit;cursor:pointer;text-align:left;transition:.15s}
 .lead-briefing-preview:hover{border-color:rgba(245,158,11,.4);transform:translateY(-1px)}
@@ -234,6 +329,17 @@ a{color:var(--accent2);text-decoration:none}
 .tpl-chip{background:rgba(25,36,59,.94);border:1px solid rgba(114,199,255,.12);border-radius:12px;padding:8px 12px;cursor:pointer;transition:.15s;font-size:.8rem}
 .tpl-chip:hover{border-color:var(--accent);color:var(--accent2)}
 .tpl-chip-cat{font-size:.67rem;color:var(--muted);text-transform:uppercase;margin-bottom:2px}
+.wa-template-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.wa-template-toolbar > h3{order:1;margin-bottom:0}
+.wa-template-toolbar > .btn{order:2}
+.wa-template-toolbar > .wa-template-filters{order:3}
+.wa-template-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wa-template-filter-label{font-size:.74rem;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.wa-template-filter-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1px solid rgba(114,199,255,.12);background:rgba(17,27,46,.9);color:#cddcf1;font-size:.8rem;font-weight:700;cursor:pointer;transition:.18s}
+.wa-template-filter-chip:hover{border-color:rgba(114,199,255,.28);color:#f4fbff;transform:translateY(-1px)}
+.wa-template-filter-chip.active{background:linear-gradient(135deg,rgba(29,155,240,.2),rgba(14,165,233,.08));border-color:rgba(56,189,248,.3);color:#f0f9ff;box-shadow:0 10px 24px rgba(2,6,23,.18)}
+.wa-template-filter-dot{width:8px;height:8px;border-radius:999px;display:inline-block}
+.wa-template-empty{grid-column:1 / -1;padding:18px;border:1px dashed rgba(114,199,255,.12);border-radius:14px;background:rgba(15,23,42,.28);color:var(--muted);font-size:.85rem;text-align:center}
 /* ── LOCATION PICKER ───────────────────────────────────────────────────── */
 .loc-picker{display:flex;flex-direction:column;gap:8px}
 .loc-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -362,7 +468,7 @@ a{color:var(--accent2);text-decoration:none}
     <button class="nav-btn active" data-tab="dashboard" data-title="Dashboard" data-subtitle="Visão geral da operação e consumo" data-tooltip="Dashboard" onclick="showTab('dashboard',this)"><span class="nav-ico">📊</span><span>Dashboard</span></button>
     <button class="nav-btn" data-tab="buscar" data-title="Nova Busca" data-subtitle="Coleta e enriquecimento de oportunidades" data-tooltip="Buscar" onclick="showTab('buscar',this)"><span class="nav-ico">🔎</span><span>Buscar</span></button>
     <button class="nav-btn" data-tab="empresas" data-title="Empresas" data-subtitle="Base central de leads e análise comercial" data-tooltip="Empresas" onclick="showTab('empresas',this)"><span class="nav-ico">🏢</span><span>Empresas</span></button>
-    <button class="nav-btn" data-tab="historico" data-title="Histórico" data-subtitle="Rastreamento de buscas anteriores" data-tooltip="Histórico" onclick="showTab('historico',this)"><span class="nav-ico">🧾</span><span>Histórico</span></button>
+    <button class="nav-btn" data-tab="historico" data-title="Lotes" data-subtitle="Extracoes concluidas e retomada operacional" data-tooltip="Lotes" onclick="showTab('historico',this)"><span class="nav-ico">🧾</span><span>Lotes</span></button>
     <div class="nav-sep"></div>
     <div class="nav-section-label">Geração de Sites</div>
     <button class="nav-btn" data-tab="templates" data-title="Templates Lovable" data-subtitle="Prompts por segmento para geração de sites" data-tooltip="Templates Lovable" onclick="showTab('templates',this)"><span class="nav-ico">🏗️</span><span>Templates Lovable</span></button>
@@ -529,6 +635,56 @@ a{color:var(--accent2);text-decoration:none}
       </div>
 
       <div>
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(148,163,184,.4);margin-bottom:6px;font-weight:600">Serviços Técnicos</div>
+        <div>
+          <span class="tag" onclick="kw('eletricista','Elétrica','Serviços')">Eletricista</span>
+          <span class="tag" onclick="kw('encanador','Hidráulica','Serviços')">Encanador</span>
+          <span class="tag" onclick="kw('dedetização','Controle de Pragas','Serviços')">Dedetização</span>
+          <span class="tag" onclick="kw('serralheria','Serralheria','Serviços')">Serralheria</span>
+          <span class="tag" onclick="kw('vidraçaria','Vidros','Serviços')">Vidracaria</span>
+          <span class="tag" onclick="kw('aplicação de adesivos','Comunicação Visual','Serviços')">Aplicadores de Adesivos</span>
+          <span class="tag" onclick="kw('fretes e mudanças','Logística','Serviços')">Fretes</span>
+          <span class="tag" onclick="kw('instalação de câmeras','Segurança','Serviços')">Instalação de Câmeras</span>
+          <span class="tag" onclick="kw('instalação de ar-condicionado','Climatização','Serviços')">Ar-Condicionado</span>
+          <span class="tag" onclick="kw('pintor residencial','Pintura','Serviços')">Pintor</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(148,163,184,.4);margin-bottom:6px;font-weight:600">Construção & Reforma</div>
+        <div>
+          <span class="tag" onclick="kw('pedreiro','Obras','Serviços')">Pedreiro</span>
+          <span class="tag" onclick="kw('reforma residencial','Reformas','Serviços')">Reforma Residencial</span>
+          <span class="tag" onclick="kw('gesso e drywall','Acabamento','Serviços')">Gesso & Drywall</span>
+          <span class="tag" onclick="kw('impermeabilização','Impermeabilização','Serviços')">Impermeabilização</span>
+          <span class="tag" onclick="kw('esquadrias de alumínio','Esquadrias','Serviços')">Esquadrias de Alumínio</span>
+          <span class="tag" onclick="kw('marmoraria','Mármores','Serviços')">Marmoraria</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(148,163,184,.4);margin-bottom:6px;font-weight:600">Logística & Transporte</div>
+        <div>
+          <span class="tag" onclick="kw('fretes e mudanças','Logística','Serviços')">Fretes</span>
+          <span class="tag" onclick="kw('transportadora','Logística','Serviços')">Transportadora</span>
+          <span class="tag" onclick="kw('moto frete','Entregas','Serviços')">Moto Frete</span>
+          <span class="tag" onclick="kw('guincho','Automotivo','Serviços')">Guincho</span>
+          <span class="tag" onclick="kw('locadora de caçamba','Entulho','Serviços')">Caçamba</span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(148,163,184,.4);margin-bottom:6px;font-weight:600">Comunicação Visual</div>
+        <div>
+          <span class="tag" onclick="kw('aplicação de adesivos','Comunicação Visual','Serviços')">Aplicadores de Adesivos</span>
+          <span class="tag" onclick="kw('gráfica rápida','Gráfica','Serviços')">Gráfica Rápida</span>
+          <span class="tag" onclick="kw('fachadas comerciais','Comunicação Visual','Serviços')">Fachadas Comerciais</span>
+          <span class="tag" onclick="kw('letreiro luminoso','Comunicação Visual','Serviços')">Letreiro Luminoso</span>
+          <span class="tag" onclick="kw('plotagem automotiva','Comunicação Visual','Serviços')">Plotagem Automotiva</span>
+        </div>
+      </div>
+
+      <div>
         <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(148,163,184,.4);margin-bottom:6px;font-weight:600">🚗 Automotivo</div>
         <div>
           <span class="tag" onclick="kw('oficina mecânica','Automotivo','Serviços')">🔧 Oficina Mecânica</span>
@@ -663,6 +819,42 @@ a{color:var(--accent2);text-decoration:none}
   </div>
 </div>
 
+<div class="overlay" id="busca-campanha-overlay" onclick="fecharBuscaCampanhaModal(event)">
+  <div class="modal" style="max-width:860px">
+    <button class="modal-close" onclick="fecharBuscaCampanhaModal()">✕</button>
+    <h2 style="margin-bottom:8px">🎯 Enviar busca para campanha</h2>
+    <div id="busca-campanha-sub" style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Selecione uma campanha existente ou crie uma nova com os leads desta busca.</div>
+    <input type="hidden" id="busca-campanha-busca-id">
+    <div class="fg">
+      <div class="field">
+        <label>Modo</label>
+        <select id="busca-campanha-modo" onchange="trocarModoBuscaCampanha()">
+          <option value="existente">Adicionar a campanha existente</option>
+          <option value="nova">Criar nova campanha</option>
+        </select>
+      </div>
+      <div class="field" id="busca-campanha-existente-wrap">
+        <label>Campanha existente</label>
+        <select id="busca-campanha-existente"></select>
+      </div>
+      <div class="field hidden" id="busca-campanha-nome-wrap">
+        <label>Nome da nova campanha</label>
+        <input id="busca-campanha-nome" placeholder="Ex: Embu das Artes - Busca 17/03" />
+      </div>
+    </div>
+    <div class="field mt" id="busca-campanha-numeros-wrap" style="display:none">
+      <label>Números da campanha</label>
+      <div id="busca-campanha-numeros" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px"></div>
+    </div>
+    <div id="busca-campanha-preview" class="alert al-info mt">Carregando dados da busca...</div>
+    <div class="flex mt">
+      <button class="btn btn-o" onclick="fecharBuscaCampanhaModal()">Cancelar</button>
+      <button class="btn btn-p" id="busca-campanha-submit" onclick="executarBuscaParaCampanha()">Enviar para campanha</button>
+    </div>
+    <div id="busca-campanha-res" class="mt"></div>
+  </div>
+</div>
+
 <!-- EMPRESAS -->
 <div id="tab-empresas" class="tab">
   <h2>🏢 Empresas Coletadas</h2>
@@ -744,11 +936,72 @@ a{color:var(--accent2);text-decoration:none}
 
 <!-- HISTORICO -->
 <div id="tab-historico" class="tab">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+    <div>
+      <h2 style="margin:0">Lotes de Extracao</h2>
+      <p style="margin:6px 0 0;color:var(--muted);font-size:.83rem">Cada busca concluida vira um lote navegavel, para voce reencontrar empresas, montar campanhas e retomar operacoes antigas sem se perder na lista geral.</p>
+    </div>
+    <button class="btn btn-o btn-sm" onclick="loadHist()">Atualizar lotes</button>
+  </div>
+  <div class="alert al-info" style="margin-bottom:14px">Use os lotes para localizar extracoes antigas por nome, cidade, status ou data. Depois voce pode abrir so as empresas daquele lote ou mandar tudo direto para uma campanha.</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px">
+    <div class="section" style="padding:14px 16px">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Lotes listados</div>
+      <div id="hist-stat-total" style="font-size:1.8rem;font-weight:800;margin-top:8px">--</div>
+    </div>
+    <div class="section" style="padding:14px 16px">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Concluidos</div>
+      <div id="hist-stat-concluido" style="font-size:1.8rem;font-weight:800;margin-top:8px;color:#4ade80">--</div>
+    </div>
+    <div class="section" style="padding:14px 16px">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Empresas novas</div>
+      <div id="hist-stat-novas" style="font-size:1.8rem;font-weight:800;margin-top:8px;color:#72c7ff">--</div>
+    </div>
+    <div class="section" style="padding:14px 16px">
+      <div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Duplicadas</div>
+      <div id="hist-stat-duplicadas" style="font-size:1.8rem;font-weight:800;margin-top:8px;color:#fbbf24">--</div>
+    </div>
+  </div>
+  <div class="section" style="padding:14px 16px;margin-bottom:14px">
+    <div style="display:grid;grid-template-columns:minmax(260px,1.4fr) minmax(190px,.7fr);gap:12px;align-items:end">
+      <div class="field" style="margin:0">
+        <label>Encontrar lote</label>
+        <input id="hist-q" placeholder="Grupo, palavra-chave, cidade ou data..." oninput="loadHist()"/>
+      </div>
+      <div class="field" style="margin:0">
+        <label>Status da busca</label>
+        <select id="hist-status" onchange="loadHist()">
+          <option value="">Todos os status</option>
+          <option value="concluido">Concluido</option>
+          <option value="rodando">Rodando</option>
+          <option value="pendente">Pendente</option>
+          <option value="erro">Erro</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn btn-o btn-sm" onclick="arquivarLotesEsgotados()">Arquivar esgotados agora</button>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);cursor:pointer">
+          <input id="hist-auto-archive" type="checkbox" onchange="loadHist()" style="accent-color:#22c55e">
+          Arquivar lotes esgotados automaticamente
+        </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);cursor:pointer">
+        <input id="hist-show-archived" type="checkbox" onchange="loadHist()" style="accent-color:#60a5fa">
+        Mostrar lotes arquivados
+      </label>
+      </div>
+    </div>
+  </div>
   <h2>📋 Histórico de Buscas</h2>
-  <div class="section" style="padding:0;overflow:hidden">
+  <style>#tab-historico > h2{display:none}</style>
+  <div id="hist-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px">
+    <div class="section" style="padding:18px;color:var(--muted)">Carregando lotes...</div>
+  </div>
+  <div class="section" style="display:none;padding:0;overflow:hidden">
     <div class="tw"><table>
       <thead><tr><th>#</th><th>Palavra-chave</th><th>Localização</th><th>Grupo</th><th>Total</th><th>✅ Novas</th><th>⚠️ Duplicadas</th><th>Status</th><th>Data</th></tr></thead>
-      <tbody id="hist-body"><tr><td colspan="9" class="empty" style="padding:30px">Carregando...</td></tr></tbody>
+      <tbody id="hist-body-legacy"><tr><td colspan="9" class="empty" style="padding:30px">Carregando...</td></tr></tbody>
     </table></div>
   </div>
 </div>
@@ -969,15 +1222,75 @@ a{color:var(--accent2);text-decoration:none}
         <div id="kanban-campanha-info" style="font-size:.76rem;color:var(--muted)">Visualizando todo o Kanban.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <select id="kanban-campanha-select" class="btn btn-o btn-sm" style="padding-right:28px;min-width:240px" onchange="aplicarFiltroCampanhaKanban(this.value)">
-          <option value="">Kanban geral</option>
-        </select>
+        <!-- Custom Campaign Dropdown -->
+        <div id="kanban-camp-dropdown" style="position:relative;min-width:240px">
+          <button id="kanban-camp-trigger" onclick="toggleKanbanCampDropdown(event)"
+            style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+                   background:rgba(15,23,42,.85);border:1px solid rgba(114,199,255,.18);
+                   border-radius:8px;padding:6px 10px;cursor:pointer;color:#e2e8f0;
+                   font-size:.82rem;font-weight:500;transition:border-color .2s,box-shadow .2s">
+            <span id="kanban-camp-trigger-label" style="display:flex;align-items:center;gap:7px;overflow:hidden">
+              <span style="color:var(--muted)">📋</span>
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Kanban geral</span>
+            </span>
+            <span id="kanban-camp-trigger-arrow" style="color:var(--muted);font-size:.7rem;flex-shrink:0;transition:transform .2s">▼</span>
+          </button>
+          <div id="kanban-camp-menu"
+            style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:9999;
+                   background:#0f172a;border:1px solid rgba(114,199,255,.22);border-radius:10px;
+                   box-shadow:0 16px 40px rgba(0,0,0,.7);overflow:hidden;min-width:260px">
+            <div id="kanban-camp-menu-inner" style="max-height:280px;overflow-y:auto;padding:4px"></div>
+          </div>
+        </div>
         <button class="btn btn-o btn-sm" id="kanban-campanha-clear-btn" onclick="limparFiltroCampanhaKanban()" style="display:none">Voltar ao geral</button>
+        <button class="btn btn-o btn-sm" id="kanban-btn-pausar-camp" onclick="pausarCampanhaKanban()" style="display:none;border-color:rgba(251,191,36,.35);color:#fde68a" title="Pausar campanha selecionada">⏸ Pausar</button>
+        <button class="btn btn-o btn-sm" id="kanban-btn-ativar-camp" onclick="ativarCampanhaKanban()" style="display:none;border-color:rgba(52,211,153,.35);color:#6ee7b7" title="Ativar/Retomar campanha selecionada">▶ Ativar</button>
+        <button class="btn btn-o btn-sm" id="kanban-btn-deletar-camp" onclick="deletarCampanhaKanban()" style="display:none;border-color:rgba(239,68,68,.35);color:#fca5a5" title="Deletar campanha selecionada">🗑 Deletar</button>
         <button class="btn btn-o btn-sm" onclick="abrirModalEnvioLote()">⚡ Envio em Lote</button>
         <button class="btn btn-o btn-sm" style="border-color:rgba(239,68,68,.3);color:#fecaca" onclick="limparKanbanCompleto()">🧹 Limpar Kanban</button>
         <button class="btn btn-o btn-sm" onclick="loadKanban()">🔄 Atualizar</button>
       </div>
     </div>
+    <div class="kanban-toolbar">
+      <div class="field">
+        <label>Buscar lead</label>
+        <input id="kanban-search-input" type="text" placeholder="Empresa, telefone, cidade ou responsavel" oninput="atualizarFiltroKanban('search', this.value)">
+      </div>
+      <div class="field">
+        <label>Coluna</label>
+        <select id="kanban-filter-col" onchange="atualizarFiltroKanban('column', this.value)">
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fila rapida</label>
+        <select id="kanban-filter-queue" onchange="atualizarFiltroKanban('queue', this.value)">
+          <option value="">Tudo</option>
+          <option value="sem_responsavel">Sem responsavel</option>
+          <option value="followup_pronto">Follow-up pronto</option>
+          <option value="lista_negra">Lista negra</option>
+          <option value="com_resposta">Com resposta recente</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ordenar</label>
+        <select id="kanban-filter-sort" onchange="atualizarFiltroKanban('sort', this.value)">
+          <option value="default">Padrao da coluna</option>
+          <option value="urgencia">Mais urgentes</option>
+          <option value="nome">Nome A-Z</option>
+          <option value="rating">Melhor avaliacao</option>
+        </select>
+      </div>
+      <button class="btn btn-o kanban-toolbar-btn" id="kanban-compact-btn" onclick="toggleKanbanCompactMode()">Modo compacto</button>
+      <button class="btn btn-o kanban-toolbar-btn" id="kanban-focus-btn" onclick="limparFocoKanban()" style="display:none">Sair do foco</button>
+    </div>
+    <div class="kanban-toolbar-meta">
+      <span class="kanban-toolbar-chip">Resultados <strong id="kanban-meta-results">0</strong></span>
+      <span class="kanban-toolbar-chip">Busca <strong id="kanban-meta-search">Todas</strong></span>
+      <span class="kanban-toolbar-chip">Modo <strong id="kanban-meta-density">Confortavel</strong></span>
+      <span class="kanban-toolbar-chip">Foco <strong id="kanban-meta-focus">Kanban completo</strong></span>
+    </div>
+    <div class="kanban-quick-row" id="kanban-quick-row"></div>
     <div class="kanban-board" id="kanban-board">
       <div style="color:var(--muted);font-size:.85rem;padding:20px"><div class="spin" style="display:inline-block"></div> Carregando Kanban...</div>
     </div>
@@ -996,10 +1309,40 @@ a{color:var(--accent2);text-decoration:none}
   </div>
   </div>
 
+  <div id="kanban-drawer-backdrop" class="kanban-drawer-backdrop" onclick="fecharKanbanDrawer()"></div>
+  <aside id="kanban-drawer" class="kanban-drawer" aria-hidden="true">
+    <div class="kanban-drawer-header">
+      <div>
+        <div class="kanban-drawer-kicker">Detalhes do lead</div>
+        <div id="kanban-drawer-title" class="kanban-drawer-title">Selecione um lead</div>
+        <div id="kanban-drawer-subtitle" class="kanban-drawer-subtitle">Clique em um card para abrir o painel lateral.</div>
+      </div>
+      <button type="button" class="kanban-drawer-close" onclick="fecharKanbanDrawer()" aria-label="Fechar detalhes">×</button>
+    </div>
+    <div id="kanban-drawer-body" class="kanban-drawer-body">
+      <div class="kanban-drawer-empty">Nenhum lead selecionado.</div>
+    </div>
+  </aside>
+
   <!-- TEMPLATES DE MENSAGEM -->
   <div class="wa-panel-section" data-wa-section="templates" id="wa-section-templates">
   <div class="section mb">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="wa-template-toolbar">
+      <div class="wa-template-filters" id="wa-template-filters" style="flex-basis:100%">
+        <span class="wa-template-filter-label">Filtrar</span>
+        <button type="button" class="wa-template-filter-chip active" data-cat="todos" onclick="setWaTplFiltro('todos')">
+          <span class="wa-template-filter-dot" style="background:#72c7ff"></span> Todos
+        </button>
+        <button type="button" class="wa-template-filter-chip" data-cat="abertura" onclick="setWaTplFiltro('abertura')">
+          <span class="wa-template-filter-dot" style="background:#22c55e"></span> Abertura
+        </button>
+        <button type="button" class="wa-template-filter-chip" data-cat="proposta" onclick="setWaTplFiltro('proposta')">
+          <span class="wa-template-filter-dot" style="background:#f59e0b"></span> Proposta
+        </button>
+        <button type="button" class="wa-template-filter-chip" data-cat="followup" onclick="setWaTplFiltro('followup')">
+          <span class="wa-template-filter-dot" style="background:#3b82f6"></span> Follow-up
+        </button>
+      </div>
       <h3>💬 Templates de Mensagem</h3>
       <button class="btn btn-p btn-sm" onclick="abrirModalWaTpl()">➕ Novo Template</button>
     </div>
@@ -1063,10 +1406,10 @@ a{color:var(--accent2);text-decoration:none}
       <div class="tw">
         <table>
           <thead><tr>
-            <th>Empresa</th><th>Telefone</th><th>Coluna</th><th>Etapa</th><th>Status</th><th>Previsto</th><th>Ação</th>
+            <th>Empresa</th><th>Telefone</th><th>Coluna</th><th>Etapa</th><th>Status</th><th>Previsto</th><th>Próxima mensagem</th><th>Ação</th>
           </tr></thead>
           <tbody id="fu-fila-tbody">
-            <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)"><div class="spin" style="display:inline-block;margin-right:8px"></div>Carregando...</td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)"><div class="spin" style="display:inline-block;margin-right:8px"></div>Carregando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -1128,6 +1471,24 @@ a{color:var(--accent2);text-decoration:none}
               <div style="font-size:.74rem;color:var(--muted)">Só faz follow-up em contatos que já responderam pelo menos uma vez — evita bloquear quem nunca interagiu</div>
             </div>
           </label>
+          <div style="display:grid;gap:10px;margin-top:10px">
+            <div style="padding:10px;background:var(--card2);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px">Colunas com follow-up automÃ¡tico</div>
+              <div style="display:flex;gap:14px;flex-wrap:wrap">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem"><input type="checkbox" id="fu-cfg-col-enviado" style="width:16px;height:16px;accent-color:var(--blue)">Enviado</label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem"><input type="checkbox" id="fu-cfg-col-respondeu" style="width:16px;height:16px;accent-color:var(--green)">Respondeu</label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem"><input type="checkbox" id="fu-cfg-col-negociando" style="width:16px;height:16px;accent-color:#f97316">Negociando</label>
+              </div>
+              <div style="font-size:.73rem;color:var(--muted);margin-top:8px">SugestÃ£o: manter <strong style="color:#fdba74">Negociando</strong> desligado para o sistema nÃ£o atropelar conversa manual.</div>
+            </div>
+            <div style="padding:10px;background:var(--card2);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:8px">Respostas automÃ¡ticas</div>
+              <div style="display:grid;gap:8px">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem"><input type="checkbox" id="fu-cfg-auto-primeira" style="width:16px;height:16px;accent-color:var(--accent)">Responder automaticamente na primeira interaÃ§Ã£o do lead</label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem"><input type="checkbox" id="fu-cfg-auto-negociando" style="width:16px;height:16px;accent-color:#f97316">Responder automaticamente quando o lead jÃ¡ estiver em Negociando</label>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Mensagens por etapa -->
@@ -1179,6 +1540,58 @@ a{color:var(--accent2);text-decoration:none}
 </div>
 
 <!-- MODAL: ADICIONAR NÚMERO WA -->
+<!-- MODAL: AGENDAR FOLLOW-UP -->
+<div class="overlay" id="fu-agendar-overlay" onclick="fecharAgendaFollowupModal(event)">
+  <div class="modal" style="max-width:560px" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="fecharAgendaFollowupModal()">✕</button>
+    <h2 style="margin-bottom:8px">⏰ Ajustar próximo follow-up</h2>
+    <div id="fu-agendar-nome" style="font-size:.92rem;font-weight:700;color:var(--accent2);margin-bottom:6px">Lead</div>
+    <div id="fu-agendar-status" style="font-size:.78rem;color:var(--muted);margin-bottom:14px">Sem previsão carregada.</div>
+    <div class="field mb">
+      <label>Mensagem que está prevista para sair</label>
+      <textarea id="fu-agendar-msg" rows="6" readonly style="resize:vertical;background:var(--card2);border:1px solid var(--border);color:var(--text)"></textarea>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <button class="btn btn-o btn-sm" onclick="toggleEditarMensagemFollowup()">Editar este follow-up</button>
+        <button class="btn btn-o btn-sm" onclick="usarMensagemPadraoFollowup()">Usar mensagem padrão</button>
+      </div>
+      <div id="fu-agendar-edit-wrap" style="display:none;margin-top:10px">
+        <label style="display:block;margin-bottom:6px">Mensagem customizada deste lead</label>
+        <textarea id="fu-agendar-msg-edit" rows="6" style="resize:vertical"></textarea>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:6px">Se salvar esse texto, o próximo follow-up deste lead usará essa versão personalizada.</div>
+      </div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:8px">Aqui você visualiza a prévia, pode editar o texto deste lead e decidir o horário ideal.</div>
+    </div>
+
+    <div class="field mb">
+      <label>Horário preferido do lead</label>
+      <input id="fu-agendar-pref" type="hidden" value="livre">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-o btn-sm" id="fu-pref-livre" onclick="selecionarHorarioPreferidoLead('livre')">Livre</button>
+        <button class="btn btn-o btn-sm" id="fu-pref-manha" onclick="selecionarHorarioPreferidoLead('manha')">Manhã</button>
+        <button class="btn btn-o btn-sm" id="fu-pref-tarde" onclick="selecionarHorarioPreferidoLead('tarde')">Tarde</button>
+        <button class="btn btn-o btn-sm" id="fu-pref-noite" onclick="selecionarHorarioPreferidoLead('noite')">Noite</button>
+      </div>
+      <div id="fu-agendar-pref-desc" style="font-size:.72rem;color:var(--muted);margin-top:6px">Sem preferência salva para este lead.</div>
+    </div>
+    <div class="field mb">
+      <label>Próximo envio manual</label>
+      <input id="fu-agendar-datetime" type="datetime-local">
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-o btn-sm" onclick="preencherAgendaFollowup(0,11)">Hoje 11h</button>
+      <button class="btn btn-o btn-sm" onclick="preencherAgendaFollowup(0,15)">Hoje 15h</button>
+      <button class="btn btn-o btn-sm" onclick="preencherAgendaFollowup(1,9)">Amanhã 9h</button>
+      <button class="btn btn-o btn-sm" onclick="preencherAgendaFollowup(1,14)">Amanhã 14h</button>
+    </div>
+    <div class="flex">
+      <button class="btn btn-p" onclick="salvarAgendaFollowup()">💾 Salvar horário</button>
+      <button class="btn btn-o" onclick="limparAgendaFollowup()">Liberar automático</button>
+      <button class="btn btn-o" onclick="fecharAgendaFollowupModal()">Cancelar</button>
+    </div>
+    <div id="fu-agendar-res" class="mt"></div>
+  </div>
+</div>
+
 <div class="overlay" id="wa-num-overlay" onclick="fecharWaNumModal(event)">
   <div class="modal" style="max-width:420px" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="fecharWaNumModal()">✕</button>
@@ -1479,6 +1892,21 @@ a{color:var(--accent2);text-decoration:none}
   </div>
 </div>
 
+<div class="overlay" id="lote-fila-overlay" onclick="fecharLoteFilaModal(event)">
+  <div class="modal" style="max-width:980px" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="fecharLoteFilaModal()">âœ•</button>
+    <h2 style="margin-bottom:8px">Fila operacional do lote</h2>
+    <div id="lote-fila-subtitle" style="font-size:.84rem;color:var(--muted);margin-bottom:16px">Carregando lote...</div>
+    <div id="lote-fila-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-o btn-sm" id="lote-fila-ver-empresas" onclick="abrirEmpresasDoLoteFila()">Ver empresas do lote</button>
+      <button class="btn btn-p btn-sm" id="lote-fila-enviar-campanha" onclick="abrirBuscaCampanhaModal(window.loteFilaState?.buscaId || 0)">Enviar para campanha</button>
+      <button class="btn btn-o btn-sm" id="lote-fila-kanban" style="display:none" onclick="abrirLoteNoKanban(window.loteFilaState?.campanhaId || 0, window.loteFilaState?.campanhaNome || '')">Abrir no kanban</button>
+    </div>
+    <div id="lote-fila-lista" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+
 <div class="overlay" id="lead-briefing-overlay" onclick="fecharLeadBriefingModal(event)">
   <div class="modal" style="max-width:820px" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="fecharLeadBriefingModal()">✕</button>
@@ -1561,11 +1989,14 @@ a{color:var(--accent2);text-decoration:none}
 
 <script>
 let buscaId=null,buscaInt=null;
+let buscaCampanhaState={buscaId:null,empresaIds:[],grupo:'',campanhas:[],numeros:[]};
+let histAutoArchiveInFlight = false;
+let loteFilaState = {buscaId:0,grupo:'',campanhaId:0,campanhaNome:'',empresas:[]};
 const TAB_META={
   dashboard:{title:'Dashboard',subtitle:'Visão geral da operação e consumo'},
   buscar:{title:'Nova Busca',subtitle:'Coleta e enriquecimento de oportunidades'},
   empresas:{title:'Empresas',subtitle:'Base central de leads e análise comercial'},
-  historico:{title:'Histórico',subtitle:'Rastreamento de buscas anteriores'},
+  historico:{title:'Lotes',subtitle:'Extracoes concluidas, filtros e acoes sobre buscas anteriores'},
   templates:{title:'Templates Lovable',subtitle:'Prompts por segmento para geração de sites'},
   whatsapp:{title:'WhatsApp',subtitle:'Kanban, automação e cadência comercial'},
   config:{title:'Configurações',subtitle:'Integrações e ajustes operacionais'}
@@ -1878,6 +2309,157 @@ function setAviso(msg,cls){
   el.className='alert '+cls;el.textContent=msg;
 }
 
+function trocarModoBuscaCampanha(){
+  const modo = document.getElementById('busca-campanha-modo')?.value || 'existente';
+  const existente = document.getElementById('busca-campanha-existente-wrap');
+  const nomeWrap = document.getElementById('busca-campanha-nome-wrap');
+  const numerosWrap = document.getElementById('busca-campanha-numeros-wrap');
+  if(existente) existente.classList.toggle('hidden', modo !== 'existente');
+  if(nomeWrap) nomeWrap.classList.toggle('hidden', modo !== 'nova');
+  if(numerosWrap) numerosWrap.style.display = modo === 'nova' ? '' : 'none';
+}
+
+function fecharBuscaCampanhaModal(e){
+  if(!e || e.target === document.getElementById('busca-campanha-overlay')){
+    document.getElementById('busca-campanha-overlay').classList.remove('show');
+  }
+}
+
+function renderBuscaCampanhaNumeros(){
+  const wrap = document.getElementById('busca-campanha-numeros');
+  if(!wrap) return;
+  if(!buscaCampanhaState.numeros.length){
+    wrap.innerHTML = '<div class="alert al-warn">Nenhum numero cadastrado para criar campanha.</div>';
+    return;
+  }
+  wrap.innerHTML = buscaCampanhaState.numeros.map((n, idx)=>`
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:12px;cursor:pointer">
+      <input type="checkbox" class="busca-campanha-num-chk" value="${escapeHtml(n.numero_id)}" ${idx === 0 ? 'checked' : ''} style="width:16px;height:16px;accent-color:#22c55e;margin-top:2px">
+      <span>
+        <strong style="display:block">${escapeHtml(n.nome || n.numero_id)}</strong>
+        <small style="color:var(--muted)">${escapeHtml(n.telefone || n.numero_id)}</small>
+      </span>
+    </label>
+  `).join('');
+}
+
+function atualizarPreviewBuscaCampanha(){
+  const preview = document.getElementById('busca-campanha-preview');
+  if(!preview) return;
+  const modo = document.getElementById('busca-campanha-modo')?.value || 'existente';
+  const total = buscaCampanhaState.empresaIds.length;
+  if(modo === 'existente'){
+    const sel = document.getElementById('busca-campanha-existente');
+    const nome = sel?.selectedOptions?.[0]?.textContent || 'campanha selecionada';
+    preview.innerHTML = `Busca pronta com <strong>${total}</strong> empresa(s). Ao confirmar, os leads entram em <strong>${escapeHtml(nome)}</strong> e o kanban abre filtrado nela.`;
+    return;
+  }
+  const checks = Array.from(document.querySelectorAll('.busca-campanha-num-chk:checked'));
+  preview.innerHTML = `Nova campanha com <strong>${total}</strong> empresa(s) e <strong>${checks.length}</strong> numero(s) selecionado(s).`;
+}
+
+async function abrirBuscaCampanhaModal(buscaIdParam){
+  const res = document.getElementById('busca-campanha-res');
+  const buscaId = Number(buscaCampanhaState.buscaId || 0);
+  const sub = document.getElementById('busca-campanha-sub');
+  if(res) res.innerHTML = '';
+  if(sub) sub.textContent = 'Carregando empresas da busca e campanhas disponíveis...';
+  document.getElementById('busca-campanha-overlay').classList.add('show');
+  try{
+    const [buscaData, campanhas, numeros] = await Promise.all([
+      fetch(`/api/busca/${buscaIdParam}/empresas`).then(r=>r.json()),
+      fetch('/api/campanhas').then(r=>r.json()).catch(()=>[]),
+      fetch('/api/wa-numeros').then(r=>r.json()).catch(()=>[]),
+    ]);
+    if(!buscaData?.ok) throw new Error(buscaData?.erro || 'Nao consegui carregar a busca');
+    buscaCampanhaState = {
+      buscaId: buscaIdParam,
+      empresaIds: buscaData.empresa_ids || [],
+      grupo: buscaData.grupo || '',
+      campanhas: Array.isArray(campanhas) ? campanhas : [],
+      numeros: Array.isArray(numeros) ? numeros : [],
+    };
+    document.getElementById('busca-campanha-busca-id').value = String(buscaIdParam);
+    document.getElementById('busca-campanha-nome').value = `Campanha ${buscaData.grupo || ('Busca ' + buscaIdParam)}`;
+    const select = document.getElementById('busca-campanha-existente');
+    if(select){
+      select.innerHTML = buscaCampanhaState.campanhas.length
+        ? buscaCampanhaState.campanhas.map(c=>`<option value="${c.id}">${escapeHtml(c.nome || ('Campanha #' + c.id))}</option>`).join('')
+        : '<option value="">Nenhuma campanha criada</option>';
+      select.onchange = atualizarPreviewBuscaCampanha;
+    }
+    const modoSel = document.getElementById('busca-campanha-modo');
+    if(modoSel && !buscaCampanhaState.campanhas.length){
+      modoSel.value = 'nova';
+    }
+    renderBuscaCampanhaNumeros();
+    trocarModoBuscaCampanha();
+    if(sub) sub.textContent = `Busca ${buscaIdParam} · grupo ${buscaData.grupo} · ${buscaCampanhaState.empresaIds.length} empresa(s).`;
+    atualizarPreviewBuscaCampanha();
+    document.querySelectorAll('.busca-campanha-num-chk').forEach(el=>el.onchange = atualizarPreviewBuscaCampanha);
+  }catch(err){
+    if(res) res.innerHTML = `<div class="alert al-err">❌ ${escapeHtml(err.message || 'Falha ao abrir envio para campanha')}</div>`;
+  }
+}
+
+async function executarBuscaParaCampanha(){
+  const modo = document.getElementById('busca-campanha-modo')?.value || 'existente';
+  const btn = document.getElementById('busca-campanha-submit');
+  const res = document.getElementById('busca-campanha-res');
+  if(!buscaCampanhaState.empresaIds.length){
+    if(res) res.innerHTML = '<div class="alert al-warn">Essa busca nao tem empresas disponiveis para campanha.</div>';
+    return;
+  }
+  if(btn){ btn.disabled = true; btn.textContent = 'Enviando...'; }
+  if(res) res.innerHTML = '<div class="alert al-info"><div class="spin" style="display:inline-block"></div> Preparando campanha...</div>';
+  try{
+    let data;
+    if(modo === 'existente'){
+      const campanhaId = Number(document.getElementById('busca-campanha-existente')?.value || 0);
+      if(!campanhaId) throw new Error('Selecione uma campanha existente');
+      data = await fetch(`/api/campanhas/${campanhaId}/adicionar-empresas`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ empresa_ids: buscaCampanhaState.empresaIds })
+      }).then(r=>r.json());
+      if(!data?.ok) throw new Error(data?.erro || 'Nao consegui adicionar os leads na campanha');
+      if(buscaId && data.campanha_id) await salvarBuscaMeta(buscaId,{campanha_id:data.campanha_id});
+      if(res) res.innerHTML = `<div class="alert al-ok">✅ Leads adicionados em <strong>${escapeHtml(data.nome || 'campanha')}</strong>. Novos: ${data.resultado?.adicionados || 0} | Atualizados: ${data.resultado?.atualizados || 0}</div>`;
+      aplicarFiltroCampanhaKanban(String(data.campanha_id || ''), data.nome || '');
+    }else{
+      const nome = (document.getElementById('busca-campanha-nome')?.value || '').trim();
+      const numeroIds = Array.from(document.querySelectorAll('.busca-campanha-num-chk:checked')).map(el => el.value).filter(Boolean);
+      if(!nome) throw new Error('Digite o nome da nova campanha');
+      if(!numeroIds.length) throw new Error('Selecione pelo menos um numero');
+      data = await fetch('/api/campanhas', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          nome,
+          estrategia:'round_robin',
+          empresa_ids: buscaCampanhaState.empresaIds,
+          numero_ids: numeroIds
+        })
+      }).then(r=>r.json());
+      if(!data?.ok) throw new Error(data?.erro || 'Nao consegui criar a campanha');
+      if(buscaId && data.campanha_id) await salvarBuscaMeta(buscaId,{campanha_id:data.campanha_id});
+      if(res) res.innerHTML = `<div class="alert al-ok">✅ Campanha <strong>${escapeHtml(data.nome || nome)}</strong> criada com os leads desta busca.</div>`;
+      aplicarFiltroCampanhaKanban(String(data.campanha_id || ''), data.nome || nome);
+    }
+    await loadCampanhasPanel();
+    await loadKanban();
+    await loadKanbanStats();
+    setTimeout(()=>{
+      fecharBuscaCampanhaModal();
+      showWhatsAppSection('kanban');
+    }, 700);
+  }catch(err){
+    if(res) res.innerHTML = `<div class="alert al-err">❌ ${escapeHtml(err.message || 'Falha ao enviar para campanha')}</div>`;
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Enviar para campanha'; }
+  }
+}
+
 function monitorar(id){
   if(buscaInt)clearInterval(buscaInt);
   buscaInt=setInterval(async()=>{
@@ -1892,7 +2474,13 @@ function monitorar(id){
       const res=document.getElementById('b-res');
       res.classList.remove('hidden');
       res.innerHTML=d.status==='concluido'
-        ?`<div class="alert al-ok">✅ Concluído! <strong>${d.novos||d.total_encontrados}</strong> novas empresas salvas${(d.duplicatas||0)>0?` · <span style="color:var(--yellow)">⚠️ ${d.duplicatas} já existiam (ignoradas)</span>`:' · sem duplicatas'}. <a href="#" onclick="showTab('empresas',document.querySelectorAll('.nav-btn')[2]);return false">Ver empresas →</a></div>`
+        ?`<div class="alert al-ok" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div>✅ Concluído! <strong>${d.novos||d.total_encontrados}</strong> novas empresas salvas${(d.duplicatas||0)>0?` · <span style="color:var(--yellow)">⚠️ ${d.duplicatas} já existiam (ignoradas)</span>`:' · sem duplicatas'}. <a href="#" onclick="showTab('empresas',document.querySelectorAll('.nav-btn')[2]);return false">Ver empresas →</a></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-o btn-sm" onclick="abrirBuscaCampanhaModal(${id})">🎯 Enviar para campanha</button>
+              <button class="btn btn-p btn-sm" onclick="abrirBuscaCampanhaModal(${id});setTimeout(()=>{const modo=document.getElementById('busca-campanha-modo'); if(modo){ modo.value='nova'; trocarModoBuscaCampanha(); atualizarPreviewBuscaCampanha(); }},80)">🚀 Criar campanha</button>
+            </div>
+          </div>`
         :`<div class="alert al-err">❌ Erro na busca. Veja o terminal para detalhes.</div>`;
     }
   },3500);
@@ -2290,6 +2878,185 @@ async function loadGruposFiltro(){
 
 function exportarCSV(){window.location.href='/api/exportar';}
 
+function getHistStatusMeta(status){
+  const map={
+    concluido:{cls:'b-green',icon:'OK',label:'Concluido'},
+    rodando:{cls:'b-yellow',icon:'...',label:'Rodando'},
+    erro:{cls:'b-red',icon:'ERRO',label:'Erro'},
+    pendente:{cls:'b-gray',icon:'PEND',label:'Pendente'},
+    arquivado:{cls:'b-gray',icon:'ARQ',label:'Arquivado'}
+  };
+  return map[String(status||'').toLowerCase()] || {cls:'b-gray',icon:'LOTE',label:status||'Sem status'};
+}
+
+function formatHistDate(value){
+  if(!value) return 'Sem data registrada';
+  return String(value).replace('T',' ').substring(0,16);
+}
+
+async function abrirLoteEmpresas(grupo){
+  const grupoLimpo=String(grupo||'').trim();
+  const navBtn=document.querySelector('.nav-btn[data-tab="empresas"]');
+  showTab('empresas',navBtn);
+  await loadGruposFiltro();
+  const grpSel=document.getElementById('filt-grp');
+  const q=document.getElementById('filt-q');
+  const st=document.getElementById('filt-status');
+  const site=document.getElementById('filt-site');
+  if(q) q.value='';
+  if(st) st.value='';
+  if(site) site.value='';
+  if(grpSel) grpSel.value=grupoLimpo;
+  await carregarEmpresas();
+}
+
+async function salvarBuscaMeta(buscaId, payload){
+  const data=await fetch(`/api/buscas/${buscaId}`,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload||{})
+  }).then(r=>r.json()).catch(()=>({ok:false,erro:'Falha ao salvar lote'}));
+  if(!data?.ok) throw new Error(data?.erro || 'Falha ao salvar lote');
+  await loadGruposFiltro().catch(()=>{});
+  return data.busca || null;
+}
+
+async function renomearLote(buscaId, nomeAtual){
+  const novoNome=(window.prompt('Novo nome do lote:', nomeAtual || '') || '').trim();
+  if(!novoNome || novoNome===String(nomeAtual||'').trim()) return;
+  try{
+    await salvarBuscaMeta(buscaId,{grupo:novoNome});
+    await loadHist();
+  }catch(err){
+    alert(err.message || 'Nao foi possivel renomear o lote');
+  }
+}
+
+async function arquivarLote(buscaId, arquivar){
+  const confirmar=window.confirm(arquivar ? 'Arquivar este lote? Ele sairá da visão principal.' : 'Reativar este lote e voltar para a visão principal?');
+  if(!confirmar) return;
+  try{
+    await salvarBuscaMeta(buscaId,{arquivada:arquivar ? 1 : 0});
+    await loadHist();
+  }catch(err){
+    alert(err.message || 'Nao foi possivel atualizar o lote');
+  }
+}
+
+function abrirLoteNoKanban(campanhaId, nome){
+  if(!campanhaId) return;
+  aplicarFiltroCampanhaKanban(String(campanhaId), nome || '');
+}
+
+async function arquivarLotesEsgotados(silent){
+  try{
+    const data=await fetch('/api/buscas/arquivar-esgotadas',{method:'POST'}).then(r=>r.json());
+    if(!data?.ok) throw new Error(data?.erro || 'Falha ao arquivar lotes esgotados');
+    if(!silent){
+      alert(data.arquivadas ? `${data.arquivadas} lote(s) esgotado(s) foram arquivados.` : 'Nenhum lote esgotado precisava ser arquivado.');
+    }
+    return Number(data.arquivadas||0);
+  }catch(err){
+    if(!silent) alert(err.message || 'Falha ao arquivar lotes esgotados');
+    return 0;
+  }
+}
+
+function fecharLoteFilaModal(e){
+  if(!e || e.target===document.getElementById('lote-fila-overlay')){
+    document.getElementById('lote-fila-overlay').classList.remove('show');
+  }
+}
+
+async function abrirEmpresasDoLoteFila(){
+  if(!loteFilaState?.grupo) return;
+  fecharLoteFilaModal();
+  await abrirLoteEmpresas(loteFilaState.grupo);
+}
+
+async function abrirFilaOperacionalLote(buscaId){
+  const overlay=document.getElementById('lote-fila-overlay');
+  const subtitle=document.getElementById('lote-fila-subtitle');
+  const summary=document.getElementById('lote-fila-summary');
+  const lista=document.getElementById('lote-fila-lista');
+  const kanbanBtn=document.getElementById('lote-fila-kanban');
+  loteFilaState = {buscaId:buscaId||0,grupo:'',campanhaId:0,campanhaNome:'',empresas:[]};
+  if(subtitle) subtitle.textContent='Carregando pendencias do lote...';
+  if(summary) summary.innerHTML='';
+  if(lista) lista.innerHTML='<div class="section" style="padding:18px;color:var(--muted)">Carregando fila operacional...</div>';
+  if(kanbanBtn) kanbanBtn.style.display='none';
+  if(overlay) overlay.classList.add('show');
+  try{
+    const data=await fetch(`/api/buscas/${buscaId}/fila-operacional`).then(r=>r.json());
+    if(!data?.ok) throw new Error(data?.erro || 'Nao foi possivel carregar a fila do lote');
+    loteFilaState = {
+      buscaId,
+      grupo:data.grupo || '',
+      campanhaId:Number(data.campanha_id||0),
+      campanhaNome:data.campanha_nome || '',
+      empresas:Array.isArray(data.empresas) ? data.empresas : []
+    };
+    if(subtitle){
+      subtitle.textContent = `${data.grupo || ('Lote #' + buscaId)} - ${loteFilaState.empresas.length} pendencia(s) operacional(is) pronta(s) para tratamento.`;
+    }
+    if(summary){
+      const resumo=data.resumo || {};
+      const cards=[
+        ['Total no lote', Number(resumo.total_lote||0), '#dbeafe'],
+        ['Pendentes', Number(resumo.pendentes||0), '#fbbf24'],
+        ['No kanban', Number(resumo.no_kanban||0), '#7dd3fc'],
+        ['Trabalhadas', Number(resumo.trabalhadas||0), '#4ade80'],
+      ];
+      summary.innerHTML = cards.map(([label,val,color])=>`
+        <div class="section" style="padding:12px 14px">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">${label}</div>
+          <div style="font-size:1.25rem;font-weight:800;margin-top:6px;color:${color}">${val}</div>
+        </div>
+      `).join('');
+    }
+    if(kanbanBtn && loteFilaState.campanhaId){
+      kanbanBtn.style.display='inline-flex';
+    }
+    if(!loteFilaState.empresas.length){
+      lista.innerHTML = `<div class="section" style="padding:22px">
+        <div style="font-size:1rem;font-weight:800">Nenhuma pendencia operacional</div>
+        <div style="margin-top:6px;color:var(--muted);font-size:.84rem">Esse lote ja foi consumido pelo kanban, por campanhas ou por mudancas de status.</div>
+      </div>`;
+      return;
+    }
+    lista.innerHTML = loteFilaState.empresas.map(emp=>{
+      const tel=escapeHtml(emp.telefone_formatado || emp.telefone || 'Sem telefone');
+      const cidade=escapeHtml(emp.cidade || 'Cidade nao informada');
+      const categoria=escapeHtml(emp.categoria || 'Sem categoria');
+      const rating=Number(emp.rating||0);
+      const reviews=Number(emp.reviews||0);
+      const badgeWebsite = emp.website ? '<span class="badge b-green">Com site</span>' : '<span class="badge b-yellow">Sem site</span>';
+      return `
+        <div class="section" style="padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap">
+            <div>
+              <div style="font-size:1rem;font-weight:800">${escapeHtml(emp.nome || 'Empresa')}</div>
+              <div style="font-size:.8rem;color:var(--muted);margin-top:4px">${categoria} - ${cidade}</div>
+              <div style="font-size:.84rem;color:#86efac;margin-top:8px">${tel}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+              ${badgeWebsite}
+              ${rating>0 ? `<span class="badge b-purple">⭐ ${rating.toFixed(1)}${reviews?` · ${reviews} av.`:''}</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button class="btn btn-o btn-sm" onclick="verFicha(${Number(emp.id)})">Abrir ficha</button>
+            <button class="btn btn-p btn-sm" onclick="abrirBuscaCampanhaModal(${Number(buscaId)})">Mandar lote para campanha</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }catch(err){
+    if(lista) lista.innerHTML = `<div class="alert al-err">❌ ${escapeHtml(err.message || 'Falha ao carregar a fila operacional')}</div>`;
+    if(subtitle) subtitle.textContent='Nao foi possivel abrir o lote.';
+  }
+}
+
 async function loadHist(){
   const data=await fetch('/api/buscas').then(r=>r.json()).catch(()=>[]);
   const tbody=document.getElementById('hist-body');
@@ -2305,6 +3072,142 @@ async function loadHist(){
     <td><span class="badge ${em[b.status]||'b-gray'}">${ic[b.status]||''} ${b.status}</span></td>
     <td><small style="color:var(--muted)">${(b.criado_em||'').substring(0,16)}</small></td>
   </tr>`).join('');
+}
+
+async function loadHist(){
+  let data=await fetch('/api/buscas').then(r=>r.json()).catch(()=>[]);
+  const container=document.getElementById('hist-body');
+  const q=(document.getElementById('hist-q')?.value||'').trim().toLowerCase();
+  const status=(document.getElementById('hist-status')?.value||'').trim().toLowerCase();
+  const showArchived=Boolean(document.getElementById('hist-show-archived')?.checked);
+  const autoArchive=Boolean(document.getElementById('hist-auto-archive')?.checked);
+  const totalEl=document.getElementById('hist-stat-total');
+  const conclEl=document.getElementById('hist-stat-concluido');
+  const novasEl=document.getElementById('hist-stat-novas');
+  const dupEl=document.getElementById('hist-stat-duplicadas');
+  if(autoArchive && !histAutoArchiveInFlight){
+    const existeEsgotado=(Array.isArray(data)?data:[]).some(b=>
+      Number(b.arquivada||0)!==1 &&
+      String(b.status||'').toLowerCase()==='concluido' &&
+      Number(b.total_empresas_lote||0)>0 &&
+      Math.max(0, Number(b.total_empresas_lote||0)-Number(b.empresas_trabalhadas||0))===0
+    );
+    if(existeEsgotado){
+      histAutoArchiveInFlight = true;
+      await arquivarLotesEsgotados(true);
+      data=await fetch('/api/buscas').then(r=>r.json()).catch(()=>[]);
+      histAutoArchiveInFlight = false;
+    }
+  }
+  const filtrados=data.filter(b=>{
+    const arquivada=Number(b.arquivada||0)===1;
+    const haystack=[
+      b.id,
+      b.keyword||'',
+      b.localizacao||'',
+      b.grupo||'',
+      b.criado_em||'',
+      b.status||''
+    ].join(' ').toLowerCase();
+    const okQ=!q || haystack.includes(q);
+    const okStatus=!status || String(b.status||'').toLowerCase()===status;
+    const okArchived=showArchived || !arquivada;
+    return okQ && okStatus && okArchived;
+  });
+  if(totalEl) totalEl.textContent=String(filtrados.length);
+  if(conclEl) conclEl.textContent=String(filtrados.filter(b=>String(b.status||'').toLowerCase()==='concluido').length);
+  if(novasEl) novasEl.textContent=String(filtrados.reduce((acc,b)=>acc+Number(b.novos||0),0));
+  if(dupEl) dupEl.textContent=String(filtrados.reduce((acc,b)=>acc+Number(b.duplicatas||0),0));
+  if(!filtrados.length){
+    container.innerHTML=`<div class="section" style="padding:24px">
+      <div style="font-size:1rem;font-weight:800">Nenhum lote encontrado</div>
+      <div style="margin-top:6px;color:var(--muted);font-size:.84rem">Ajuste a busca ou o status para localizar uma extracao anterior.</div>
+    </div>`;
+    return;
+  }
+  container.innerHTML=filtrados.map(b=>{
+    const arquivada=Number(b.arquivada||0)===1;
+    const campanhaId=Number(b.campanha_id||0);
+    const campanhaNome=escapeHtml(b.campanha_nome || (campanhaId ? `Campanha #${campanhaId}` : ''));
+    const stMeta=arquivada ? getHistStatusMeta('arquivado') : getHistStatusMeta(b.status);
+    const grupoLabel=escapeHtml(b.grupo || `Busca ${b.id}`);
+    const grupoRaw=String(b.grupo || '').replace(/'/g,'&#39;');
+    const keyword=escapeHtml(b.keyword || 'Sem palavra-chave');
+    const local=escapeHtml(b.localizacao || 'Localizacao nao informada');
+    const criado=escapeHtml(formatHistDate(b.criado_em));
+    const total=Number(b.total_encontrados||0);
+    const novas=Number(b.novos||0);
+    const duplicadas=Number(b.duplicatas||0);
+    const totalLote=Number(b.total_empresas_lote||0);
+    const noKanban=Number(b.empresas_no_kanban||0);
+    const trabalhadas=Number(b.empresas_trabalhadas||0);
+    const pendentes=Math.max(0,totalLote-trabalhadas);
+    return `<div class="section" style="padding:18px;display:flex;flex-direction:column;gap:14px;min-height:260px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div>
+          <div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2)">Lote #${b.id}</div>
+          <div style="font-size:1rem;font-weight:800;line-height:1.35;margin-top:6px">${grupoLabel}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:5px">${keyword} - ${local}</div>
+        </div>
+        <span class="badge ${stMeta.cls}" style="white-space:nowrap">${stMeta.icon} ${stMeta.label}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+        <div style="padding:12px;border-radius:12px;background:rgba(114,199,255,.08);border:1px solid rgba(114,199,255,.14)">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Total</div>
+          <div style="font-size:1.15rem;font-weight:800;margin-top:6px">${total}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.16)">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Novas</div>
+          <div style="font-size:1.15rem;font-weight:800;margin-top:6px;color:#4ade80">${novas}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.16)">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Duplicadas</div>
+          <div style="font-size:1.15rem;font-weight:800;margin-top:6px;color:#fbbf24">${duplicadas}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="padding:12px;border-radius:12px;background:rgba(15,23,42,.34);border:1px solid rgba(255,255,255,.06)">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Criado em</div>
+          <div style="font-size:.84rem;font-weight:700;margin-top:6px">${criado}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(15,23,42,.34);border:1px solid rgba(255,255,255,.06)">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Grupo aplicado</div>
+          <div style="font-size:.84rem;font-weight:700;margin-top:6px;color:var(--accent2)">${grupoLabel}</div>
+        </div>
+      </div>
+      <div style="padding:12px;border-radius:12px;background:${campanhaId ? 'rgba(96,165,250,.08)' : 'rgba(148,163,184,.08)'};border:1px solid ${campanhaId ? 'rgba(96,165,250,.22)' : 'rgba(148,163,184,.18)'}">
+        <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Campanha vinculada</div>
+        <div style="font-size:.84rem;font-weight:700;margin-top:6px;color:${campanhaId ? '#93c5fd' : 'var(--muted)'}">${campanhaId ? campanhaNome : 'Nenhuma campanha ligada ainda'}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+        <div style="padding:12px;border-radius:12px;background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.16)">
+          <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Empresas no lote</div>
+          <div style="font-size:1rem;font-weight:800;margin-top:6px">${totalLote}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.16)">
+          <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">No kanban</div>
+          <div style="font-size:1rem;font-weight:800;margin-top:6px;color:#7dd3fc">${noKanban}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.16)">
+          <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Ja trabalhadas</div>
+          <div style="font-size:1rem;font-weight:800;margin-top:6px;color:#4ade80">${trabalhadas}</div>
+        </div>
+        <div style="padding:12px;border-radius:12px;background:${pendentes>0?'rgba(251,191,36,.08)':'rgba(148,163,184,.08)'};border:1px solid ${pendentes>0?'rgba(251,191,36,.16)':'rgba(148,163,184,.16)'}">
+          <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)">Pendentes</div>
+          <div style="font-size:1rem;font-weight:800;margin-top:6px;color:${pendentes>0?'#fbbf24':'#94a3b8'}">${pendentes}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto">
+        <button class="btn btn-o btn-sm" onclick="abrirFilaOperacionalLote(${b.id})">Ver pendentes</button>
+        <button class="btn btn-o btn-sm" onclick="abrirLoteEmpresas('${grupoRaw}')">Ver empresas</button>
+        ${campanhaId ? `<button class="btn btn-o btn-sm" onclick="abrirLoteNoKanban(${campanhaId},'${campanhaNome.replace(/'/g,'&#39;')}')">Abrir no kanban</button>` : ''}
+        <button class="btn btn-p btn-sm" onclick="abrirBuscaCampanhaModal(${b.id})">Enviar para campanha</button>
+        <button class="btn btn-g btn-sm" onclick="abrirBuscaCampanhaModal(${b.id});setTimeout(()=>{const s=document.getElementById('busca-campanha-modo');if(s){s.value='nova';trocarModoBuscaCampanha();}},60)">Criar campanha</button>
+        <button class="btn btn-o btn-sm" onclick="renomearLote(${b.id},'${grupoRaw}')">Renomear</button>
+        <button class="btn btn-o btn-sm" style="border-color:${arquivada ? 'rgba(34,197,94,.35)' : 'rgba(251,191,36,.28)'};color:${arquivada ? '#86efac' : '#fcd34d'}" onclick="arquivarLote(${b.id}, ${arquivada ? 0 : 1})">${arquivada ? 'Reativar lote' : 'Arquivar lote'}</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function loadCfg(){
@@ -2448,6 +3351,14 @@ document.addEventListener('DOMContentLoaded',()=>{
   }catch(e){
     // Fallback: carrega dashboard normalmente
     loadDash();
+  }
+
+  initKanbanUiState();
+  syncKanbanToolbarUi();
+  const kanbanColSelect = document.getElementById('kanban-filter-col');
+  if(kanbanColSelect){
+    kanbanColSelect.innerHTML = `<option value="">Todas</option>${KANBAN_COLS.map(col=>`<option value="${col.id}">${col.id}</option>`).join('')}`;
+    kanbanColSelect.value = kanbanUiState.column || '';
   }
 
   setInterval(()=>{if(document.getElementById('tab-dashboard').classList.contains('active'))loadDash();},30000);
@@ -2658,9 +3569,22 @@ let waNumerosCache = [];
 let waStatusCache = {};
 let waCampanhasCache = [];
 let waTemplatesCache = [];
+let waTemplateFiltroAtivo = 'todos';
 let kanbanCampanhaSelecionadaId = '';
 let kanbanCampanhaSelecionadaNome = '';
 let waCurrentSection = 'kanban';
+let kanbanDrawerContatoId = null;
+let kanbanDataCache = {};
+let kanbanLastInteractionAt = 0;
+let kanbanScrollPositions = {};
+let kanbanUiState = {
+  search: '',
+  column: '',
+  queue: '',
+  sort: 'default',
+  compact: false,
+  focusColumn: '',
+};
 let loteEnvioPendente = null;
 const DEFAULT_PRINCIPAL_QUICK_REPLY_CONFIG = {
   footer: 'Toque em uma opção abaixo',
@@ -2945,41 +3869,197 @@ function updateCampaignTopbarContext(){
   }
 }
 
+function _getCampStatusMeta(status){
+  switch((status||'').toLowerCase()){
+    case 'rodando':   return {icon:'▶', label:'Rodando',  cor:'#34d399', bg:'rgba(52,211,153,.13)', pulse:true};
+    case 'pausada':   return {icon:'⏸', label:'Pausada',  cor:'#fbbf24', bg:'rgba(251,191,36,.13)', pulse:false};
+    case 'concluida': return {icon:'✅', label:'Concluída',cor:'#60a5fa', bg:'rgba(96,165,250,.13)', pulse:false};
+    case 'planejada': return {icon:'📋', label:'Planejada',cor:'#a78bfa', bg:'rgba(167,139,250,.13)', pulse:false};
+    case 'parcial':   return {icon:'⏳', label:'Parcial',  cor:'#fb923c', bg:'rgba(251,146,60,.13)', pulse:false};
+    case 'vazia':     return {icon:'○',  label:'Vazia',   cor:'#6b7280', bg:'rgba(107,114,128,.13)', pulse:false};
+    default:          return {icon:'●',  label:status||'?',cor:'#94a3b8',bg:'rgba(148,163,184,.13)', pulse:false};
+  }
+}
+
 function atualizarInfoCampanhaKanban(){
   const info = document.getElementById('kanban-campanha-info');
   const clearBtn = document.getElementById('kanban-campanha-clear-btn');
+  const btnPausar = document.getElementById('kanban-btn-pausar-camp');
+  const btnAtivar = document.getElementById('kanban-btn-ativar-camp');
+  const btnDeletar = document.getElementById('kanban-btn-deletar-camp');
+
+  const campanha = waCampanhasCache.find(c => String(c.id) === String(kanbanCampanhaSelecionadaId));
+  const statusAtual = campanha?.status || '';
+  const sm = _getCampStatusMeta(statusAtual);
+
   if(info){
     if(kanbanCampanhaSelecionadaId){
-      const cor = getSelectedCampaignColorMeta();
-      info.innerHTML = `<span style="display:inline-flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:999px;background:${cor.solid};box-shadow:0 0 0 4px ${cor.soft}"></span>Visualizando apenas a campanha: ${escapeHtml(kanbanCampanhaSelecionadaNome || ('#' + kanbanCampanhaSelecionadaId))}</span>`;
+      const pulseStyle = sm.pulse
+        ? `animation:kanban-pulse 1.6s ease-in-out infinite;`
+        : '';
+      info.innerHTML = `<span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:6px;background:${sm.bg};border:1px solid ${sm.cor}44;border-radius:999px;padding:2px 10px 2px 6px">
+          <span style="width:9px;height:9px;border-radius:999px;background:${sm.cor};${pulseStyle}"></span>
+          <span style="font-size:.78rem;font-weight:700;color:${sm.cor}">${sm.icon} ${sm.label}</span>
+        </span>
+        <span style="font-size:.76rem;color:var(--muted)">Campanha: <strong style="color:#e2e8f0">${escapeHtml(kanbanCampanhaSelecionadaNome || ('#' + kanbanCampanhaSelecionadaId))}</strong></span>
+      </span>`;
     }else{
       info.textContent = 'Visualizando todo o Kanban.';
     }
   }
-  if(clearBtn){
-    clearBtn.style.display = kanbanCampanhaSelecionadaId ? '' : 'none';
+
+  if(clearBtn) clearBtn.style.display = kanbanCampanhaSelecionadaId ? '' : 'none';
+
+  const mostrar = kanbanCampanhaSelecionadaId ? '' : 'none';
+  const estaRodando  = statusAtual === 'rodando';
+  const estaPausada  = statusAtual === 'pausada';
+  const podePausar   = estaRodando;
+  const podeAtivar   = !estaRodando && statusAtual !== '' && statusAtual !== 'concluida' && statusAtual !== 'vazia';
+
+  if(btnPausar){
+    btnPausar.style.display = mostrar;
+    btnPausar.disabled = !podePausar;
+    if(podePausar){
+      btnPausar.style.opacity = '1';
+      btnPausar.style.borderColor = 'rgba(251,191,36,.5)';
+      btnPausar.style.color = '#fde68a';
+      btnPausar.style.boxShadow = 'none';
+    } else {
+      btnPausar.style.opacity = '0.38';
+      btnPausar.style.borderColor = '';
+      btnPausar.style.color = '';
+      btnPausar.style.boxShadow = 'none';
+    }
   }
+  if(btnAtivar){
+    btnAtivar.style.display = mostrar;
+    btnAtivar.disabled = !podeAtivar;
+    if(estaRodando){
+      // já está ativa — destaque verde pulsante para indicar que está ON
+      btnAtivar.style.opacity = '1';
+      btnAtivar.style.borderColor = '#34d399';
+      btnAtivar.style.color = '#6ee7b7';
+      btnAtivar.style.boxShadow = '0 0 0 2px rgba(52,211,153,.25)';
+      btnAtivar.textContent = '▶ Ativa';
+    } else if(podeAtivar){
+      btnAtivar.style.opacity = '1';
+      btnAtivar.style.borderColor = 'rgba(52,211,153,.35)';
+      btnAtivar.style.color = '#6ee7b7';
+      btnAtivar.style.boxShadow = 'none';
+      btnAtivar.textContent = '▶ Ativar';
+    } else {
+      btnAtivar.style.opacity = '0.38';
+      btnAtivar.style.borderColor = '';
+      btnAtivar.style.color = '';
+      btnAtivar.style.boxShadow = 'none';
+      btnAtivar.textContent = '▶ Ativar';
+    }
+  }
+  if(btnDeletar){
+    btnDeletar.style.display = mostrar;
+  }
+
   updateCampaignTopbarContext();
 }
 
-function renderKanbanCampanhaOptions(){
-  const select = document.getElementById('kanban-campanha-select');
-  if(!select) return;
-  const atual = String(kanbanCampanhaSelecionadaId || '');
-  select.innerHTML = '<option value="">Kanban geral</option>' + waCampanhasCache.map(c =>
-    `<option value="${c.id}">● ${escapeHtml(c.nome || ('Campanha #' + c.id))}</option>`
-  ).join('');
-  select.value = atual;
-  if(atual){
-    const cor = getSelectedCampaignColorMeta();
-    select.style.borderColor = cor.solid;
-    select.style.boxShadow = `0 0 0 3px ${cor.soft}`;
-    select.style.background = `linear-gradient(135deg, ${cor.soft}, rgba(25,36,59,.96))`;
-  }else{
-    select.style.borderColor = 'rgba(114,199,255,.14)';
-    select.style.boxShadow = 'none';
-    select.style.background = '';
+/* ── Dropdown de campanha (customizado) ─────────────────────────────── */
+function toggleKanbanCampDropdown(e){
+  e && e.stopPropagation();
+  const menu = document.getElementById('kanban-camp-menu');
+  const arrow = document.getElementById('kanban-camp-trigger-arrow');
+  if(!menu) return;
+  const isOpen = menu.style.display !== 'none';
+  if(isOpen){ fecharKanbanCampDropdown(); }
+  else {
+    menu.style.display = 'block';
+    if(arrow) arrow.style.transform = 'rotate(180deg)';
   }
+}
+function fecharKanbanCampDropdown(){
+  const menu = document.getElementById('kanban-camp-menu');
+  const arrow = document.getElementById('kanban-camp-trigger-arrow');
+  if(menu) menu.style.display = 'none';
+  if(arrow) arrow.style.transform = 'rotate(0deg)';
+}
+document.addEventListener('click', function(e){
+  const dd = document.getElementById('kanban-camp-dropdown');
+  if(dd && !dd.contains(e.target)) fecharKanbanCampDropdown();
+});
+
+/* animação de pulso para campanha rodando */
+(function _injectKanbanPulseStyle(){
+  if(document.getElementById('kanban-pulse-css')) return;
+  const s = document.createElement('style');
+  s.id = 'kanban-pulse-css';
+  s.textContent = `@keyframes kanban-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.35)}}`;
+  document.head.appendChild(s);
+})();
+
+function renderKanbanCampanhaOptions(){
+  const trigger = document.getElementById('kanban-camp-trigger');
+  const triggerLabel = document.getElementById('kanban-camp-trigger-label');
+  const menuInner = document.getElementById('kanban-camp-menu-inner');
+  if(!trigger || !menuInner) return;
+
+  const atual = String(kanbanCampanhaSelecionadaId || '');
+
+  // Monta os itens do menu
+  const itemStyle = `display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;
+    border-radius:7px;cursor:pointer;font-size:.82rem;color:#e2e8f0;border:none;
+    background:transparent;text-align:left;transition:background .15s`;
+
+  const items = [
+    `<button style="${itemStyle}" onmouseenter="this.style.background='rgba(114,199,255,.09)'" onmouseleave="this.style.background='transparent'"
+       onclick="aplicarFiltroCampanhaKanban('','');fecharKanbanCampDropdown()">
+      <span style="width:24px;height:24px;border-radius:6px;background:rgba(148,163,184,.12);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0">📋</span>
+      <span style="flex:1;font-weight:500;color:#94a3b8">Kanban geral</span>
+    </button>`
+  ];
+
+  waCampanhasCache.forEach(c => {
+    const sm = _getCampStatusMeta(c.status);
+    const isSelected = String(c.id) === atual;
+    const pulseAnim = sm.pulse ? 'animation:kanban-pulse 1.6s ease-in-out infinite;' : '';
+    const selectedBg = isSelected ? `background:rgba(114,199,255,.09);` : '';
+    items.push(`
+      <button style="${itemStyle}${selectedBg}"
+        onmouseenter="this.style.background='rgba(114,199,255,.09)'"
+        onmouseleave="this.style.background='${isSelected ? 'rgba(114,199,255,.09)' : 'transparent'}'"
+        onclick="aplicarFiltroCampanhaKanban('${c.id}','${escapeHtml(c.nome||'')}');fecharKanbanCampDropdown()">
+        <span style="width:24px;height:24px;border-radius:6px;background:${sm.bg};border:1px solid ${sm.cor}44;
+          display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative">
+          <span style="width:8px;height:8px;border-radius:999px;background:${sm.cor};${pulseAnim}"></span>
+        </span>
+        <span style="flex:1;overflow:hidden">
+          <span style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:${isSelected?'700':'500'}">${escapeHtml(c.nome || ('Campanha #'+c.id))}</span>
+          <span style="font-size:.7rem;color:${sm.cor};font-weight:600">${sm.icon} ${sm.label}</span>
+        </span>
+        ${isSelected ? `<span style="color:#60a5fa;font-size:.75rem">✓</span>` : ''}
+      </button>`);
+  });
+
+  menuInner.innerHTML = items.join('');
+
+  // Atualiza o trigger (botão visível)
+  if(atual){
+    const camp = waCampanhasCache.find(c => String(c.id) === atual);
+    const sm = _getCampStatusMeta(camp?.status);
+    const pulseAnim = sm.pulse ? 'animation:kanban-pulse 1.6s ease-in-out infinite;' : '';
+    trigger.style.borderColor = sm.cor + '88';
+    trigger.style.boxShadow = `0 0 0 2px ${sm.cor}22`;
+    trigger.style.background = `linear-gradient(135deg, ${sm.bg}, rgba(15,23,42,.95))`;
+    triggerLabel.innerHTML = `
+      <span style="width:9px;height:9px;border-radius:999px;background:${sm.cor};flex-shrink:0;${pulseAnim}"></span>
+      <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${escapeHtml(camp?.nome || ('#'+atual))}</span>
+      <span style="font-size:.7rem;color:${sm.cor};font-weight:700;flex-shrink:0">${sm.icon} ${sm.label}</span>`;
+  } else {
+    trigger.style.borderColor = 'rgba(114,199,255,.18)';
+    trigger.style.boxShadow = 'none';
+    trigger.style.background = 'rgba(15,23,42,.85)';
+    triggerLabel.innerHTML = `<span style="color:var(--muted)">📋</span><span style="color:#94a3b8">Kanban geral</span>`;
+  }
+
   atualizarInfoCampanhaKanban();
 }
 
@@ -3166,6 +4246,7 @@ async function loadWaTab(){
     // Só atualiza se a aba WhatsApp estiver ativa
     const waTab = document.getElementById('tab-whatsapp');
     if(waTab && waTab.classList.contains('active')){
+      if(shouldPauseKanbanAutoRefresh()) return;
       loadKanban();
       loadKanbanStats();
       loadListaNegraPanel();
@@ -3525,22 +4606,700 @@ const KANBAN_COLS = [
 async function loadKanban(){
   const params = new URLSearchParams();
   if(kanbanCampanhaSelecionadaId) params.set('campanha_id', kanbanCampanhaSelecionadaId);
-  const data = await fetch('/api/kanban' + (params.toString() ? `?${params.toString()}` : '')).then(r=>r.json()).catch(()=>({}));
-  const board = document.getElementById('kanban-board');
+  kanbanDataCache = await fetch('/api/kanban' + (params.toString() ? `?${params.toString()}` : '')).then(r=>r.json()).catch(()=>({}));
   atualizarInfoCampanhaKanban();
+  renderKanbanBoard();
+  syncKanbanDrawerFromBoard(kanbanDataCache);
+}
+
+function kanbanMatchesQueueFilter(card){
+  const queue = String(kanbanUiState.queue || '');
+  if(!queue) return true;
+  if(queue === 'sem_responsavel') return !String(card.nome_responsavel || '').trim();
+  if(queue === 'followup_pronto') return String(card.followup_status || '').toLowerCase() === 'pronto';
+  if(queue === 'lista_negra') return Number(card.optout_global || 0) === 1 && !Number(card.is_teste || 0);
+  if(queue === 'com_resposta') return !!String(card.ultima_msg || '').trim();
+  return true;
+}
+
+function kanbanSortCards(cards){
+  const sort = String(kanbanUiState.sort || 'default');
+  const list = [...cards];
+  if(sort === 'nome') return list.sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''), 'pt-BR'));
+  if(sort === 'rating') return list.sort((a,b)=>Number(b.rating||0) - Number(a.rating||0));
+  if(sort === 'urgencia'){
+    const score = card => {
+      let total = 0;
+      const status = String(card.followup_status || '').toLowerCase();
+      if(Number(card.optout_global || 0) && !Number(card.is_teste || 0)) total += 100;
+      if(card.kanban_coluna === 'Negociando') total += 80;
+      if(card.kanban_coluna === 'Respondeu') total += 70;
+      if(status === 'pronto') total += 60;
+      if(!String(card.nome_responsavel || '').trim()) total += 20;
+      total += Math.min(Number(card.followup_horas_restantes || 0) * -1, 20);
+      return total;
+    };
+    return list.sort((a,b)=>score(b)-score(a));
+  }
+  return list;
+}
+
+function markKanbanInteraction(){
+  kanbanLastInteractionAt = Date.now();
+}
+
+function shouldPauseKanbanAutoRefresh(){
+  return (Date.now() - kanbanLastInteractionAt) < 4000;
+}
+
+function captureKanbanScrollPositions(){
+  const next = {};
+  document.querySelectorAll('.kanban-col-body').forEach(el=>{
+    if(el.id) next[el.id] = el.scrollTop || 0;
+  });
+  kanbanScrollPositions = next;
+}
+
+function restoreKanbanScrollPositions(){
+  Object.entries(kanbanScrollPositions || {}).forEach(([id, top])=>{
+    const el = document.getElementById(id);
+    if(el) el.scrollTop = top;
+  });
+}
+
+function bindKanbanInteractionGuards(){
+  const board = document.getElementById('kanban-board');
+  if(!board || board.dataset.interactionBound === '1') return;
+  board.dataset.interactionBound = '1';
+  ['wheel','pointerdown','touchstart','keydown'].forEach(evt=>{
+    board.addEventListener(evt, markKanbanInteraction, { passive:true, capture:true });
+  });
+  board.addEventListener('scroll', e=>{
+    const target = e.target;
+    if(target && target.classList && target.classList.contains('kanban-col-body')){
+      markKanbanInteraction();
+      if(target.id) kanbanScrollPositions[target.id] = target.scrollTop || 0;
+    }
+  }, true);
+}
+
+function renderKanbanBoard(){
+  const board = document.getElementById('kanban-board');
+  if(!board) return;
+  captureKanbanScrollPositions();
+  const search = String(kanbanUiState.search || '').trim().toLowerCase();
+  const focus = String(kanbanUiState.focusColumn || '');
+  let totalVisible = 0;
+  board.classList.toggle('is-compact', !!kanbanUiState.compact);
+  board.classList.toggle('has-focus', !!focus);
   board.innerHTML = KANBAN_COLS.map(col=>{
-    const cards = data[col.id] || [];
-    return `<div class="kanban-col ${col.cls}" data-col="${col.id}"
+    if(kanbanUiState.column && kanbanUiState.column !== col.id) return '';
+    let cards = (kanbanDataCache[col.id] || []).filter(card=>{
+      const haystack = [
+        card.nome,
+        card.telefone_wa,
+        card.telefone,
+        card.cidade,
+        card.categoria,
+        card.nome_responsavel,
+      ].join(' ').toLowerCase();
+      const okSearch = !search || haystack.includes(search);
+      return okSearch && kanbanMatchesQueueFilter(card);
+    });
+    cards = kanbanSortCards(cards);
+    totalVisible += cards.length;
+    return `<div class="kanban-col ${col.cls} ${focus === col.id ? 'is-focus' : ''}" data-col="${col.id}"
       ondragover="kbDragOver(event)" ondragleave="kbDragLeave(event)" ondrop="kbDrop(event,this,'${col.id}')">
       <div class="kanban-col-header">
         <span class="kanban-col-title">${col.label}</span>
-        <span class="kanban-col-count">${cards.length}</span>
+        <div class="kanban-col-tools">
+          <span class="kanban-col-count">${cards.length}</span>
+          <button class="kanban-col-focus-btn" type="button" title="${focus === col.id ? 'Recolher coluna' : 'Focar coluna'}" onclick="event.stopPropagation();toggleFocoKanbanColuna('${col.id}')">${focus === col.id ? '×' : '⤢'}</button>
+        </div>
       </div>
       <div class="kanban-col-body" id="kb-col-${col.id.replace(/ /g,'_')}">
-        ${cards.length ? cards.map(c=>renderKanbanCard(c)).join('') : '<div style="text-align:center;padding:16px;color:var(--muted);font-size:.75rem">Vazio</div>'}
+        ${cards.length ? cards.map(c=>renderKanbanCard(c)).join('') : `
+          <div style="text-align:center;padding:26px 18px;color:var(--muted);font-size:.76rem;border:1px dashed rgba(114,199,255,.12);border-radius:16px;background:rgba(255,255,255,.025)">
+            <div style="font-size:1.15rem;margin-bottom:8px;opacity:.75">○</div>
+            <div style="font-weight:700;color:#cfdbec;margin-bottom:4px">Nenhum lead aqui</div>
+            <div>Assim que um contato entrar nesta etapa, ele aparece nesta coluna.</div>
+          </div>`}
       </div>
     </div>`;
-  }).join('');
+  }).join('') || '<div class="empty"><div class="ico">🔎</div>Nenhum lead encontrado com os filtros atuais.</div>';
+  bindKanbanInteractionGuards();
+  restoreKanbanScrollPositions();
+  updateKanbanMetaResults(totalVisible);
+  syncKanbanToolbarUi();
+  renderKanbanQuickActions();
+  syncKanbanDrawerFromBoard(kanbanDataCache);
+}
+
+function initKanbanUiState(){
+  try{
+    kanbanUiState.search = localStorage.getItem('pl_kanban_search') || '';
+    kanbanUiState.column = localStorage.getItem('pl_kanban_filter_col') || '';
+    kanbanUiState.queue = localStorage.getItem('pl_kanban_filter_queue') || '';
+    kanbanUiState.sort = localStorage.getItem('pl_kanban_filter_sort') || 'default';
+    kanbanUiState.compact = localStorage.getItem('pl_kanban_compact') === '1';
+    kanbanUiState.focusColumn = localStorage.getItem('pl_kanban_focus_col') || '';
+  }catch(_){}
+}
+
+function syncKanbanToolbarUi(){
+  const search = document.getElementById('kanban-search-input');
+  const col = document.getElementById('kanban-filter-col');
+  const queue = document.getElementById('kanban-filter-queue');
+  const sort = document.getElementById('kanban-filter-sort');
+  const compactBtn = document.getElementById('kanban-compact-btn');
+  const focusBtn = document.getElementById('kanban-focus-btn');
+  const metaSearch = document.getElementById('kanban-meta-search');
+  const metaDensity = document.getElementById('kanban-meta-density');
+  const metaFocus = document.getElementById('kanban-meta-focus');
+  if(search) search.value = kanbanUiState.search || '';
+  if(col) col.value = kanbanUiState.column || '';
+  if(queue) queue.value = kanbanUiState.queue || '';
+  if(sort) sort.value = kanbanUiState.sort || 'default';
+  if(compactBtn){
+    compactBtn.textContent = kanbanUiState.compact ? 'Modo confortavel' : 'Modo compacto';
+    compactBtn.classList.toggle('btn-p', !!kanbanUiState.compact);
+  }
+  if(focusBtn) focusBtn.style.display = kanbanUiState.focusColumn ? '' : 'none';
+  if(metaSearch) metaSearch.textContent = (kanbanUiState.search || '').trim() || 'Todas';
+  if(metaDensity) metaDensity.textContent = kanbanUiState.compact ? 'Compacto' : 'Confortavel';
+  if(metaFocus) metaFocus.textContent = kanbanUiState.focusColumn || 'Kanban completo';
+}
+
+function updateKanbanMetaResults(total){
+  const el = document.getElementById('kanban-meta-results');
+  if(el) el.textContent = String(total || 0);
+}
+
+function renderKanbanQuickActions(){
+  const row = document.getElementById('kanban-quick-row');
+  if(!row) return;
+  const allCards = Object.values(kanbanDataCache || {}).flat();
+  const counters = {
+    respondeu: allCards.filter(card => card.kanban_coluna === 'Respondeu').length,
+    followup: allCards.filter(card => String(card.followup_status || '').toLowerCase() === 'pronto').length,
+    semResponsavel: allCards.filter(card => !String(card.nome_responsavel || '').trim()).length,
+    negociando: allCards.filter(card => card.kanban_coluna === 'Negociando').length,
+    blacklist: allCards.filter(card => Number(card.optout_global || 0) === 1 && !Number(card.is_teste || 0)).length,
+  };
+  row.innerHTML = `
+    <button class="kanban-quick-btn" onclick="aplicarAtalhoKanban('respondeu')">Responder agora <strong>${counters.respondeu}</strong></button>
+    <button class="kanban-quick-btn" onclick="aplicarAtalhoKanban('followup_pronto')">Follow-up pronto <strong>${counters.followup}</strong></button>
+    <button class="kanban-quick-btn" onclick="aplicarAtalhoKanban('sem_responsavel')">Sem responsavel <strong>${counters.semResponsavel}</strong></button>
+    <button class="kanban-quick-btn" onclick="aplicarAtalhoKanban('negociando')">Negociando <strong>${counters.negociando}</strong></button>
+    <button class="kanban-quick-btn" onclick="aplicarAtalhoKanban('lista_negra')">Lista negra <strong>${counters.blacklist}</strong></button>
+    <button class="kanban-quick-btn" onclick="limparAtalhosKanban()">Limpar atalhos</button>
+  `;
+}
+
+function aplicarAtalhoKanban(tipo){
+  if(tipo === 'respondeu'){
+    kanbanUiState.column = 'Respondeu';
+    kanbanUiState.focusColumn = 'Respondeu';
+    kanbanUiState.queue = '';
+  }else if(tipo === 'followup_pronto'){
+    kanbanUiState.column = '';
+    kanbanUiState.focusColumn = 'Enviado';
+    kanbanUiState.queue = 'followup_pronto';
+  }else if(tipo === 'sem_responsavel'){
+    kanbanUiState.column = '';
+    kanbanUiState.focusColumn = '';
+    kanbanUiState.queue = 'sem_responsavel';
+  }else if(tipo === 'negociando'){
+    kanbanUiState.column = 'Negociando';
+    kanbanUiState.focusColumn = 'Negociando';
+    kanbanUiState.queue = '';
+  }else if(tipo === 'lista_negra'){
+    kanbanUiState.column = '';
+    kanbanUiState.focusColumn = 'Descartado';
+    kanbanUiState.queue = 'lista_negra';
+  }
+  try{
+    localStorage.setItem('pl_kanban_filter_col', kanbanUiState.column || '');
+    localStorage.setItem('pl_kanban_filter_queue', kanbanUiState.queue || '');
+    localStorage.setItem('pl_kanban_focus_col', kanbanUiState.focusColumn || '');
+  }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+function limparAtalhosKanban(){
+  kanbanUiState.column = '';
+  kanbanUiState.queue = '';
+  kanbanUiState.focusColumn = '';
+  try{
+    localStorage.setItem('pl_kanban_filter_col', '');
+    localStorage.setItem('pl_kanban_filter_queue', '');
+    localStorage.setItem('pl_kanban_focus_col', '');
+  }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+function atualizarFiltroKanban(key, value){
+  kanbanUiState[key] = value;
+  const map = {
+    search:'pl_kanban_search',
+    column:'pl_kanban_filter_col',
+    queue:'pl_kanban_filter_queue',
+    sort:'pl_kanban_filter_sort',
+  };
+  try{
+    if(map[key]) localStorage.setItem(map[key], String(value || ''));
+  }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+function toggleKanbanCompactMode(){
+  kanbanUiState.compact = !kanbanUiState.compact;
+  try{ localStorage.setItem('pl_kanban_compact', kanbanUiState.compact ? '1' : '0'); }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+function toggleFocoKanbanColuna(coluna){
+  kanbanUiState.focusColumn = kanbanUiState.focusColumn === coluna ? '' : coluna;
+  try{ localStorage.setItem('pl_kanban_focus_col', kanbanUiState.focusColumn || ''); }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+function limparFocoKanban(){
+  kanbanUiState.focusColumn = '';
+  try{ localStorage.setItem('pl_kanban_focus_col', ''); }catch(_){}
+  syncKanbanToolbarUi();
+  renderKanbanBoard();
+}
+
+async function toggleEntregaLead(contatoId, campo, checked){
+  const card = document.getElementById('kcard-' + contatoId);
+  if(card) card.style.opacity = '.7';
+  const payload = {
+    site_enviado: document.getElementById(`entrega-site-${contatoId}`)?.checked ? '1' : '0',
+    pdf_enviado: document.getElementById(`entrega-pdf-${contatoId}`)?.checked ? '1' : '0',
+  };
+  payload[campo] = checked ? '1' : '0';
+  const data = await fetch('/api/kanban/' + contatoId + '/entregas', {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  }).then(r=>r.json()).catch(()=>({ok:false}));
+  if(card) card.style.opacity = '';
+  if(!data.ok){
+    alert('Nao consegui salvar esse check agora.');
+    await loadKanban();
+    return;
+  }
+}
+
+async function confirmarRespostaHumana(contatoId){
+  const btn = document.getElementById('auto-human-btn-' + contatoId);
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+  }
+  const data = await fetch('/api/kanban/' + contatoId + '/confirmar-humana', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({})
+  }).then(r=>r.json()).catch(()=>({ok:false}));
+  if(!data.ok){
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = 'Tratar como humana';
+    }
+    alert(data.erro || 'Nao consegui liberar essa resposta agora.');
+    return;
+  }
+  await loadKanban();
+  await loadKanbanStats();
+}
+
+function renderKanbanEntregas(c){
+  const itens = [
+    {
+      id: `entrega-site-${c.id}`,
+      campo: 'site_enviado',
+      ativo: Number(c.site_enviado || 0) === 1,
+      titulo: 'Site',
+      subtitulo: 'Ja recebeu o site',
+    },
+    {
+      id: `entrega-pdf-${c.id}`,
+      campo: 'pdf_enviado',
+      ativo: Number(c.pdf_enviado || 0) === 1,
+      titulo: 'PDF',
+      subtitulo: 'Ja recebeu o relatorio',
+    },
+  ];
+  return `
+    <div class="kanban-card-sidechecks">
+      <div class="kanban-check-card">
+        <div class="kanban-check-title">Entregas</div>
+        ${itens.map(item=>`
+          <label class="kanban-check-item ${item.ativo ? 'is-on' : ''}" title="${item.subtitulo}">
+            <input
+              id="${item.id}"
+              type="checkbox"
+              ${item.ativo ? 'checked' : ''}
+              onchange="toggleEntregaLead(${c.id}, '${item.campo}', this.checked)">
+            <span>${item.titulo}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function getKanbanPrimaryAction(c, coluna){
+  const status = String(c.followup_status || '').toLowerCase();
+  if(Number(c.optout_global || 0) && !Number(c.is_teste || 0)) return 'Lead bloqueado na lista negra.';
+  if(coluna === 'Negociando') return 'Conduzir conversa manual e registrar proxima etapa.';
+  if(coluna === 'Respondeu') return 'Responder rapido para manter o lead aquecido.';
+  if(coluna === 'Fechado') return 'Lead concluido. Validar entregas feitas.';
+  if(coluna === 'Descartado') return 'Lead descartado. Revise antes de reativar.';
+  if(status === 'bloqueado_coluna') return 'Modo manual ativo nesta coluna.';
+  if(status === 'warm_only') return 'Aguardando resposta real antes do proximo follow-up.';
+  if(status === 'adiado') return 'Follow-up adiado manualmente.';
+  if(status === 'pausado') return 'Follow-up pausado neste lead.';
+  if(status === 'pronto') return 'Proximo follow-up pronto para envio.';
+  if(c.ultima_msg) return 'Abrir detalhes para ver contexto da conversa.';
+  if(coluna === 'Enviado') return 'Acompanhar a primeira resposta deste contato.';
+  return 'Avaliar e executar a proxima acao do lead.';
+}
+
+function getKanbanStatusBadge(c, coluna){
+  if(Number(c.optout_global || 0) && !Number(c.is_teste || 0)){
+    return { text:'Lista negra', cls:'danger' };
+  }
+  if(coluna === 'Fechado') return { text:'Fechado', cls:'' };
+  if(coluna === 'Negociando') return { text:'Negociando', cls:'warn' };
+  if(coluna === 'Respondeu') return { text:'Respondeu', cls:'' };
+  if(coluna === 'Descartado') return { text:'Descartado', cls:'danger' };
+  const status = String(c.followup_status || '').toLowerCase();
+  const map = {
+    pronto:{ text:'Follow-up pronto', cls:'warn' },
+    pausado:{ text:'Follow-up pausado', cls:'danger' },
+    warm_only:{ text:'Aguardando resposta real', cls:'warn' },
+    bloqueado_coluna:{ text:'Modo manual', cls:'warn' },
+  };
+  return map[status] || { text:coluna || 'Lead', cls:'' };
+}
+
+function renderKanbanDrawerBriefing(briefing){
+  const itens = [
+    ['Logo', briefing.logo],
+    ['Cores', briefing.cores_marca],
+    ['Fotos', briefing.fotos],
+    ['Contatos', briefing.contatos],
+    ['Servicos', briefing.principais_servicos],
+    ['Observacoes', briefing.observacoes],
+  ].filter(([, valor])=>String(valor || '').trim());
+  if(!itens.length){
+    return '<div class="kanban-drawer-value" style="color:var(--muted)">Nenhum briefing preenchido para este lead.</div>';
+  }
+  return `<div class="kanban-drawer-list">${itens.map(([label, valor])=>`
+    <div class="kanban-drawer-list-item">
+      <div class="kanban-drawer-label">${escapeHtml(label)}</div>
+      <div class="kanban-drawer-value">${escapeHtml(valor)}</div>
+    </div>
+  `).join('')}</div>`;
+}
+
+function formatKanbanDate(value){
+  const raw = String(value || '').trim();
+  if(!raw) return '';
+  const iso = raw.includes('T') ? raw : raw.replace(' ', 'T');
+  const dt = new Date(iso);
+  if(Number.isNaN(dt.getTime())) return raw;
+  return new Intl.DateTimeFormat('pt-BR', {
+    day:'2-digit',
+    month:'2-digit',
+    hour:'2-digit',
+    minute:'2-digit'
+  }).format(dt);
+}
+
+function formatKanbanRelativeTime(value){
+  const raw = String(value || '').trim();
+  if(!raw) return '';
+  const iso = raw.includes('T') ? raw : raw.replace(' ', 'T');
+  const dt = new Date(iso);
+  if(Number.isNaN(dt.getTime())) return '';
+  const diffMs = Date.now() - dt.getTime();
+  const future = diffMs < 0;
+  const totalMin = Math.round(Math.abs(diffMs) / 60000);
+  if(totalMin < 1) return future ? 'em instantes' : 'agora mesmo';
+  if(totalMin < 60) return future ? `em ${totalMin} min` : `${totalMin} min atras`;
+  const totalHours = Math.round(totalMin / 60);
+  if(totalHours < 24) return future ? `em ${totalHours} h` : `${totalHours} h atras`;
+  const totalDays = Math.round(totalHours / 24);
+  return future ? `em ${totalDays} d` : `${totalDays} d atras`;
+}
+
+function getKanbanPriorityMeta(contato, coluna){
+  if(Number(contato.optout_global || 0) && !Number(contato.is_teste || 0)){
+    return { label:'Bloqueado', tone:'is-hot', detail:'Lista negra ativa' };
+  }
+  const status = String(contato.followup_status || '').toLowerCase();
+  if(coluna === 'Negociando'){
+    return { label:'Alta', tone:'is-hot', detail:'Conversa manual em andamento' };
+  }
+  if(status === 'pronto'){
+    return { label:'Alta', tone:'is-hot', detail:'Follow-up pronto para envio' };
+  }
+  if(coluna === 'Respondeu'){
+    return { label:'Alta', tone:'is-hot', detail:'Lead respondeu e pede retorno' };
+  }
+  if(status === 'warm_only' || status === 'adiado'){
+    return { label:'Media', tone:'is-warm', detail:'Aguardar janela ideal' };
+  }
+  if(coluna === 'Fechado'){
+    return { label:'Concluido', tone:'is-cool', detail:'Validar apenas entregas' };
+  }
+  return { label:'Normal', tone:'is-cool', detail:'Fluxo sob controle' };
+}
+
+function buildKanbanActivityTimeline(contato, coluna){
+  const itens = [];
+  const ultimaMsgEm = contato.ultima_msg_em || '';
+  if(ultimaMsgEm || contato.ultima_msg){
+    itens.push({
+      title:'Ultima interacao',
+      meta:[formatKanbanDate(ultimaMsgEm), formatKanbanRelativeTime(ultimaMsgEm)].filter(Boolean).join(' · ') || 'Sem horario salvo',
+      text: contato.ultima_msg || 'Houve interacao recente com este lead.',
+    });
+  }
+  if(contato.followup_previsto_em || contato.followup_previsto_iso){
+    itens.push({
+      title:'Proximo follow-up',
+      meta:[String(contato.followup_previsto_em || '').trim(), formatKanbanRelativeTime(contato.followup_previsto_iso || contato.followup_previsto_em || '')].filter(Boolean).join(' · '),
+      text: contato.followup_texto_resumo || 'Mensagem de follow-up pronta para esta etapa.',
+    });
+  }
+  if(contato.optout_em){
+    itens.push({
+      title:'Lista negra',
+      meta:[formatKanbanDate(contato.optout_em), formatKanbanRelativeTime(contato.optout_em)].filter(Boolean).join(' · '),
+      text: contato.optout_motivo ? `Motivo: ${contato.optout_motivo}` : 'Contato bloqueado para novos envios.',
+    });
+  }
+  if(!itens.length){
+    itens.push({
+      title:'Sem historico recente',
+      meta: coluna || 'Kanban',
+      text:'Abra a conversa ou mova o lead para registrar a proxima acao.',
+    });
+  }
+  return itens.slice(0, 3);
+}
+
+function highlightKanbanSelectedCard(contatoId){
+  document.querySelectorAll('.kanban-card').forEach(card=>{
+    card.classList.toggle('is-active', String(card.id) === `kcard-${contatoId}`);
+  });
+}
+
+function renderKanbanDrawer(contato){
+  const drawer = document.getElementById('kanban-drawer');
+  const backdrop = document.getElementById('kanban-drawer-backdrop');
+  const title = document.getElementById('kanban-drawer-title');
+  const subtitle = document.getElementById('kanban-drawer-subtitle');
+  const body = document.getElementById('kanban-drawer-body');
+  if(!drawer || !backdrop || !title || !subtitle || !body) return;
+
+  if(!contato){
+    title.textContent = 'Selecione um lead';
+    subtitle.textContent = 'Clique em um card para abrir o painel lateral.';
+    body.innerHTML = '<div class="kanban-drawer-empty">Nenhum lead selecionado.</div>';
+    drawer.classList.remove('show');
+    backdrop.classList.remove('show');
+    drawer.setAttribute('aria-hidden', 'true');
+    highlightKanbanSelectedCard(null);
+    return;
+  }
+
+  const tel = contato.telefone_wa || contato.telefone_formatado || contato.telefone || 'Nao informado';
+  const briefing = parseLeadBriefing(contato.briefing_lead, contato.notas_kanban || '');
+  const coluna = contato.kanban_coluna || '';
+  const mapsBusca = [contato.nome, contato.endereco, contato.cidade, contato.estado].filter(Boolean).join(', ');
+  const mapsUrl = (contato.google_maps_url || '').trim() || (mapsBusca ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsBusca)}` : '');
+  const rating = Number(contato.rating || 0);
+  const reviews = Number(contato.reviews || 0);
+  const statusBadge = getKanbanStatusBadge(contato, coluna);
+  const prioridade = getKanbanPriorityMeta(contato, coluna);
+  const timeline = buildKanbanActivityTimeline(contato, coluna);
+  const ultimaInteracao = formatKanbanRelativeTime(contato.ultima_msg_em || '');
+  const proximoToque = formatKanbanRelativeTime(contato.followup_previsto_iso || contato.followup_previsto_em || '');
+  const etapaAtual = `${Number(contato.followup_proxima_etapa || (Number(contato.followup_etapa || 0) + 1))}/${Number(contato.followup_max_etapas || 3)}`;
+  const chips = [
+    `<span class="kanban-mini-chip ${statusBadge.cls || ''}">${escapeHtml(statusBadge.text)}</span>`,
+    rating > 0 || reviews > 0 ? `<span class="kanban-mini-chip warn">⭐ ${rating > 0 ? rating.toFixed(1) : '—'}${reviews ? ` · ${reviews} aval.` : ''}</span>` : '',
+    contato.nome_responsavel ? `<span class="kanban-mini-chip">Responsavel: ${escapeHtml(contato.nome_responsavel)}</span>` : '',
+  ].filter(Boolean).join('');
+
+  title.textContent = contato.nome || 'Lead';
+  subtitle.textContent = [contato.categoria, contato.cidade].filter(Boolean).join(' · ') || 'Sem categoria';
+  body.innerHTML = `
+    <div class="kanban-drawer-card">
+      <div class="kanban-card-chip-row" style="margin-top:0">${chips}</div>
+      <div class="kanban-summary-strip" style="margin-top:12px">
+        <div class="kanban-summary-box">
+          <div class="kanban-summary-label">Prioridade</div>
+          <div class="kanban-summary-value ${prioridade.tone}">${escapeHtml(prioridade.label)}</div>
+          <div class="kanban-timeline-meta" style="margin-top:4px">${escapeHtml(prioridade.detail)}</div>
+        </div>
+        <div class="kanban-summary-box">
+          <div class="kanban-summary-label">Ultima interacao</div>
+          <div class="kanban-summary-value ${ultimaInteracao && /d atras|h atras/.test(ultimaInteracao) ? 'is-warm' : ''}">${escapeHtml(ultimaInteracao || 'Sem registro')}</div>
+          <div class="kanban-timeline-meta" style="margin-top:4px">${escapeHtml(formatKanbanDate(contato.ultima_msg_em || '') || 'Sem horario salvo')}</div>
+        </div>
+        <div class="kanban-summary-box">
+          <div class="kanban-summary-label">Follow-up</div>
+          <div class="kanban-summary-value ${String(contato.followup_status || '').toLowerCase() === 'pronto' ? 'is-hot' : 'is-cool'}">${escapeHtml(proximoToque || 'Sem agenda')}</div>
+          <div class="kanban-timeline-meta" style="margin-top:4px">Etapa ${escapeHtml(etapaAtual)}</div>
+        </div>
+      </div>
+      <div class="kanban-drawer-grid" style="margin-top:12px">
+        <div>
+          <div class="kanban-drawer-label">Telefone</div>
+          <div class="kanban-drawer-value">${escapeHtml(tel)}</div>
+        </div>
+        <div>
+          <div class="kanban-drawer-label">Coluna atual</div>
+          <div class="kanban-drawer-value">${escapeHtml(coluna || 'Nao definida')}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="kanban-drawer-label">Proxima acao</div>
+        <div class="kanban-drawer-value">${escapeHtml(getKanbanPrimaryAction(contato, coluna))}</div>
+      </div>
+    </div>
+
+    <div class="kanban-drawer-card">
+      <div class="kanban-drawer-label">Radar comercial</div>
+      <div class="kanban-timeline">
+        ${timeline.map(item=>`
+          <div class="kanban-timeline-item">
+            <div class="kanban-timeline-title">${escapeHtml(item.title)}</div>
+            <div class="kanban-timeline-meta">${escapeHtml(item.meta || '')}</div>
+            <div class="kanban-timeline-text">${escapeHtml(item.text || '')}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="kanban-drawer-card">
+      <div class="kanban-drawer-label">Responsavel</div>
+      ${contato.nome_responsavel
+        ? `<div id="resp-display-${contato.id}" onclick="abrirRespEditor(${contato.id})" class="kanban-drawer-value" style="cursor:pointer;color:#7dd3fc">${escapeHtml(contato.nome_responsavel)}</div>`
+        : `<div id="resp-display-${contato.id}" onclick="abrirRespEditor(${contato.id})" class="kanban-drawer-value" style="cursor:pointer;color:var(--muted)">Adicionar responsavel</div>`
+      }
+      <div id="resp-editor-${contato.id}" style="display:none;margin-top:8px">
+        <input id="resp-txt-${contato.id}" type="text" placeholder="Nome do responsavel..." value="${escapeHtml(contato.nome_responsavel || '')}" style="width:100%;background:var(--card2);border:1px solid #3b82f6;border-radius:10px;color:var(--text);padding:8px 10px;font-size:.78rem;font-family:inherit">
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button onclick="salvarResponsavel(${contato.id})" style="flex:1;padding:6px 8px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:.72rem;cursor:pointer">Salvar</button>
+          <button onclick="fecharRespEditor(${contato.id})" style="padding:6px 9px;background:var(--card2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:.72rem;cursor:pointer">Fechar</button>
+        </div>
+      </div>
+      ${contato.endereco ? `
+        <div style="margin-top:12px">
+          <div class="kanban-drawer-label">Endereco</div>
+          <div class="kanban-drawer-value">${escapeHtml([contato.endereco, contato.bairro, contato.cidade, contato.estado].filter(Boolean).join(', '))}</div>
+        </div>` : ''}
+      ${contato.ultima_msg ? `
+        <div style="margin-top:12px">
+          <div class="kanban-drawer-label">Ultima mensagem</div>
+          <div class="kanban-drawer-value">${escapeHtml(contato.ultima_msg)}</div>
+        </div>` : ''}
+    </div>
+
+    <div class="kanban-drawer-card">
+      <div class="kanban-drawer-label">Automacao e entregas</div>
+      ${renderFollowupCardStatus(contato, coluna) || '<div class="kanban-drawer-value" style="color:var(--muted)">Sem follow-up relevante nesta coluna.</div>'}
+      <div style="margin-top:12px">${renderKanbanEntregas(contato)}</div>
+    </div>
+
+    <div class="kanban-drawer-card">
+      <div class="kanban-drawer-label">Briefing do lead</div>
+      ${renderKanbanDrawerBriefing(briefing)}
+      ${contato.notas_kanban ? `
+        <div style="margin-top:12px">
+          <div class="kanban-drawer-label">Notas</div>
+          <div class="kanban-drawer-value">${escapeHtml(contato.notas_kanban)}</div>
+        </div>` : ''}
+    </div>
+
+    <div class="kanban-drawer-card">
+      <div class="kanban-drawer-label">Acoes rapidas</div>
+      <div class="kanban-drawer-actions">
+        <button class="btn btn-p btn-sm" onclick="abrirChatKanban(${contato.id})">Abrir conversa</button>
+        <button class="btn btn-o btn-sm" onclick="editarTelKanban(${contato.id},'${escapeHtml(tel)}')">Editar numero</button>
+        <button class="btn btn-o btn-sm" onclick="abrirLeadBriefingModal(${contato.id})">Editar briefing</button>
+        ${contato.empresa_id ? `<button class="btn btn-o btn-sm" onclick="verFicha(${Number(contato.empresa_id)})">Abrir ficha</button>` : ''}
+        ${mapsUrl ? `<a class="btn btn-o btn-sm" href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer">Abrir Maps</a>` : ''}
+        ${['Negociando','Fechado'].includes(coluna) ? `<button class="btn btn-o btn-sm" onclick="copiarPromptLovable(${contato.id})">Copiar prompt</button>` : ''}
+        <button class="btn btn-o btn-sm" style="border-color:rgba(239,68,68,.35);color:#fecaca" onclick="removerKanban(${contato.id})">Remover do Kanban</button>
+      </div>
+    </div>
+  `;
+
+  drawer.classList.add('show');
+  backdrop.classList.add('show');
+  drawer.setAttribute('aria-hidden', 'false');
+  highlightKanbanSelectedCard(contato.id);
+}
+
+function syncKanbanDrawerFromBoard(data){
+  if(!kanbanDrawerContatoId) return;
+  let contato = null;
+  for(const col of KANBAN_COLS){
+    contato = (data[col.id] || []).find(item => String(item.id) === String(kanbanDrawerContatoId));
+    if(contato) break;
+  }
+  if(contato){
+    highlightKanbanSelectedCard(contato.id);
+  }else{
+    fecharKanbanDrawer();
+  }
+}
+
+async function abrirKanbanDrawer(contatoId){
+  kanbanDrawerContatoId = contatoId;
+  highlightKanbanSelectedCard(contatoId);
+  const title = document.getElementById('kanban-drawer-title');
+  const subtitle = document.getElementById('kanban-drawer-subtitle');
+  const body = document.getElementById('kanban-drawer-body');
+  const drawer = document.getElementById('kanban-drawer');
+  const backdrop = document.getElementById('kanban-drawer-backdrop');
+  if(drawer && backdrop){
+    drawer.classList.add('show');
+    backdrop.classList.add('show');
+    drawer.setAttribute('aria-hidden', 'false');
+  }
+  if(title) title.textContent = 'Carregando lead...';
+  if(subtitle) subtitle.textContent = 'Buscando detalhes mais recentes.';
+  if(body) body.innerHTML = '<div class="kanban-drawer-empty"><div class="spin" style="display:inline-block"></div> Carregando detalhes do lead...</div>';
+  try{
+    const contato = await fetch('/api/kanban/contato/' + contatoId).then(r=>r.json());
+    if(contato?.erro) throw new Error(contato.erro);
+    if(String(kanbanDrawerContatoId) !== String(contatoId)) return;
+    renderKanbanDrawer(contato);
+  }catch(err){
+    if(String(kanbanDrawerContatoId) !== String(contatoId)) return;
+    if(title) title.textContent = 'Nao foi possivel abrir';
+    if(subtitle) subtitle.textContent = 'Tente novamente em instantes.';
+    if(body) body.innerHTML = `<div class="alert al-err">❌ ${escapeHtml(err.message || 'Falha ao carregar lead')}</div>`;
+  }
+}
+
+function fecharKanbanDrawer(){
+  kanbanDrawerContatoId = null;
+  renderKanbanDrawer(null);
 }
 
 // Nova versao do card: substitui a nota rapida por um resumo do briefing estruturado.
@@ -3603,11 +5362,7 @@ function renderKanbanCard(c){
       </div>
     </div>
     ${showPromptBtn ? `<button id="prompt-btn-${c.id}" class="kbtn" onclick="copiarPromptLovable(${c.id})" title="Copiar prompt Lovable para criar o site" style="width:100%;margin:6px 0 4px;padding:5px 8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:6px;font-size:.72rem;cursor:pointer;font-weight:600;letter-spacing:.3px">🚀 Copiar Prompt Lovable</button>` : ''}
-    ${['Enviado','Respondeu','Negociando'].includes(coluna) ? `
-    <div id="fu-card-${c.id}" style="display:flex;align-items:center;justify-content:space-between;margin:4px 0;padding:4px 7px;background:${c.followup_pausado?'rgba(239,68,68,.1)':'rgba(34,197,94,.07)'};border:1px solid ${c.followup_pausado?'rgba(239,68,68,.2)':'rgba(34,197,94,.15)'};border-radius:5px;font-size:.68rem">
-      <span style="color:${c.followup_pausado?'#fca5a5':'#86efac'}">${c.followup_pausado?'⏸ Follow-up pausado':'⚡ Follow-up ativo'}</span>
-      <button onclick="togglePausarFollowup(${c.id},${c.followup_pausado?0:1})" style="padding:2px 7px;font-size:.66rem;border-radius:4px;border:none;cursor:pointer;font-weight:700;background:${c.followup_pausado?'#16a34a':'#7f1d1d'};color:#fff">${c.followup_pausado?'▶ Retomar':'⏸ Pausar'}</button>
-    </div>` : ''}
+    ${renderFollowupCardStatus(c, coluna)}
     <div class="kanban-card-actions">
       <button class="kbtn kbtn-g" onclick="abrirChatKanban(${c.id})" title="Enviar mensagem">💬</button>
       <button class="kbtn kbtn-b" onclick="editarTelKanban(${c.id},'${tel}')" title="Editar número WA">✏️</button>
@@ -3650,6 +5405,8 @@ function renderKanbanCard(c){
     ondragend="kbDragEnd(event)"
     id="kcard-${c.id}">
     ${topActions}
+    <div class="kanban-card-main">
+      <div class="kanban-card-content">
     <div class="kanban-card-nome" title="${c.nome || ''}">${c.nome || 'Empresa'}</div>
     ${ratingInfo}
     <div class="kanban-card-cat">${c.categoria || ''} · ${c.cidade || ''}</div>
@@ -3669,11 +5426,84 @@ function renderKanbanCard(c){
     ${msg}
     ${renderLeadBriefingPreview(c.id, briefing)}
     ${showPromptBtn ? `<button id="prompt-btn-${c.id}" class="kbtn" onclick="copiarPromptLovable(${c.id})" title="Copiar prompt Lovable para criar o site" style="width:100%;margin:6px 0 4px;padding:5px 8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:6px;font-size:.72rem;cursor:pointer;font-weight:600;letter-spacing:.3px">🚀 Copiar Prompt Lovable</button>` : ''}
-    ${['Enviado','Respondeu','Negociando'].includes(coluna) ? `
-    <div id="fu-card-${c.id}" style="display:flex;align-items:center;justify-content:space-between;margin:4px 0;padding:4px 7px;background:${c.followup_pausado ? 'rgba(239,68,68,.1)' : 'rgba(34,197,94,.07)'};border:1px solid ${c.followup_pausado ? 'rgba(239,68,68,.2)' : 'rgba(34,197,94,.15)'};border-radius:5px;font-size:.68rem">
-      <span style="color:${c.followup_pausado ? '#fca5a5' : '#86efac'}">${c.followup_pausado ? '⏸ Follow-up pausado' : '⚡ Follow-up ativo'}</span>
-      <button onclick="togglePausarFollowup(${c.id},${c.followup_pausado ? 0 : 1})" style="padding:2px 7px;font-size:.66rem;border-radius:4px;border:none;cursor:pointer;font-weight:700;background:${c.followup_pausado ? '#16a34a' : '#7f1d1d'};color:#fff">${c.followup_pausado ? '▶ Retomar' : '⏸ Pausar'}</button>
-    </div>` : ''}
+    ${renderFollowupCardStatus(c, coluna)}
+    <div class="kanban-card-actions">
+      <button class="kbtn kbtn-g" onclick="abrirChatKanban(${c.id})" title="Enviar mensagem">💬</button>
+      <button class="kbtn kbtn-b" onclick="editarTelKanban(${c.id},'${tel}')" title="Editar número WA">✏️</button>
+      <button class="kbtn kbtn-y" onclick="abrirLeadBriefingModal(${c.id})" title="Abrir briefing do lead" style="background:#78350f;color:#fbbf24;border:1px solid #92400e">📝</button>
+      <button class="kbtn kbtn-r" onclick="removerKanban(${c.id})" title="Remover">✕</button>
+    </div>
+      </div>
+      ${renderKanbanEntregas(c)}
+    </div>
+  </div>`;
+}
+
+renderKanbanCard = function(c){
+  const tel = c.telefone_wa || c.telefone_formatado || c.telefone || '';
+  const coluna = c.kanban_coluna || '';
+  const empresaId = Number(c.empresa_id || 0);
+  const rating = Number(c.rating || 0);
+  const reviews = Number(c.reviews || 0);
+  const responsavel = (c.nome_responsavel || '').replace(/"/g,'&quot;');
+  const briefing = parseLeadBriefing(c.briefing_lead, c.notas_kanban || '');
+  const mapsBusca = [c.nome, c.endereco, c.cidade, c.estado].filter(Boolean).join(', ');
+  const mapsUrl = (c.google_maps_url || '').trim() || (mapsBusca ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsBusca)}` : '');
+  const mapsBtn = mapsUrl
+    ? `<a href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer" class="kanban-card-top-link" title="Abrir local no Google Maps" onclick="event.stopPropagation()">📍</a>`
+    : '';
+  const fichaBtn = empresaId
+    ? `<button class="kanban-card-top-link kanban-card-top-btn" title="Abrir ficha da empresa" onclick="event.stopPropagation();verFicha(${empresaId})">📋</button>`
+    : '';
+  const topActions = (mapsBtn || fichaBtn)
+    ? `<div class="kanban-card-top-actions">${fichaBtn}${mapsBtn}</div>`
+    : '';
+  const ratingInfo = (rating > 0 || reviews > 0)
+    ? `<div class="kanban-card-rating">⭐ ${rating > 0 ? rating.toFixed(1) : '—'} <small>(${reviews} avaliações)</small></div>`
+    : '';
+  const responsavelView = responsavel
+    ? `<div id="resp-display-${c.id}" onclick="abrirRespEditor(${c.id})" title="Clique para editar responsável" class="kanban-card-line" style="cursor:pointer"><span class="ico">👤</span><span class="txt" style="color:#7dd3fc">${responsavel}</span></div>`
+    : `<div id="resp-display-${c.id}" onclick="abrirRespEditor(${c.id})" title="Adicionar nome do responsável" class="kanban-card-line" style="cursor:pointer"><span class="ico">👤</span><span class="txt" style="color:var(--muted)">Adicionar responsável</span></div>`;
+  const telefoneView = tel
+    ? `<div class="kanban-card-line"><span class="ico">📞</span><span class="txt kanban-card-tel">${tel}</span></div>`
+    : '';
+  const ultimaMsg = c.ultima_msg
+    ? `<div class="kanban-card-line"><span class="ico">💬</span><span class="txt">${escapeHtml(String(c.ultima_msg).substring(0, 60))}${String(c.ultima_msg).length > 60 ? '...' : ''}</span></div>`
+    : '';
+  const listaNegraTag = (Number(c.optout_global || 0) && !Number(c.is_teste || 0))
+    ? `<div style="margin-top:8px;padding:6px 9px;border-radius:10px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28);font-size:.68rem;color:#fecaca">Lista negra ativa</div>`
+    : '';
+  const autoReplyBadge = renderAutoReplyQuarantine(c, coluna);
+  const showPromptBtn = ['Negociando','Fechado'].includes(coluna);
+
+  return `<div class="kanban-card" draggable="true"
+    ondragstart="kbDragStart(event,${c.id})"
+    ondragend="kbDragEnd(event)"
+    id="kcard-${c.id}">
+    ${topActions}
+    <div class="kanban-card-head">
+      <div class="kanban-card-head-main">
+        <div class="kanban-card-nome" title="${c.nome || ''}">${c.nome || 'Empresa'}</div>
+        <div class="kanban-card-cat">${c.categoria || ''} · ${c.cidade || ''}</div>
+        <div class="kanban-card-meta">${ratingInfo}</div>
+      </div>
+    </div>
+    ${responsavelView}
+    <div id="resp-editor-${c.id}" style="display:none;margin:6px 0 2px">
+      <input id="resp-txt-${c.id}" type="text" placeholder="Nome do responsável..." value="${responsavel}" style="width:100%;background:var(--card2);border:1px solid #3b82f6;border-radius:10px;color:var(--text);padding:8px 10px;font-size:.78rem;font-family:inherit">
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button onclick="salvarResponsavel(${c.id})" style="flex:1;padding:6px 8px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:.72rem;cursor:pointer">Salvar</button>
+        <button onclick="fecharRespEditor(${c.id})" style="padding:6px 9px;background:var(--card2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:.72rem;cursor:pointer">Fechar</button>
+      </div>
+    </div>
+    ${telefoneView}
+    ${ultimaMsg}
+    ${listaNegraTag}
+    ${autoReplyBadge}
+    ${renderKanbanEntregas(c)}
+    ${showPromptBtn ? `<button id="prompt-btn-${c.id}" class="kbtn" onclick="copiarPromptLovable(${c.id})" title="Copiar prompt Lovable para criar o site" style="width:100%;margin:10px 0 0;padding:10px 12px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:12px;font-size:.74rem;cursor:pointer;font-weight:700;letter-spacing:.01em;white-space:normal;line-height:1.3;text-align:center">🚀 Copiar Prompt Lovable</button>` : ''}
+    ${renderFollowupCardStatus(c, coluna)}
+    ${renderLeadBriefingPreview(c.id, briefing)}
     <div class="kanban-card-actions">
       <button class="kbtn kbtn-g" onclick="abrirChatKanban(${c.id})" title="Enviar mensagem">💬</button>
       <button class="kbtn kbtn-b" onclick="editarTelKanban(${c.id},'${tel}')" title="Editar número WA">✏️</button>
@@ -3681,6 +5511,170 @@ function renderKanbanCard(c){
       <button class="kbtn kbtn-r" onclick="removerKanban(${c.id})" title="Remover">✕</button>
     </div>
   </div>`;
+}
+
+
+renderKanbanCard = function(c){
+  const tel = c.telefone_wa || c.telefone_formatado || c.telefone || '';
+  const coluna = c.kanban_coluna || '';
+  const empresaId = Number(c.empresa_id || 0);
+  const rating = Number(c.rating || 0);
+  const reviews = Number(c.reviews || 0);
+  const mapsBusca = [c.nome, c.endereco, c.cidade, c.estado].filter(Boolean).join(', ');
+  const mapsUrl = (c.google_maps_url || '').trim() || (mapsBusca ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsBusca)}` : '');
+  const mapsBtn = mapsUrl
+    ? `<a href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener noreferrer" class="kanban-card-top-link" title="Abrir local no Google Maps" onclick="event.stopPropagation()">📍</a>`
+    : '';
+  const fichaBtn = empresaId
+    ? `<button class="kanban-card-top-link kanban-card-top-btn" title="Abrir ficha da empresa" onclick="event.stopPropagation();verFicha(${empresaId})">📋</button>`
+    : '';
+  const topActions = (mapsBtn || fichaBtn)
+    ? `<div class="kanban-card-top-actions">${fichaBtn}${mapsBtn}</div>`
+    : '';
+  const ratingInfo = (rating > 0 || reviews > 0)
+    ? `<div class="kanban-card-rating">⭐ ${rating > 0 ? rating.toFixed(1) : '—'} <small>(${reviews} avaliacoes)</small></div>`
+    : '';
+  const responsavelView = c.nome_responsavel
+    ? `<div class="kanban-card-line"><span class="ico">👤</span><span class="txt" style="color:#7dd3fc">${escapeHtml(c.nome_responsavel)}</span></div>`
+    : `<div class="kanban-card-line"><span class="ico">👤</span><span class="txt" style="color:var(--muted)">Sem responsavel</span></div>`;
+  const telefoneView = tel
+    ? `<div class="kanban-card-line"><span class="ico">📞</span><span class="txt kanban-card-tel">${tel}</span></div>`
+    : '';
+  const ultimaMsg = c.ultima_msg
+    ? `<div class="kanban-card-line"><span class="ico">💬</span><span class="txt">${escapeHtml(String(c.ultima_msg).substring(0, 60))}${String(c.ultima_msg).length > 60 ? '...' : ''}</span></div>`
+    : '';
+  const statusBadge = getKanbanStatusBadge(c, coluna);
+  const showPromptBtn = ['Negociando','Fechado'].includes(coluna);
+
+  return `<div class="kanban-card" draggable="true"
+    ondragstart="kbDragStart(event,${c.id})"
+    ondragend="kbDragEnd(event)"
+    onclick="abrirKanbanDrawer(${c.id})"
+    id="kcard-${c.id}">
+    ${topActions}
+    <div class="kanban-card-head">
+      <div class="kanban-card-head-main">
+        <div class="kanban-card-nome" title="${c.nome || ''}">${c.nome || 'Empresa'}</div>
+        <div class="kanban-card-cat">${c.categoria || ''} · ${c.cidade || ''}</div>
+        <div class="kanban-card-meta">${ratingInfo}</div>
+      </div>
+    </div>
+    <div class="kanban-card-chip-row">
+      <span class="kanban-mini-chip ${statusBadge.cls || ''}">${escapeHtml(statusBadge.text)}</span>
+      ${Number(c.site_enviado || 0) === 1 ? '<span class="kanban-mini-chip">Site entregue</span>' : ''}
+      ${Number(c.pdf_enviado || 0) === 1 ? '<span class="kanban-mini-chip">PDF entregue</span>' : ''}
+    </div>
+    <div class="kanban-card-secondary">
+      ${responsavelView}
+      ${telefoneView}
+      ${ultimaMsg}
+    </div>
+    <div class="kanban-card-primary">
+      <div class="kanban-card-primary-label">Proxima acao</div>
+      <div class="kanban-card-primary-value">${escapeHtml(getKanbanPrimaryAction(c, coluna))}</div>
+    </div>
+    <div class="kanban-card-actions">
+      <button class="kbtn kbtn-g" onclick="event.stopPropagation();abrirChatKanban(${c.id})" title="Enviar mensagem">💬</button>
+      <button class="kbtn kbtn-b" onclick="event.stopPropagation();editarTelKanban(${c.id},'${tel}')" title="Editar numero WA">✏️</button>
+      <button class="kbtn kbtn-y" onclick="event.stopPropagation();abrirLeadBriefingModal(${c.id})" title="Abrir briefing do lead" style="background:#78350f;color:#fbbf24;border:1px solid #92400e">📝</button>
+      ${showPromptBtn ? `<button class="kbtn kbtn-p" onclick="event.stopPropagation();copiarPromptLovable(${c.id})" title="Copiar prompt">🚀</button>` : ''}
+      <button class="kbtn kbtn-r" onclick="event.stopPropagation();removerKanban(${c.id})" title="Remover">✕</button>
+    </div>
+    <button type="button" class="kanban-card-open" onclick="event.stopPropagation();abrirKanbanDrawer(${c.id})">
+      <span>Ver detalhes completos</span>
+      <strong>Abrir painel ›</strong>
+    </button>
+  </div>`;
+}
+
+function renderAutoReplyQuarantine(c, coluna){
+  if(coluna !== 'Enviado') return '';
+  if(String(c.resposta_classificacao || '').toLowerCase() !== 'automatica') return '';
+  return `
+    <div style="margin-top:10px;padding:11px 12px;border-radius:12px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);display:grid;gap:7px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span style="font-size:.72rem;font-weight:800;color:#fcd34d">Auto-resposta em quarentena</span>
+        <span style="font-size:.62rem;color:#fde68a;padding:3px 7px;border-radius:999px;background:rgba(120,53,15,.3);border:1px solid rgba(245,158,11,.18)">Sem auto-reply</span>
+      </div>
+      <div style="font-size:.69rem;line-height:1.45;color:#e5e7eb">
+        O sistema segurou a proxima mensagem porque essa resposta parece atendimento automatico.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="auto-human-btn-${c.id}" class="kbtn" onclick="confirmarRespostaHumana(${c.id})" style="background:#2563eb;color:#fff;min-width:unset;padding:7px 10px">Tratar como humana</button>
+      </div>
+    </div>`;
+}
+
+
+function renderFollowupCardStatus(c, coluna){
+  if(!['Enviado','Respondeu','Negociando'].includes(coluna)) return '';
+  const status = c.followup_status || (c.followup_pausado ? 'pausado' : 'aguardando');
+  const labelMap = {
+    pronto:'Pronto para envio',
+    aguardando:'Aguardando janela',
+    adiado:'Adiado manualmente',
+    pausado:'Pausado no lead',
+    aguardando_horario:'Fora do horario',
+    sistema_pausado:'Sistema pausado',
+    bloqueado_coluna:'Modo manual nesta coluna',
+    concluido:'Fluxo concluido',
+    warm_only:'Aguardando resposta real',
+    fora_fluxo:'Fora do fluxo',
+  };
+  const colorMap = {
+    pronto:['rgba(34,197,94,.08)','rgba(34,197,94,.2)','#86efac'],
+    aguardando:['rgba(59,130,246,.08)','rgba(59,130,246,.18)','#93c5fd'],
+    adiado:['rgba(245,158,11,.08)','rgba(245,158,11,.18)','#fcd34d'],
+    pausado:['rgba(239,68,68,.1)','rgba(239,68,68,.2)','#fca5a5'],
+    aguardando_horario:['rgba(99,102,241,.08)','rgba(99,102,241,.18)','#c7d2fe'],
+    sistema_pausado:['rgba(148,163,184,.08)','rgba(148,163,184,.18)','#cbd5e1'],
+    bloqueado_coluna:['rgba(249,115,22,.08)','rgba(249,115,22,.18)','#fdba74'],
+    concluido:['rgba(148,163,184,.08)','rgba(148,163,184,.18)','#cbd5e1'],
+    warm_only:['rgba(234,179,8,.08)','rgba(234,179,8,.18)','#fde68a'],
+    fora_fluxo:['rgba(148,163,184,.08)','rgba(148,163,184,.18)','#cbd5e1'],
+  };
+  const palette = colorMap[status] || colorMap.aguardando;
+  const etapa = Number(c.followup_proxima_etapa || (Number(c.followup_etapa || 0) + 1));
+  const maxEtapas = Number(c.followup_max_etapas || 3);
+  const previsto = c.followup_previsto_em || '';
+  const previstoIso = c.followup_previsto_iso || '';
+  const restante = Number(c.followup_horas_restantes || 0);
+  const resumo = c.followup_texto_resumo || '';
+  const textoCompleto = c.followup_texto_previsto || '';
+  const preferencia = c.followup_horario_preferido_label || 'Sem preferencia';
+  const customAtivo = !!c.followup_msg_custom_ativo;
+  const colunaManual = status === 'bloqueado_coluna';
+  const podePausar = !['bloqueado_coluna','concluido','fora_fluxo'].includes(status);
+  const resumoStatus = colunaManual
+    ? (coluna === 'Negociando'
+        ? 'Modo manual em Negociando'
+        : 'Modo manual nesta coluna')
+    : `Etapa ${etapa}/${maxEtapas}${previsto ? ` • ${previsto}` : ''}${restante > 0 ? ` • ${restante}h` : ''}`;
+  const detalheManual = colunaManual ? `Automacao desligada aqui. Fluxo salvo em ${etapa}/${maxEtapas}.` : '';
+  const resumoCurto = resumo ? `${String(resumo).slice(0, 78)}${String(resumo).length > 78 ? '...' : ''}` : '';
+  return `
+    <div id="fu-card-${c.id}" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:8px 0 0;padding:10px 11px;background:${palette[0]};border:1px solid ${palette[1]};border-radius:12px;font-size:.69rem">
+      <div style="display:grid;gap:5px;min-width:0;flex:1">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="color:${palette[2]};font-weight:800">${labelMap[status] || status}</span>
+          <span style="font-size:.62rem;color:var(--muted);padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)">${escapeHtml(preferencia)}${customAtivo ? ' • custom' : ''}</span>
+        </div>
+        <span style="color:var(--muted);line-height:1.35">${escapeHtml(resumoStatus)}</span>
+        ${!colunaManual && resumoCurto ? `<span style="color:#d9e4f5;line-height:1.4">${escapeHtml(resumoCurto)}</span>` : ''}
+        ${colunaManual ? `<span style="color:#d9e4f5;line-height:1.35">${escapeHtml(detalheManual)}</span>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+        <button
+          data-nome="${escapeHtml(c.nome||'Lead')}"
+          data-previsto="${escapeHtml(previstoIso)}"
+          data-mensagem="${escapeHtml(textoCompleto)}"
+          data-preferencia="${escapeHtml(c.followup_horario_preferido||'livre')}"
+          data-custom="${c.followup_msg_custom_ativo ? '1' : '0'}"
+          onclick="abrirAgendaFollowupButton(this, ${c.id})"
+          style="padding:5px 9px;font-size:.68rem;border-radius:8px;border:none;cursor:pointer;font-weight:800;background:#2563eb;color:#fff">${colunaManual ? 'Planejar' : 'Agendar'}</button>
+        ${podePausar ? `<button onclick="togglePausarFollowup(${c.id},${c.followup_pausado ? 0 : 1})" style="padding:5px 9px;font-size:.68rem;border-radius:8px;border:none;cursor:pointer;font-weight:800;background:${c.followup_pausado ? '#16a34a' : '#7f1d1d'};color:#fff">${c.followup_pausado ? 'Retomar' : 'Pausar'}</button>` : ''}
+      </div>
+    </div>`;
 }
 
 async function loadKanbanStats(){
@@ -4264,6 +6258,49 @@ async function alterarStatusCampanha(campanhaId, status){
     return;
   }
   await loadCampanhasPanel();
+}
+
+async function pausarCampanhaKanban(){
+  if(!kanbanCampanhaSelecionadaId){ alert('Nenhuma campanha selecionada.'); return; }
+  const nome = kanbanCampanhaSelecionadaNome || ('#' + kanbanCampanhaSelecionadaId);
+  if(!confirm(`Pausar a campanha "${nome}"?\n\nOs envios em andamento serão interrompidos.`)) return;
+  const data = await fetch(`/api/campanhas/${kanbanCampanhaSelecionadaId}/status`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status:'pausada'})
+  }).then(r=>r.json()).catch(()=>({ok:false, erro:'Erro de conexão'}));
+  if(!data.ok){ alert(data.erro || 'Não consegui pausar a campanha.'); return; }
+  await loadCampanhasPanel();
+  await loadKanban();
+}
+
+async function ativarCampanhaKanban(){
+  if(!kanbanCampanhaSelecionadaId){ alert('Nenhuma campanha selecionada.'); return; }
+  const nome = kanbanCampanhaSelecionadaNome || ('#' + kanbanCampanhaSelecionadaId);
+  if(!confirm(`Ativar/retomar a campanha "${nome}"?`)) return;
+  const data = await fetch(`/api/campanhas/${kanbanCampanhaSelecionadaId}/status`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status:'rodando'})
+  }).then(r=>r.json()).catch(()=>({ok:false, erro:'Erro de conexão'}));
+  if(!data.ok){ alert(data.erro || 'Não consegui ativar a campanha.'); return; }
+  await loadCampanhasPanel();
+  await loadKanban();
+}
+
+async function deletarCampanhaKanban(){
+  if(!kanbanCampanhaSelecionadaId){ alert('Nenhuma campanha selecionada.'); return; }
+  const nome = kanbanCampanhaSelecionadaNome || ('#' + kanbanCampanhaSelecionadaId);
+  if(!confirm(`⚠️ DELETAR a campanha "${nome}"?\n\nTodos os dados dessa campanha serão removidos permanentemente.\n\nEssa ação não pode ser desfeita!`)) return;
+  const data = await fetch(`/api/campanhas/${kanbanCampanhaSelecionadaId}`, {
+    method:'DELETE', headers:{'Content-Type':'application/json'}
+  }).then(r=>r.json()).catch(()=>({ok:false, erro:'Erro de conexão'}));
+  if(!data.ok){ alert(data.erro || 'Não consegui deletar a campanha.'); return; }
+  kanbanCampanhaSelecionadaId = '';
+  kanbanCampanhaSelecionadaNome = '';
+  try{ localStorage.setItem('pl_kanban_campanha_id',''); localStorage.setItem('pl_kanban_campanha_nome',''); }catch(e){}
+  renderKanbanCampanhaOptions();
+  await loadCampanhasPanel();
+  await loadKanban();
+  await loadKanbanStats();
 }
 
 function limparFiltrosCampanhas(){
@@ -5099,6 +7136,8 @@ function fecharWaLoteModal(e){
 async function loadWaTplLista(){
   const data = await fetch('/api/wa-msg-templates').then(r=>r.json()).catch(()=>[]);
   waTemplatesCache = Array.isArray(data) ? data : [];
+  renderWaTplLista();
+  return;
   const el = document.getElementById('wa-tpl-lista');
   const catColors = {abertura:'b-green',proposta:'b-yellow',followup:'b-blue'};
   const catLabels = {abertura:'🟢 Abertura',proposta:'🟡 Proposta',followup:'🔵 Follow-up'};
@@ -5113,6 +7152,48 @@ async function loadWaTplLista(){
         <div style="display:flex;gap:4px">
           <button class="kbtn kbtn-b" onclick="editarWaTpl(${t.id})">✏️</button>
           <button class="kbtn kbtn-r" onclick="deletarWaTpl(${t.id})">🗑️</button>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);background:var(--card2);border-radius:6px;padding:8px;line-height:1.5">${t.texto}</div>
+    </div>
+  `).join('');
+}
+
+function setWaTplFiltro(categoria){
+  waTemplateFiltroAtivo = categoria || 'todos';
+  document.querySelectorAll('#wa-template-filters .wa-template-filter-chip').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.cat === waTemplateFiltroAtivo);
+  });
+  renderWaTplLista();
+}
+
+function renderWaTplLista(){
+  const el = document.getElementById('wa-tpl-lista');
+  if(!el) return;
+  const catColors = {abertura:'b-green',proposta:'b-yellow',followup:'b-blue'};
+  const catLabels = {abertura:'ðŸŸ¢ Abertura',proposta:'ðŸŸ¡ Proposta',followup:'ðŸ”µ Follow-up'};
+  const lista = waTemplateFiltroAtivo === 'todos'
+    ? waTemplatesCache
+    : waTemplatesCache.filter(t => (t.categoria || '').toLowerCase() === waTemplateFiltroAtivo);
+  if(!waTemplatesCache.length){
+    el.innerHTML = '<div class="wa-template-empty">Nenhum template cadastrado ainda.</div>';
+    return;
+  }
+  if(!lista.length){
+    const labels = {abertura:'Abertura',proposta:'Proposta',followup:'Follow-up'};
+    el.innerHTML = `<div class="wa-template-empty">Nenhum template encontrado em <strong>${labels[waTemplateFiltroAtivo] || 'este filtro'}</strong>.</div>`;
+    return;
+  }
+  el.innerHTML = lista.map(t=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-weight:600;font-size:.88rem;margin-bottom:3px">${t.nome}</div>
+          <span class="badge ${catColors[t.categoria]||'b-gray'}">${catLabels[t.categoria]||t.categoria}</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="kbtn kbtn-b" onclick="editarWaTpl(${t.id})">âœï¸</button>
+          <button class="kbtn kbtn-r" onclick="deletarWaTpl(${t.id})">ðŸ—‘ï¸</button>
         </div>
       </div>
       <div style="font-size:.8rem;color:var(--muted);background:var(--card2);border-radius:6px;padding:8px;line-height:1.5">${t.texto}</div>
@@ -5170,9 +7251,91 @@ function fecharWaTplModal(e){
     document.getElementById('wa-tpl-overlay').classList.remove('show');
 }
 
+function renderWaTplLista(){
+  const el = document.getElementById('wa-tpl-lista');
+  if(!el) return;
+  const catColors = {abertura:'b-green',proposta:'b-yellow',followup:'b-blue'};
+  const catLabels = {abertura:'Abertura',proposta:'Proposta',followup:'Follow-up'};
+  const lista = waTemplateFiltroAtivo === 'todos'
+    ? waTemplatesCache
+    : waTemplatesCache.filter(t => (t.categoria || '').toLowerCase() === waTemplateFiltroAtivo);
+  if(!waTemplatesCache.length){
+    el.innerHTML = '<div class="wa-template-empty">Nenhum template cadastrado ainda.</div>';
+    return;
+  }
+  if(!lista.length){
+    const labels = {abertura:'Abertura',proposta:'Proposta',followup:'Follow-up'};
+    el.innerHTML = `<div class="wa-template-empty">Nenhum template encontrado em <strong>${labels[waTemplateFiltroAtivo] || 'este filtro'}</strong>.</div>`;
+    return;
+  }
+  el.innerHTML = lista.map(t=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px">
+        <div style="min-width:0">
+          <div style="font-weight:600;font-size:.88rem;margin-bottom:3px">${t.nome}</div>
+          <span class="badge ${catColors[t.categoria]||'b-gray'}">${catLabels[t.categoria]||t.categoria}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="kbtn kbtn-b" onclick="editarWaTpl(${t.id})">Editar</button>
+          <button class="kbtn kbtn-r" onclick="deletarWaTpl(${t.id})">Excluir</button>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted);background:var(--card2);border-radius:6px;padding:8px;line-height:1.5">${t.texto}</div>
+    </div>
+  `).join('');
+}
+
+function abrirModalWaTpl(){
+  document.getElementById('wa-tpl-id').value='';
+  document.getElementById('wa-tpl-modal-title').textContent='Novo template';
+  document.getElementById('wa-tpl-nome').value='';
+  document.getElementById('wa-tpl-cat').value='abertura';
+  document.getElementById('wa-tpl-texto').value='';
+  document.getElementById('wa-tpl-res').innerHTML='';
+  document.getElementById('wa-tpl-overlay').classList.add('show');
+}
+
+async function editarWaTpl(id){
+  const data = await fetch('/api/wa-msg-templates').then(r=>r.json()).catch(()=>[]);
+  const t = data.find(x=>x.id===id);
+  if(!t) return;
+  document.getElementById('wa-tpl-id').value=t.id;
+  document.getElementById('wa-tpl-modal-title').textContent='Editar template';
+  document.getElementById('wa-tpl-nome').value=t.nome;
+  document.getElementById('wa-tpl-cat').value=t.categoria;
+  document.getElementById('wa-tpl-texto').value=t.texto;
+  document.getElementById('wa-tpl-res').innerHTML='';
+  document.getElementById('wa-tpl-overlay').classList.add('show');
+}
+
+async function salvarWaTpl(){
+  const id = document.getElementById('wa-tpl-id').value;
+  const body = {
+    nome: document.getElementById('wa-tpl-nome').value.trim(),
+    categoria: document.getElementById('wa-tpl-cat').value,
+    texto: document.getElementById('wa-tpl-texto').value.trim(),
+  };
+  if(!body.nome||!body.texto){
+    document.getElementById('wa-tpl-res').innerHTML='<div class="alert al-warn">Preencha todos os campos.</div>';
+    return;
+  }
+  const url = id ? '/api/wa-msg-templates/'+id : '/api/wa-msg-templates';
+  const method = id ? 'PUT' : 'POST';
+  const d = await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+  if(d.erro){
+    document.getElementById('wa-tpl-res').innerHTML=`<div class="alert al-err">Erro ao salvar: ${d.erro}</div>`;
+    return;
+  }
+  document.getElementById('wa-tpl-overlay').classList.remove('show');
+  loadWaTplLista();
+}
+
 // ── CONTROLE DE FOLLOW-UPS ────────────────────────────────────────────────────
 
 let fuCfgOpen = false;
+let followupAgendaContatoId = null;
+let followupAgendaMensagemOriginal = '';
+let followupAgendaMensagemCustomAtiva = false;
 
 function toggleFuConfig(){
   fuCfgOpen = !fuCfgOpen;
@@ -5194,70 +7357,232 @@ function _fuUpdateToggle(ativo){
   if(lbl){ lbl.textContent = ativo ? 'ATIVO' : 'PAUSADO'; lbl.style.color = ativo ? '#4ade80' : '#ef4444'; }
 }
 
+function fecharAgendaFollowupModal(e){
+  const overlay = document.getElementById('fu-agendar-overlay');
+  if(!overlay || (e && e.target !== overlay)) return;
+  overlay.classList.remove('show');
+}
+
+function toggleEditarMensagemFollowup(forceOpen){
+  const wrap = document.getElementById('fu-agendar-edit-wrap');
+  if(!wrap) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : wrap.style.display === 'none';
+  wrap.style.display = shouldOpen ? 'block' : 'none';
+}
+
+function usarMensagemPadraoFollowup(){
+  followupAgendaMensagemCustomAtiva = false;
+  const edit = document.getElementById('fu-agendar-msg-edit');
+  if(edit) edit.value = followupAgendaMensagemOriginal || '';
+  toggleEditarMensagemFollowup(false);
+}
+
+function selecionarHorarioPreferidoLead(valor){
+  const hidden = document.getElementById('fu-agendar-pref');
+  const desc = document.getElementById('fu-agendar-pref-desc');
+  const current = valor || 'livre';
+  if(hidden) hidden.value = current;
+  const labelMap = {
+    livre: 'Sem preferência salva para este lead.',
+    manha: 'O sistema vai priorizar horários da manhã para este lead.',
+    tarde: 'O sistema vai priorizar horários da tarde para este lead.',
+    noite: 'O sistema vai priorizar horários da noite para este lead.',
+  };
+  if(desc) desc.textContent = labelMap[current] || labelMap.livre;
+  ['livre','manha','tarde','noite'].forEach(key=>{
+    const btn = document.getElementById('fu-pref-' + key);
+    if(!btn) return;
+    btn.style.background = key === current ? '#1d4ed8' : '';
+    btn.style.color = key === current ? '#fff' : '';
+    btn.style.borderColor = key === current ? '#2563eb' : '';
+  });
+}
+
+function preencherAgendaFollowup(dias, hora){
+  const input = document.getElementById('fu-agendar-datetime');
+  if(!input) return;
+  const dt = new Date();
+  dt.setSeconds(0, 0);
+  dt.setDate(dt.getDate() + Number(dias || 0));
+  dt.setHours(Number(hora || 9), 0, 0, 0);
+  input.value = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}T${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+}
+
+function abrirAgendaFollowup(contatoId, nome, previstoIso, mensagem){
+  followupAgendaContatoId = contatoId;
+  followupAgendaMensagemOriginal = mensagem || '';
+  followupAgendaMensagemCustomAtiva = false;
+  const overlay = document.getElementById('fu-agendar-overlay');
+  const nomeEl = document.getElementById('fu-agendar-nome');
+  const statusEl = document.getElementById('fu-agendar-status');
+  const msgEl = document.getElementById('fu-agendar-msg');
+  const dtEl = document.getElementById('fu-agendar-datetime');
+  const resEl = document.getElementById('fu-agendar-res');
+  if(nomeEl) nomeEl.textContent = nome || 'Lead';
+  if(statusEl) statusEl.textContent = previstoIso ? `Próximo envio previsto: ${previstoIso.replace('T',' ')}` : 'Sem horário definido.';
+  if(msgEl) msgEl.value = mensagem || '';
+  if(dtEl) dtEl.value = previstoIso || '';
+  if(resEl) resEl.innerHTML = '';
+  const edit = document.getElementById('fu-agendar-msg-edit');
+  if(edit) edit.value = mensagem || '';
+  toggleEditarMensagemFollowup(false);
+  selecionarHorarioPreferidoLead('livre');
+  if(overlay) overlay.classList.add('show');
+}
+
+function abrirAgendaFollowupButton(btn, contatoId){
+  if(!btn) return;
+  abrirAgendaFollowup(
+    contatoId,
+    btn.dataset.nome || 'Lead',
+    btn.dataset.previsto || '',
+    btn.dataset.mensagem || ''
+  );
+  followupAgendaMensagemCustomAtiva = String(btn.dataset.custom || '') === '1';
+  selecionarHorarioPreferidoLead(btn.dataset.preferencia || 'livre');
+  const edit = document.getElementById('fu-agendar-msg-edit');
+  if(edit) edit.value = btn.dataset.mensagem || '';
+  toggleEditarMensagemFollowup(followupAgendaMensagemCustomAtiva);
+}
+
+async function salvarAgendaFollowup(){
+  if(!followupAgendaContatoId) return;
+  const input = document.getElementById('fu-agendar-datetime');
+  const res = document.getElementById('fu-agendar-res');
+  const pref = document.getElementById('fu-agendar-pref')?.value || 'livre';
+  const editWrap = document.getElementById('fu-agendar-edit-wrap');
+  const editValue = (document.getElementById('fu-agendar-msg-edit')?.value || '').trim();
+  const quando = input?.value || '';
+  const editando = !!editWrap && editWrap.style.display !== 'none';
+  const mensagemCustom = editando ? editValue : '';
+  const limparMensagemCustom = !editando || !mensagemCustom || mensagemCustom === (followupAgendaMensagemOriginal || '').trim();
+  if(res) res.innerHTML = '<div class="alert al-info"><div class="spin" style="display:inline-block"></div> Salvando ajustes...</div>';
+  const data = await fetch('/api/followup/agendar/' + followupAgendaContatoId, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      quando,
+      retomar: true,
+      horario_preferido: pref,
+      mensagem_custom: limparMensagemCustom ? '' : mensagemCustom,
+      limpar_mensagem_custom: limparMensagemCustom
+    })
+  }).then(r=>r.json()).catch(()=>({ok:false}));
+  if(!data.ok){
+    if(res) res.innerHTML = `<div class="alert al-err">${escapeHtml(data.erro || 'Erro ao salvar horário.')}</div>`;
+    return;
+  }
+  if(res) res.innerHTML = '<div class="alert al-ok">Ajustes salvos para este lead.</div>';
+  loadKanban();
+  loadFollowupPanel();
+  setTimeout(()=>fecharAgendaFollowupModal(), 700);
+}
+
+async function limparAgendaFollowup(){
+  if(!followupAgendaContatoId) return;
+  const res = document.getElementById('fu-agendar-res');
+  if(res) res.innerHTML = '<div class="alert al-info"><div class="spin" style="display:inline-block"></div> Voltando para o automático...</div>';
+  const data = await fetch('/api/followup/agendar/' + followupAgendaContatoId, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({limpar: true, retomar: true, horario_preferido: 'livre', limpar_mensagem_custom: true})
+  }).then(r=>r.json()).catch(()=>({ok:false}));
+  if(!data.ok){
+    if(res) res.innerHTML = `<div class="alert al-err">${escapeHtml(data.erro || 'Erro ao liberar horário.')}</div>`;
+    return;
+  }
+  if(res) res.innerHTML = '<div class="alert al-ok">Lead voltou para o automático.</div>';
+  loadKanban();
+  loadFollowupPanel();
+  setTimeout(()=>fecharAgendaFollowupModal(), 700);
+}
+
 async function loadFollowupPanel(){
-  // Carregar fila
   const data = await fetch('/api/followup/fila').then(r=>r.json()).catch(()=>null);
   if(!data){ return; }
 
-  // Stats
   const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  set('fu-stat-total',    data.total    ?? '–');
-  set('fu-stat-prontos',  data.prontos  ?? '–');
-  set('fu-stat-aguardando', data.aguardando ?? '–');
-  set('fu-stat-pausados', data.pausados ?? '–');
-
-  // Toggle sistema
+  set('fu-stat-total', data.total ?? '-');
+  set('fu-stat-prontos', data.prontos ?? '-');
+  set('fu-stat-aguardando', data.aguardando ?? '-');
+  set('fu-stat-pausados', data.pausados ?? '-');
   _fuUpdateToggle(data.sistema_ativo);
 
-  // Horário permitido
   const ht = document.getElementById('fu-horario-tag');
-  if(ht) ht.textContent = '🕐 Envio: ' + (data.horario_permitido || '–');
+  if(ht){
+    const cols = Array.isArray(data.colunas_ativas) && data.colunas_ativas.length ? ` | ${data.colunas_ativas.join(', ')}` : '';
+    ht.textContent = `Envio: ${data.horario_permitido || '-'}${cols}`;
+  }
 
-  // Tabela de fila
   const tbody = document.getElementById('fu-fila-tbody');
   if(!tbody) return;
   if(!data.itens || !data.itens.length){
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">✅ Fila vazia — nenhum follow-up pendente</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Fila vazia - nenhum follow-up pendente</td></tr>';
   } else {
     const statusMap = {
-      pronto: '<span class="badge b-green">✅ Pronto</span>',
-      aguardando: '<span class="badge b-yellow">⏳ Aguardando</span>',
-      adiado: '<span class="badge" style="background:#1f2937;color:#fbbf24">⏰ Adiado</span>',
-      pausado: '<span class="badge b-gray">⏸ Pausado</span>',
-      aguardando_horario: '<span class="badge b-blue">🕐 Fora do horário</span>',
-      sistema_pausado: '<span class="badge" style="background:#1a1a2e;color:#94a3b8">🚫 Sistema parado</span>',
+      pronto: '<span class="badge b-green">Pronto</span>',
+      aguardando: '<span class="badge b-yellow">Aguardando</span>',
+      adiado: '<span class="badge" style="background:#1f2937;color:#fbbf24">Adiado</span>',
+      pausado: '<span class="badge b-gray">Pausado</span>',
+      aguardando_horario: '<span class="badge b-blue">Fora do horario</span>',
+      sistema_pausado: '<span class="badge" style="background:#1a1a2e;color:#94a3b8">Sistema parado</span>',
+      bloqueado_coluna: '<span class="badge" style="background:#3b1d12;color:#fdba74">Modo manual</span>',
+      warm_only: '<span class="badge" style="background:#3a2d0e;color:#fde68a">Aguardando resposta</span>',
     };
     const colunaColor = {Enviado:'#3b82f6',Respondeu:'#22c55e',Negociando:'#f97316'};
     tbody.innerHTML = data.itens.map(i=>`<tr>
-      <td style="font-weight:600;font-size:.82rem">${i.nome||'–'}</td>
-      <td style="font-size:.78rem;color:var(--muted)">${i.telefone||'–'}</td>
+      <td style="font-weight:600;font-size:.82rem">${i.nome||'-'}</td>
+      <td style="font-size:.78rem;color:var(--muted)">${i.telefone||'-'}</td>
       <td><span style="color:${colunaColor[i.coluna]||'#94a3b8'};font-size:.78rem;font-weight:600">${i.coluna}</span></td>
       <td style="text-align:center"><span style="background:var(--card2);border-radius:99px;padding:2px 8px;font-size:.75rem">${i.etapa}/${i.max_etapas}</span></td>
-      <td>${statusMap[i.status]||i.status}</td>
-      <td style="font-size:.76rem;color:var(--muted)">${i.previsto_em}${i.horas_restantes>0?` <span style="color:var(--yellow)">(${i.horas_restantes}h)</span>`:''}</td>
+      <td title="${escapeHtml(i.status_label || i.status || '')}">${statusMap[i.status]||escapeHtml(i.status_label||i.status||'-')}</td>
+      <td style="font-size:.76rem;color:var(--muted)">${i.previsto_em||'-'}${i.horas_restantes>0?` <span style="color:var(--yellow)">(${i.horas_restantes}h)</span>`:''}</td>
+      <td style="min-width:240px">
+        <div style="font-size:.76rem;color:var(--text);line-height:1.45">${escapeHtml(i.mensagem_prevista || 'Sem mensagem prevista.')}</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:4px">
+          Horário: ${escapeHtml(i.horario_preferido_label || 'Sem preferência')}${i.mensagem_custom_ativa ? ' • Texto customizado' : ''}
+        </div>
+      </td>
       <td>
-        <button onclick="togglePausarFollowup(${i.contato_id},${i.pausado?0:1})"
-          style="padding:3px 8px;font-size:.7rem;border-radius:5px;border:none;cursor:pointer;font-weight:700;background:${i.pausado?'#166534':'#7f1d1d'};color:#fff">
-          ${i.pausado?'▶ Retomar':'⏸ Pausar'}
-        </button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button
+            data-nome="${escapeHtml(i.nome||'Lead')}"
+            data-previsto="${escapeHtml(i.previsto_iso||'')}"
+            data-mensagem="${escapeHtml(i.mensagem_completa||'')}"
+            data-preferencia="${escapeHtml(i.horario_preferido||'livre')}"
+            data-custom="${i.mensagem_custom_ativa ? '1' : '0'}"
+            onclick="abrirAgendaFollowupButton(this, ${i.contato_id})"
+            style="padding:3px 8px;font-size:.7rem;border-radius:5px;border:none;cursor:pointer;font-weight:700;background:#1d4ed8;color:#fff">
+            Horário
+          </button>
+          <button onclick="togglePausarFollowup(${i.contato_id},${i.pausado?0:1})"
+            style="padding:3px 8px;font-size:.7rem;border-radius:5px;border:none;cursor:pointer;font-weight:700;background:${i.pausado?'#166534':'#7f1d1d'};color:#fff">
+            ${i.pausado?'Retomar':'Pausar'}
+          </button>
+        </div>
       </td>
     </tr>`).join('');
   }
 
-  // Carregar configurações
   const cfg = await fetch('/api/followup/config').then(r=>r.json()).catch(()=>null);
   if(cfg){
     const g = (id,v) => { const el=document.getElementById(id); if(el&&v!==undefined) el.value=v; };
     const gc = (id,v) => { const el=document.getElementById(id); if(el) el.checked=v==='1'||v===true; };
-    g('fu-cfg-horas',      cfg.followup_horas||'48');
+    g('fu-cfg-horas', cfg.followup_horas||'48');
     g('fu-cfg-max-etapas', cfg.followup_max_etapas||'3');
-    g('fu-cfg-hora-ini',   cfg.followup_hora_inicio||'8');
-    g('fu-cfg-hora-fim',   cfg.followup_hora_fim||'20');
-    g('fu-cfg-msg1',       cfg.msg_followup||'');
-    g('fu-cfg-msg2',       cfg.msg_followup_etapa2||'');
-    g('fu-cfg-msg3',       cfg.msg_followup_etapa3||'');
-    gc('fu-cfg-warm',      cfg.followup_so_warm_leads);
-    gc('fu-cfg-botoes',    cfg.followup_botoes_ativos);
+    g('fu-cfg-hora-ini', cfg.followup_hora_inicio||'8');
+    g('fu-cfg-hora-fim', cfg.followup_hora_fim||'20');
+    g('fu-cfg-msg1', cfg.msg_followup||'');
+    g('fu-cfg-msg2', cfg.msg_followup_etapa2||'');
+    g('fu-cfg-msg3', cfg.msg_followup_etapa3||'');
+    gc('fu-cfg-warm', cfg.followup_so_warm_leads);
+    gc('fu-cfg-botoes', cfg.followup_botoes_ativos);
+    const colsAtivas = String(cfg.followup_colunas_ativas||'').split(',').map(v=>v.trim());
+    gc('fu-cfg-col-enviado', colsAtivas.includes('Enviado'));
+    gc('fu-cfg-col-respondeu', colsAtivas.includes('Respondeu'));
+    gc('fu-cfg-col-negociando', colsAtivas.includes('Negociando'));
+    gc('fu-cfg-auto-primeira', cfg.auto_reply_primeira_resposta_ativo);
+    gc('fu-cfg-auto-negociando', cfg.auto_reply_negociando_ativo);
   }
 }
 
@@ -5274,20 +7599,9 @@ async function togglePausarFollowup(contatoId, pausar){
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({pausar:pausar===1||pausar===true})
   });
-  // Atualiza o card no kanban sem reload total
-  const cardBadge = document.getElementById('fu-card-'+contatoId);
-  if(cardBadge){
-    const isPausado = pausar===1||pausar===true;
-    cardBadge.style.background = isPausado?'rgba(239,68,68,.1)':'rgba(34,197,94,.07)';
-    cardBadge.style.borderColor = isPausado?'rgba(239,68,68,.2)':'rgba(34,197,94,.15)';
-    cardBadge.innerHTML = `
-      <span style="color:${isPausado?'#fca5a5':'#86efac'}">${isPausado?'⏸ Follow-up pausado':'⚡ Follow-up ativo'}</span>
-      <button onclick="togglePausarFollowup(${contatoId},${isPausado?0:1})" style="padding:2px 7px;font-size:.66rem;border-radius:4px;border:none;cursor:pointer;font-weight:700;background:${isPausado?'#16a34a':'#7f1d1d'};color:#fff">${isPausado?'▶ Retomar':'⏸ Pausar'}</button>
-    `;
-  }
-  // Refresca a tabela da fila se estiver aberta
+  await loadKanban();
   const fuSection = document.getElementById('wa-section-followup');
-  if(fuSection && fuSection.style.display !== 'none') loadFollowupPanel();
+  if(fuSection && fuSection.style.display !== 'none') await loadFollowupPanel();
 }
 
 async function testarBotoesFollowup(){
@@ -5331,6 +7645,13 @@ async function salvarFollowupConfig(){
     msg_followup_etapa3:    g('fu-cfg-msg3'),
     followup_so_warm_leads: gc('fu-cfg-warm'),
     followup_botoes_ativos: gc('fu-cfg-botoes'),
+    followup_colunas_ativas: [
+      gc('fu-cfg-col-enviado') === '1' ? 'Enviado' : '',
+      gc('fu-cfg-col-respondeu') === '1' ? 'Respondeu' : '',
+      gc('fu-cfg-col-negociando') === '1' ? 'Negociando' : ''
+    ].filter(Boolean).join(','),
+    auto_reply_primeira_resposta_ativo: gc('fu-cfg-auto-primeira'),
+    auto_reply_negociando_ativo: gc('fu-cfg-auto-negociando'),
   };
   const res = document.getElementById('fu-cfg-res');
   if(res){ res.innerHTML='<div class="spin"></div>'; }
